@@ -30,7 +30,7 @@ ipfname="ip_idns.dat"
 ipf=open(ipfname)
 IP_IDNS=json.loads(ipf.read())
 ipf.close()
-logging.debug('IP_IDNS loaded')
+logging.debug('IP_IDNS loaded:'+`IP_IDNS`+" "+`type(IP_IDNS)`)
 
 class DaemonProcess(Daemon):
 	"""
@@ -110,11 +110,11 @@ class DaemonProcess(Daemon):
 
 			a=rexp.match(line)
 			if not a:
-				#logging.debug("NO MATCH")
+				logging.debug("NO MATCH")
 				continue
 			else:
+				logging.debug("Match")
 				pass
-				#logging.debug("Match")
 
 			tstamp=mktstamp()
 
@@ -133,20 +133,31 @@ class DaemonProcess(Daemon):
 
 			dest=a.group(6)
 			#dest="0.0.0.0"
-
+			
 			src_port=a.group(5)
 			dest_port=a.group(7)
-
-			if not IP_IDNS.has_key(dest):
-				IP_IDNS["last_idn"]+=1
-				IP_IDNS[dest]=IP_IDNS["last_idn"]
-				logging.debug("added :"+dest+" as IP_IDNS IDN="+IP_IDNS[dest])
-
-			if not IP_IDNS.has_key(src):
-				IP_IDNS["last_idn"]+=1
-				IP_IDNS[src]=IP_IDNS["last_idn"]
-				logging.debug("added :"+src+" as IP_IDNS IDN="+IP_IDNS[src])
+			
+			try:
+				logging.debug("checking for dest: "+dest)
+				if not IP_IDNS.has_key(dest):
+					logging.debug("adding dest")
+					logging.debug(IP_IDNS['last_idn'])
+					IP_IDNS["last_idn"]+=1
+					logging.debug(IP_IDNS['last_idn'])
+					logging.debug("last_idn="+`IP_IDNS['last_idn']`)
+					IP_IDNS[dest]=IP_IDNS['last_idn']
+					logging.debug("added :"+dest+" as IP_IDNS IDN="+`IP_IDNS[dest]`)
 				
+				logging.debug("checking for src: "+src)
+				if not IP_IDNS.has_key(src):
+					logging.debug("adding src")
+					IP_IDNS["last_idn"]+=1
+					IP_IDNS[src]=IP_IDNS["last_idn"]
+					logging.debug("added :"+src+" as IP_IDNS IDN="+`IP_IDNS[src]`)
+			
+			except Exception,e:
+				logging.exception("AYE!")
+			
 			try:
 				if not self.ips.has_key(dest):
 
@@ -161,13 +172,13 @@ class DaemonProcess(Daemon):
 					if not g:
 						if dest=='10.0.0.13':
 							self.ips[dest]={
-                                'keys':gkeys,
-                                'src':src,
-                                'dest':dest,
-                                'src_port':src_port,
-                            	'dest_port':dest_port,
-                                'idn_country':'US',
-                                'ip_idn':0,
+								'keys':gkeys,
+								'src':src,
+								'dest':dest,
+								'src_port':src_port,
+								'dest_port':dest_port,
+								'idn_country':'US',
+								'ip_idn':0,
 								'city':'Beaverton',
 								'region_name':'Oregon',
 								'area_code':503,
@@ -176,7 +187,7 @@ class DaemonProcess(Daemon):
 								'longitude':-122.803,
 								'country_code':232,
 								'country_name':'United States',
-                            }
+							}
 
 						else:
 							logging.debug("skipping: "+dest)
