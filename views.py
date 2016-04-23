@@ -9,9 +9,8 @@ from lanwatch.models import NetworkEvent
 from django.contrib.auth.decorators import login_required
 
 FORMAT = '%(asctime)-15s %(message)s'
-logging.basicConfig(filename='/var/log/lanwatch/lanwatch.log',level=logging.INFO, format=FORMAT)
+logging.basicConfig(filename='/var/log/lanwatch/lanwatch.log',level=logging.DEBUG, format=FORMAT)
 
-@login_required
 def home(request):
 	#return HttpResponse("Yay")
 	logging.debug("lanwatch.home")
@@ -42,6 +41,7 @@ def home(request):
 				server_str="http://%s:%s"%(RPC_HOSTNAME,TCP_SERVICE_PORT)
 				s=xmlrpclib.Server(server_str)
 				overview_pyld['geoip_buffer']=s.get_geoip()
+				#logging.debug(overview_pyld['geoip_buffer'])
 
 				server_str="http://%s:%s"%(RPC_HOSTNAME,ACCESS_LOG_SERVICE_PORT)
 				s=xmlrpclib.Server(server_str)

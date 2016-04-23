@@ -1,11 +1,19 @@
 #!/usr/bin/python
 import thread,time,string,re,os,unicodedata,math,sys
 from string import *
-import pygeoip
+
+gip=None
+if USE_PYGEOIP:
+	import pygeoip
+	gip=pygeoip.GeoIP("/usr/share/GeoIP/GeoLiteCity.dat")
+else:
+	import GeoIP
+	gip=GeoIP.open("/usr/share/GeoIP/GeoLiteCity.dat",GeoIP.GEOIP_STANDARD)
+
 from dict_formatter import *
 from mk_whois import *
 
-gip=pygeoip.GeoIP("/usr/share/GeoIP/GeoLiteCity.dat")
+
 MONTHLIST=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
 YEARLIST=['2001','2002','2003','2004','2005','2006','2007','2008','2009','2010','2011','2012','2013','2014','2015','2016','2017']
 date_re = re.compile(r'''(?P<day>\d*)/(?P<month>.*)/(?P<year>\d*):(?P<hour>\d*):(?P<min>\d*):(?P<sec>\d*) *(?P<gmt_offset>.*)''')
@@ -156,7 +164,8 @@ def ProcessLine(a):
 	rdict['city']=safe_city
 
 
-	region=rec['region_code']
+	region=rec['region_name']
+	#region=rec['region_code']
 	if not region:region=''
 	safe_region=''
 	for ridx in range(len(region)):
@@ -183,7 +192,7 @@ def ProcessLine(a):
 	rdict['country_name']=safe_country_name
 	
 	rdict['postal_code']=rec['postal_code']
-	rdict['dma_code']=rec['dma_code']
+	#rdict['dma_code']=rec['dma_code']
 	rdict['country_code3']=rec['country_code3']
 	
 	for key in rdict.keys():

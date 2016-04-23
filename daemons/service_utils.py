@@ -13,7 +13,7 @@ thus no django references allowed (or will crash daemons).
 #RECEIVE_URL="www.autoteach.net/receive"
 
 AM_DEMO=False
-INTERFACE="eth0"#wlan0
+INTERFACE="eth0"
 CREDIT_METER_TIMEOUT=30
 
 TCP_SERVICE_PORT=8008
@@ -24,7 +24,7 @@ DJANGO_SERVICE_PORT=8012
 RC_SERVICE_PORT=8013
 METER_SERVICE_PORT=8014
 MEMORY_PORT=8015
-
+USE_PYGEOIP=False
 APACHE_ACCESS_LOG="/var/log/apache2/access_log_parks"
 LOGDIR="/var/log/lanwatch"
 DJANGO_LOG=os.path.join(LOGDIR,"django_daemon_messages.log")
@@ -36,7 +36,7 @@ TCP_LOG=os.path.join(LOGDIR,"tcp_daemon.log")
 MEMORY_LOG=os.path.join(LOGDIR,"memory_daemon.log")
 
 
-HOSTNAME="dev.asymptopia.org"#"127.0.0.1"#"192.168.31.1"#"rpi.asymptopia.org"
+HOSTNAME="autoteach.ourhouse.net"#"dev.asymptopia.org"#"127.0.0.1"#"192.168.31.1"#"rpi.asymptopia.org"
 BUFFSIZE=100.#seconds: keep this small for safety ... daemons will delete buffer beyond t=BUFFSIZE.  Increase saved length via .js saved
 TSLEEP=1.5
 hexchars=['8','9','A','B','C','D','E','F']#'0','1','2','3','4','5','6','7',
@@ -48,10 +48,10 @@ ERROR_LOGS=[
 	'/var/log/apache2/error.pac',	#pac
 ]
 ACCESS_LOGS=[
-	'/var/log/apache2/access.dev',	#geonode
+#	'/var/log/apache2/access.dev',	#geonode
 #	'/var/log/apache2/access.',#const
 #	'/var/log/apache2/access.aorg',	#aorg
-	'/var/log/apache2/access.pac',	#pac
+#	'/var/log/apache2/access.pac',	#pac
 ]
 
 def device_from_mac(mac):

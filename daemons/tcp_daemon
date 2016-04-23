@@ -5,11 +5,14 @@ from country_codes import *
 #from ip_idns import *
 import logging,json
 
-#import GeoIP
-import pygeoip
+gip=None
+if USE_PYGEOIP:
+	import pygeoip
+	gip=pygeoip.GeoIP("/usr/share/GeoIP/GeoLiteCity.dat")
+else:
+	import GeoIP
+	gip=GeoIP.open("/usr/share/GeoIP/GeoLiteCity.dat",GeoIP.GEOIP_STANDARD)
 
-#gip=GeoIP.open("/usr/share/GeoIP/GeoLiteCity.dat",GeoIP.GEOIP_STANDARD)
-pygip=pygeoip.GeoIP("/usr/share/GeoIP/GeoLiteCity.dat")
 
 FORMAT = '%(message)s'
 logging.basicConfig(filename=TCP_LOG,level=logging.DEBUG,format=FORMAT)
@@ -44,7 +47,7 @@ class DaemonProcess(Daemon):
 		#cmd="tcpdump -i %s -l -s 0 -nn not dst net 192.168.66"%(INTERFACE)#udp video data (mucho data!)
 
 		#cmd="tcpdump -i %s -l -s 0 -nn not dst net 208.111.39.69"%(INTERFACE)#udp video data (mucho data!)
-		cmd="tcpdump -i eth0 -l -s 0 -n |grep 39.69"#not src net 70.210 and not dst net 70.210|grep  39.69"
+		cmd="tcpdump -i eth0 -l -s 0 -n"#not src net 70.210 and not dst net 70.210|grep  39.69"
 
 		self.tcpdump_cmd=cmd
 		self.t_last_call=time.time()
@@ -142,13 +145,18 @@ class DaemonProcess(Daemon):
 			try:
 				if not self.ips.has_key(dest):
 
-					#logging.debug("adding "+dest)
-					g=pygip.record_by_addr(dest)
+					logging.debug("adding "+dest)
+					g=gip.record_by_addr(dest)
 					if not g:
 						logging.debug("skipping: "+dest)
 						continue
 
-					gkeys=['city','region_code','area_code','time_zone','dma_code','metro_code','country_code3','latitude','postal_code','longitude','country_code','country_name','continent']
+					gkeys=None
+					if USE_PYGEOIP:
+						gkeys=['city','region_code','area_code','time_zone','dma_code','metro_code','country_code3','latitude','postal_code','longitude','country_code','country_name','continent']
+					else:
+						gkeys=['city','region_name','area_code','time_zone','metro_code','country_code3','latitude','postal_code','longitude','country_code','country_name']
+					
 					self.ips[dest]={
 						'keys':gkeys,
 						'src':src,
@@ -161,7 +169,9 @@ class DaemonProcess(Daemon):
 					for gidx in range(len(gkeys)):
 						gkey=gkeys[gidx]
 						gval=g[gkey]
-						if not gval:gval=""
+						if not gval:
+							logging.debug("failed to get "+gkey)
+							gval=""
 						self.ips[dest][gkey]=gval
 
 					logging.debug(self.ips[dest])
@@ -171,7 +181,7 @@ class DaemonProcess(Daemon):
 				logging.debug(dest)
 
 			msg="%.02f,%s,%s,%s,%s,%s"%(time.time(),tstamp,src,dest,src_port,dest_port)
-			#logging.debug(msg)
+			logging.debug(msg)
 			self.buffer.append(msg)
 
 			#scenerio: nobody's expired,large buffer, then trickle of traffic and only removing 10x per matched line
