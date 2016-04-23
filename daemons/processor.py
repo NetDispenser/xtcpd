@@ -1,6 +1,7 @@
 #!/usr/bin/python
 import thread,time,string,re,os,unicodedata,math,sys
 from string import *
+from service_utils import *
 
 gip=None
 if USE_PYGEOIP:

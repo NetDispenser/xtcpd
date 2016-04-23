@@ -15,7 +15,7 @@ else:
 
 
 FORMAT = '%(message)s'
-logging.basicConfig(filename=TCP_LOG,level=logging.DEBUG,format=FORMAT)
+logging.basicConfig(filename=TCP_LOG,level=logging.INFO,format=FORMAT)
 
 #13:34:18.556110 IP 192.168.66.166.49963 > 208.111.39.47.http: Flags [P.], seq 3153:3679, ack 1029, win 8192, options [nop,nop,TS val 655284177 ecr 109486646], length 526
 #rexp=re.compile('(\d+:\d+:\d+)(\.\d+) (IP) (.*)(\.\d+) > (\d+\.\d+\.\d+\.\d+)(\.\d\:)(.*)')#(.*)#
@@ -148,7 +148,27 @@ class DaemonProcess(Daemon):
 					logging.debug("adding "+dest)
 					g=gip.record_by_addr(dest)
 					if not g:
-						logging.debug("skipping: "+dest)
+						if dest=='10.0.0.13':
+							self.ips[dest]={
+                                                		'keys':gkeys,
+                                                		'src':src,
+                                                		'dest':dest,
+                                                		'src_port':src_port,
+                                                		'dest_port':dest_port,
+                                                		'idn_country':'US',
+                                                		'ip_idn':0,
+								'city':'Beaverton',
+								'region_name':'Oregon',
+								'area_code':503,
+								'time_zone':'Pacific',
+								'latitude':37.333,
+								'longitude':-121.9,
+								'country_code':232,
+								'country_name':'United States',
+                                        		}
+                                        		
+						else:	
+							logging.debug("skipping: "+dest)
 						continue
 
 					gkeys=None
@@ -156,7 +176,7 @@ class DaemonProcess(Daemon):
 						gkeys=['city','region_code','area_code','time_zone','dma_code','metro_code','country_code3','latitude','postal_code','longitude','country_code','country_name','continent']
 					else:
 						gkeys=['city','region_name','area_code','time_zone','metro_code','country_code3','latitude','postal_code','longitude','country_code','country_name']
-					
+			
 					self.ips[dest]={
 						'keys':gkeys,
 						'src':src,

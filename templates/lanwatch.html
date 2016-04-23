@@ -284,7 +284,7 @@ window.render_data=function(x){
 			skey=SORTED_SRCS[sidx];
 			console.log(skey+"/"+SORTED_SRCS.length);
 			try{
-			t=document.createTextNode(SORTED_SRCS[sidx]+" @ "+GEOIP_DATA[skey]['src_port']+" -> "+GEOIP_DATA[skey]['dest_port']+" "+GEOIP_DATA[skey]['city']+", "+GEOIP_DATA[skey]['metro_code']+", "+GEOIP_DATA[skey]['country_name']);
+			t=document.createTextNode(SORTED_SRCS[sidx]+" @ "+GEOIP_DATA[skey]['src_port']+" -> "+GEOIP_DATA[skey]['dest_port']+" "+GEOIP_DATA[skey]['city']+", "+GEOIP_DATA[skey]['region_name']+", "+GEOIP_DATA[skey]['country_name']);
 			}catch(e){console.log("skipping");continue;}
 			b.appendChild(t);
 	
