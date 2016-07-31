@@ -1,0 +1,55 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN">
+
+<html lang="en">
+<head>
+
+    <title>{% block title %}{% endblock %}</title>
+
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	{% block meta %}
+	{% endblock %}
+
+	<link rel="stylesheet" href="/static/jquery.mobile-1.4.4.css">
+	{% block style %}
+	{% endblock %}
+
+	{% block jsimport %}
+	{% endblock %}
+	<script type="text/javascript" src="/static/router/common.js"></script>
+	<script src="/static/jquery.js"></script>
+	<script src="/static/jquery.mobile-1.4.4.js"></script>
+
+	<script type="text/javascript">
+	{% block js %}
+	{% endblock %}
+	</script>
+
+</head>
+
+<body>
+
+    <div id="background_div" class="background" data-role="page" data-theme="{{theme}}">
+		<!--
+		<div id="header" data-role="header">
+			<img src="/static/images/autoteach-logo-black-40x40.png" align="left"/>
+			<h3>{{ title }}</h3>
+			<a href="#" data-icon="gear" class="ui-btn-right">Options</a>
+		</div>
+		-->
+	
+		{% block content %}
+		{% endblock %}
+		
+		<!--
+		<div data-role="footer">
+			<div data-role="navbar" data-iconpos="right">
+    	    	<ul>
+    	    	    <li><a href="/">Home</a></li>
+    	    	</ul>
+			</div>
+    	</div>
+		-->
+	</div>
+
+</body>
+</html>

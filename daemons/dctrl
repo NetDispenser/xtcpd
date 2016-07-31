@@ -1,0 +1,46 @@
+#!/usr/bin/python
+"""
+Manage 6x RemoteCompel daemons
+"""
+import os,string,sys
+
+dnames=[
+	'memory_daemon',
+	'access_log_daemon',
+	'django_listener_daemon',
+	'network_traffic_daemon',
+	'tcp_daemon',
+	'credit_meter_daemon',
+	#'messages_daemon',
+]
+
+dcmds=[
+	'stop',
+	'start',
+	'status',
+]
+
+class DCTRL:
+	def __init__(self,dcmd):
+		for idx in range(len(dnames)):
+			#cmd="/etc/init.d/%s %s"%(dnames[idx],dcmd)
+			cmd="./%s %s"%(dnames[idx],dcmd)
+			#print cmd,'\n'
+			os.system(cmd)
+
+def show_usage():
+	print "USAGE: dctrl [stop|start|status]"
+
+if __name__=='__main__':
+
+	if len(sys.argv)<2:
+		show_usage()
+		sys.exit()
+	
+	if dcmds.count(sys.argv[1])<1:
+		#print sys.argv[1]
+		show_usage()
+		sys.exit()
+	
+	x=DCTRL(sys.argv[1])
+	sys.exit()

@@ -1,0 +1,188 @@
+#!/usr/bin/env python
+from daemon import Daemon
+from service_utils import *
+import logging
+
+#import GeoIP
+import pygeoip
+
+#gip=GeoIP.open("/usr/share/GeoIP/GeoLiteCity.dat",GeoIP.GEOIP_STANDARD)
+pygip=pygeoip.GeoIP("/usr/share/GeoIP/GeoLiteCity.dat")
+
+
+FORMAT = '%(message)s'
+logging.basicConfig(filename=TCP_LOG,level=logging.DEBUG,format=FORMAT)
+
+#13:34:18.556110 IP 192.168.66.166.49963 > 208.111.39.47.http: Flags [P.], seq 3153:3679, ack 1029, win 8192, options [nop,nop,TS val 655284177 ecr 109486646], length 526
+#rexp=re.compile('(\d+:\d+:\d+)(\.\d+) (IP) (.*)(\.\d+) > (\d+\.\d+\.\d+\.\d+)(\.\d\:)(.*)')#(.*)#
+
+
+#The following tcpdump command produce the next following output (among other) ... so want rexp for this line:
+#tcpdump -i eth0 -l -s 0 -nn not src net 70.210 and not dst net 70.210|grep  208.111.39.69
+#13:46:51.841958 IP 66.249.67.78.49772 > 208.111.39.69.80: Flags [.], ack 5673, win 424, options [nop,nop,TS val 2125410414 ecr 839918059], length 0
+rexp=re.compile('(\d+:\d+:\d+)(\.\d+) (IP) (.*)(\.\d+) > (\d+\.\d+\.\d+\.\d+)(\.\d+)(.*)')
+
+class DaemonProcess(Daemon):
+	"""
+	The written record: /tmp/tcp_daemon.log handles the long-term record.
+	The buffered record is for plotting on timeline.
+	This service should also do long-term buffer of (arb) events above (arb) threshold.
+	"""
+	def __init__(self,pidfile):
+		Daemon.__init__(self,pidfile)
+		self.buffer=[]
+		self.ips={}
+		#cmd="tcpdump -i %s -l -s 0 -A -qt 'tcp[((tcp[12:1] & 0xf0) >> 2):4] = 0x47455420'"%(INTERFACE)
+		#cmd="tcpdump -i %s -l -s 0 -A -nn not dst net 192.168.66 and tcp and port 80 and  and tcp[13]==2"%(INTERFACE)
+		#cmd="tcpdump -i %s -l -s 0 -nn not dst net 192.168.66"%(INTERFACE)#udp video data (mucho data!)
+		
+		#cmd="tcpdump -i %s -l -s 0 -nn not dst net 208.111.39.69"%(INTERFACE)#udp video data (mucho data!)
+		cmd="tcpdump -i eth0 -l -s 0 -n |grep 39.69|grep -v 80.8.24"#not src net 70.210 and not dst net 70.210|grep  39.69"
+		
+		self.tcpdump_cmd=cmd
+		self.t_last_call=time.time()
+		
+	def get_geoip(self,*args):
+		logging.debug("get_geoip")
+		rval=copy.copy(self.ips)
+		rval['keys']=rval.keys()
+		logging.debug(rval)
+		self.ips={}
+		return rval
+	
+	def get_data(self,*args):
+		
+		#logging.debug("get_data")
+		
+		self.t_last_call=time.time()
+		
+		if not self.RUNNING:
+			self.RUNNING=True
+			logging.debug("tcp_daemon self-starting")
+			thread.start_new_thread(self.while_running,())
+		
+		"""
+		assume only 1 client and clear data each time requested
+		"""
+		rval=copy.copy(self.buffer)
+		
+		if AM_DEMO:
+			pass
+		else:
+			self.buffer.__init__()
+		
+		return rval
+	
+	def get_tcpdump_cmd(self):
+		return self.tcpdump_cmd
+					
+	def get_buffer_length(self):
+		return len(self.buffer)
+	
+	def while_running(self,*args):
+		
+		logging.debug(self.tcpdump_cmd)
+		p=os.popen(self.tcpdump_cmd)
+		
+		tstamp=''
+		
+		while self.RUNNING:
+			if self.t_last_call<time.time()-30:
+				self.RUNNING=False
+				logging.debug("tcp_daemon self-stopping")
+				
+			line=p.readline()
+			logging.debug(line)
+			
+			a=rexp.match(line)
+			if not a:
+				logging.debug("NO MATCH")
+				continue
+			else:
+				logging.debug("Match")
+				
+			tstamp=mktstamp()
+			
+			src=a.group(4)
+			if src=='0.0.0.0':continue
+			
+			#function at service_utils.py but refers to gentoo router.  demo mode had hard coded leases.
+			#this iteration just skipping altogether for simplicity.
+			#src=get_best_name(src)
+			
+			dest=a.group(6)
+			#dest="0.0.0.0"
+			
+			try:
+				if not self.ips.has_key(dest):
+					
+					logging.debug("adding "+dest)
+					g=pygip.record_by_addr(dest)
+					if not g:
+						logging.debug("skipping: "+dest)
+						continue
+					
+					city=g['city']
+					if not city:
+						city=g['country_name']
+						if not city:city="unknown"
+					self.ips[dest]={'lat':g['latitude'],'lon':g['longitude'],'city':city}
+					logging.debug("okay")
+					
+			except Exception,e:
+				logging.exception("exception getting geoip info")
+				logging.debug(dest)
+				
+			msg="%.02f,%s,%s,%s"%(time.time(),tstamp,src,dest)
+			logging.debug(msg)
+			self.buffer.append(msg)
+			
+			#scenerio: nobody's expired,large buffer, then trickle of traffic and only removing 10x per matched line
+			#i.e. not clearing out fast enough ... hence dangerour while loop:
+			while True:
+				try:
+					x=eval(string.split(self.buffer[0],",")[0])
+					t_min=time.time()-BUFFSIZE
+					if x<t_min:
+						self.buffer.pop(0)
+					else:break
+				except Exception,e:
+					logging.exception("exception clearing tcp buffer")
+					break
+					
+	def run(self):
+
+		self.RUNNING=False
+
+		self.server=SimpleXMLRPCServer((get_rpc_hostname(),TCP_SERVICE_PORT))
+		self.server.register_introspection_functions()
+		self.server.register_instance(self)
+		self.server.serve_forever()
+
+
+
+if __name__=="__main__":
+
+	daemon=DaemonProcess('/var/run/tcp_daemon.pid')
+	
+	if len(sys.argv)==2:
+		if 'start'==sys.argv[1]:
+			daemon.start()
+		elif 'stop'==sys.argv[1]:
+			daemon.stop()
+		elif 'restart'==sys.argv[1]:
+			daemon.restart()
+		elif 'status'==sys.argv[1]:
+			if os.path.exists('/var/run/tcp_daemon.pid'):
+				print 'running'
+			else:
+				print 'stopped'
+				
+		else:
+			logging.debug("UNK")
+			print "Unknown command"
+			sys.exit(2)
+		sys.exit(0)
+	else:
+		print "usage: %s start|stop|restart|status"%sys.argv[0]
+		sys.exit(2)
