@@ -205,7 +205,7 @@ window.render_data=function(x){
 			var t=parseFloat(msg[0]);
 
 			var src_device=msg[2];
-			var dst_device=msg[3]
+			var dst_device=msg[3];
 
 			if(src_device=="0.0.0.0")continue;
 			if(dst_device=="0.0.0.0")continue;
@@ -238,7 +238,7 @@ window.render_data=function(x){
 
 		var SORTED_SRCS=new Array();
 		for(var sidx=0;sidx<SRCS.length;sidx++){
-			if(SRC_COUNTS[SRCS[sidx]]>0){
+			if(SRC_COUNTS[SRCS[sidx]]>=0){
 				SORTED_SRCS.push(SRCS[sidx]);
 			}
 		}
