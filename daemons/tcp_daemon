@@ -124,18 +124,21 @@ class DaemonProcess(Daemon):
 						logging.debug("skipping: "+dest)
 						continue
 
-					city=g['city']
-					if not city:
-						city=g['country_name']
-						if not city:city="unknown"
-					self.ips[dest]={'lat':g['latitude'],'lon':g['longitude'],'city':city}
+					gkeys=['city','region_code','area_code','time_zone','dma_code','metro_code','country_code3','latitude','postal_code','longitude','country_code','country_name','continent']
+					self.ips[dest]={'keys':gkeys,}
+					for gidx in range(len(gkeys)):
+						gkey=gkeys[gidx]
+						gval=g[gkey]
+						if not gval:gval=""
+						self.ips[dest][gkey]=gval
+
 					logging.debug(g)
 
 			except Exception,e:
 				logging.exception("exception getting geoip info")
 				logging.debug(dest)
 
-			msg="%.02f,%s,%s,%s,%s"%(time.time(),tstamp,src,dest,city)
+			msg="%.02f,%s,%s,%s"%(time.time(),tstamp,src,dest)
 			#logging.debug(msg)
 			self.buffer.append(msg)
 
