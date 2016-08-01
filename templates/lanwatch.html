@@ -102,14 +102,14 @@ window.decode=function(str){
 
 window.render_data=function(x){
 	var pyld=JSON.parse(window.decode(x));
-	
+
 	//document.getElementById("extra_div").innerHTML=pyld['server_date']+"<br>";
-	
+
 	TCP_DATA=TCP_DATA.concat(pyld['tcp_data']);
 	TRAFFIC_DATA=TRAFFIC_DATA.concat(pyld['traffic_data']);
 	MEMORY_DATA=MEMORY_DATA.concat(pyld['memory_data']);
 	APACHE_DATA=APACHE_DATA.concat(pyld['apache_data']);
-	
+
 	var t0=pyld['t1']-CLIENT_BUFFSIZE;
 	var targets=[TRAFFIC_DATA,TCP_DATA,MEMORY_DATA,APACHE_DATA];//me.APACHE_DATA,,me.TCP_DATA,me.DJANGO_DATA,
 	var shift_count=0;
@@ -126,7 +126,7 @@ window.render_data=function(x){
 			else break;
 		}
 	}
-	
+
 	//GEOIP
 	var keys=pyld['geoip_buffer']['keys'];
 	//var d=document.getElementById("details");
@@ -139,21 +139,21 @@ window.render_data=function(x){
 				GEOIP_DATA[key]=pyld['geoip_buffer'][key];
 				GEOIP_DATA['keys'].push(key);
 				//plot the new destination on map overlay:
-				
+
 				var p2=[parseFloat(GEOIP_DATA[key]['lon']),parseFloat(GEOIP_DATA[key]['lat'])];
 				window.draw_radial(HOME_LONLAT,p2);
-				
+
 				//var p2 = ol.proj.transform(p2, 'EPSG:4326', 'EPSG:3857');
 				rdiv=window.draw_icon(HOME_LONLAT,p2,"client_marker");
-				rdiv.title=key;
+				rdiv.title=key+" "+GEOIP_DATA[key]['city'];
 			}
 		}catch(e){console.log(e);}
 	}
 	msg="MEMORY:"+MEMORY_DATA.length;
-	
+
 	//document.getElementById("message_div").innerHTML=msg;
 	//document.getElementById("message_div").style.height="200px";
-	
+
 	/*
 	LAST_IDX=MEMORY_DATA.length-1;
 	if(LAST_IDX>=0){
@@ -164,43 +164,43 @@ window.render_data=function(x){
 	*/
 	msg="Traffic: "+TRAFFIC_DATA.length+"<br>TCP: "+TCP_DATA.length+"<br>";
 	//document.getElementById("message_div").innerHTML=msg;
-	
+
 	msg="Traffic: "+TRAFFIC_DATA.length+"<br>TCP: "+TCP_DATA.length+"<br>";
 	//document.getElementById("tcp_div").innerHTML=msg;
-	
+
 	//window.traffic_stuff(pyld['t1']);
 	var t1=pyld['t1'];
 	var t0=t1-CLIENT_BUFFSIZE;
 	window.traffic.render_data(t0,t1,TRAFFIC_DATA);
-	
+
 	window.memory.render_data(t0,t1,MEMORY_DATA);
-	
+
 	try{
-	
+
 //NEED:send to spectra instead
 //		window.tcp_stuff(pyld['t1']);
-		
+
 		/////////////////////////////////////////
 		//START: tcp_stuff relocated here
 		//var SRCS=new Array();
 		//SRCS.push("Django");//This reserves the 0th row
-		
+
 		var SRC_COUNTS={};
 		for(var sidx=0;sidx<SRCS.length;sidx++){
 			try{SRC_COUNTS[SRCS[sidx]]=0;}
 			catch(e){;}
 		}
 		for(var tidx=0;tidx<TCP_DATA.length;tidx++){
-			
+
 			var msg=TCP_DATA[tidx].split(",");
 			var t=parseFloat(msg[0]);
-			
+
 			var src_device=msg[2];
 			var dst_device=msg[3]
-			
+
 			if(src_device=="0.0.0.0")continue;
 			if(dst_device=="0.0.0.0")continue;
-			
+
 			try{
 				dummy=SRCS.indexOf(src_device);
 				if(dummy<0){
@@ -211,8 +211,8 @@ window.render_data=function(x){
 					SRC_COUNTS[src_device]+=1;
 				}
 			}catch(e){;}
-			
-			
+
+
 			try{
 				dummy=SRCS.indexOf(dst_device);
 				if(dummy<0){
@@ -223,17 +223,17 @@ window.render_data=function(x){
 					SRC_COUNTS[dst_device]+=1;
 				}
 			}catch(e){;}
-			
+
 		}
 		SRC_COUNTS['Django']=DJANGO_DATA.length;
-		
+
 		var SORTED_SRCS=new Array();
 		for(var sidx=0;sidx<SRCS.length;sidx++){
 			if(SRC_COUNTS[SRCS[sidx]]>0){
 				SORTED_SRCS.push(SRCS[sidx]);
 			}
 		}
-		
+
 		var p=document.getElementById("lhs_panel");
 		p.innerHTML="";
 		for(var sidx=0;sidx<SORTED_SRCS.length;sidx++){
@@ -241,43 +241,43 @@ window.render_data=function(x){
 			b=document.createElement("b");
 			t=document.createTextNode(SORTED_SRCS[sidx]);
 			b.appendChild(t);
-			
+
 			b.id=SORTED_SRCS[sidx];
 			b.className="traffic_src";
 			b.style.color=SRC_COLORS[sidx];
-			
+
 			//NEED:
 			//b.addEventListener("click",load_channelCB,false);
-			
+
 			dummy.appendChild(b);
-			
+
 			b=document.createElement("b");
 			b.style.color="#CCCCCC";
 			t=document.createTextNode(" ("+SRC_COUNTS[SORTED_SRCS[sidx]]+")");
 			b.appendChild(t);
 			dummy.appendChild(b);
 			dummy.style.position="absolute";
-			
+
 			p.appendChild(dummy);
 			p.appendChild(document.createElement("br"));
 		}
-		
+
 		var ap=document.getElementById("apache_panel");
 		ap.innerHTML="";
 		for(var aidx=0;aidx<APACHE_DATA.length;aidx++){
 			ap.innerHTML+=APACHE_DATA[aidx]+"<br>";
 		}
-		
+
 		//END: tcp_stuff relocated here
 		/////////////////////////////////////////
-		
+
 		var t1=pyld['t1'];
 		var t0=t1-CLIENT_BUFFSIZE;
-		
+
 		window.spectra.render_data(t0,t1,TCP_DATA,SORTED_SRCS,SRC_COLORS);
-		
-		
-		
+
+
+
 	}catch(e){console.log("error calling tcp_stuff:"+e);}
 
 }
@@ -300,12 +300,12 @@ window.update=function(){
 				}
 			}
 		}
-	}	
+	}
 	xhr.open('Get',"/lanwatch?get_data",true);
 	xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
 	xhr.send("");
 }
-	
+
 window.remake_buttons=function(ar,d){
 	if(ar<1){
 		d.style.height=(window.innerHeight*(1.-LAYOUT['division'])-H2_HEADER)+"px";
@@ -314,10 +314,10 @@ window.remake_buttons=function(ar,d){
 		d.style.height=(window.innerHeight-H2_HEADER)+"px";
 	}
 	d.innerHTML="";//this is critical!
-	
+
 	var t=document.createElement("table");
 	t.style.align="top";
-	
+
 	//TRAFFIC
 	var w_traffic=h_traffic=null;
 	if(ar<=1){
@@ -351,8 +351,8 @@ window.remake_buttons=function(ar,d){
 	c=r.insertCell(-1);
 	c.appendChild(window.spectra.get_canvas());
 	window.spectra.render_size("#FFFFFF");
-	
-	
+
+
 	//MEMORY
 	var w_memory=h_memory=null;
 	if(ar<=1){
@@ -383,55 +383,55 @@ window.remake_buttons=function(ar,d){
 	d.appendChild(t);
 }
 window.onorientationchange=window.onload=window.onresize=function(e){
-	
+
 	var AR=(1.0*window.innerWidth)/(1.0*window.innerHeight);
 	if(AR<1.0)LAYOUT=LAYOUTS['vertical'];
 	else LAYOUT=LAYOUTS['horizontal'];
-	
+
 	try{
 		var	w_map;
 		var h_map;
 		if(AR<1.0){
 			w_map=1.0*window.innerWidth;
 			h_map=window.innerHeight*LAYOUT['division'];
-		}	
+		}
 		else{
 			w_map=window.innerWidth*LAYOUT['division'];
 			h_map=window.innerHeight-H2_HEADER;
 		}
-		
+
 		document.getElementById("c00").style.width=w_map+"px";
 		document.getElementById("c00").style.height=h_map+"px";
 		document.getElementById("map_div").style.width=w_map+"px";
 		document.getElementById("map_div").style.height=h_map+"px";
-		
+
 		var button_cell;
 		if(AR<1.0)
 			button_cell=document.getElementById("c10");
 		else
 			button_cell=document.getElementById("c01");
-		
-		
-		
+
+
+
 		var buttons=document.getElementById("buttons").parentNode.removeChild(document.getElementById("buttons"));
 		button_cell.appendChild(buttons);
-		
+
 		window.remake_buttons(AR,buttons);
-		
+
 		var msg="W="+window.innerWidth+"<br>H="+window.innerHeight+"<br>AR="+AR.toString().slice(0,4);
 		//document.getElementById("message_div").innerHTML=msg;
-		
+
 		var msg="W="+window.innerWidth+"<br>H="+window.innerHeight+"<br>AR="+AR.toString().slice(0,4);
 		//document.getElementById("tcp_div").innerHTML=msg;
 
 	}catch(e){console.log(e);}
-	
+
 	document.getElementById("content_table").style.height=(window.innerHeight)+"px";
-	
+
 	THE_MAP.updateSize();
-	
+
 	THE_MAP.render();
-	
+
 	var lbd=document.getElementById("map_div");
 	var lbdr=lbd.getBoundingClientRect();
 	var lhs_panel=document.getElementById("lhs_panel");
@@ -453,16 +453,16 @@ window.onorientationchange=window.onload=window.onresize=function(e){
 	aux_panel.style.left=lbdr.left+"px";
 	aux_panel.style.width=lbdr.width+"px";
 	aux_panel.style.height=lbdr.height+"px";
-	
+
 }
 
 $(document).ready(function(){
-	
+
 	var lhs_panel=document.createElement("div");
 	lhs_panel.id="lhs_panel";
 	lhs_panel.className="lhs";
 	document.getElementById("c00").appendChild(lhs_panel);
-	
+
 	var apache_panel=document.createElement("div");
 	apache_panel.id="apache_panel";
 	apache_panel.className="apache";
@@ -472,11 +472,11 @@ $(document).ready(function(){
 	aux_panel.id="aux_panel";
 	aux_panel.className="aux";
 	document.getElementById("c00").appendChild(aux_panel);
-	
+
 	var c1,c1x;
 	c1=HOME_LONLAT;
 	c1x = ol.proj.transform(c1, 'EPSG:4326', 'EPSG:3857');
-	
+
 	THE_MAP = new ol.Map({
 		target: 'map_div',
 		layers: [
@@ -489,16 +489,16 @@ $(document).ready(function(){
 			zoom:2,
 		}),
 	});
-	
-	rdiv=window.draw_icon(c1,c1,"home_marker");	
+
+	rdiv=window.draw_icon(c1,c1,"home_marker");
 	rdiv.title="LAN-Watch Location";
-	
+
 	//lanwatch_footer buttons
 	var runB=document.createElement("div");
 	runB.className="ui-corner-all interface_button";
 	runB.id="runB";
 	runB.innerHTML="RUN";
-	
+
 	var lhsB=document.createElement("div");
 	lhsB.className="ui-corner-all interface_button";
 	lhsB.id="lhsB";
@@ -508,7 +508,7 @@ $(document).ready(function(){
 	apacheB.className="ui-corner-all interface_button";
 	apacheB.id="apacheB";
 	apacheB.innerHTML=">";
-/*	
+/*
 	var auxB=document.createElement("div");
 	//auxB.className="ui-corner-all interface_button";
 	auxB.className="auxB ui-btn ui-btn-inline ui-mini ui-corner-all";
@@ -526,7 +526,7 @@ $(document).ready(function(){
 	runBdiv.style.align="center";
 	runBdiv.style.textAlign="center";
 	runBdiv.style.background=UNLOCKED_COLOR;
-	
+
 	runB=document.createElement("input");
 	runB.type="button";
 	runB.id="runB";
@@ -536,7 +536,7 @@ $(document).ready(function(){
 	runB.setAttribute("data-icon","power");
 	runBdiv.appendChild(runB);
 	document.getElementById("footer_row").insertCell(-1).appendChild(runBdiv);
-	
+
 	//LHS PANEL
 	lhsBdiv=document.createElement("div");
 	lhsBdiv.id="lhsBdiv";
@@ -547,7 +547,7 @@ $(document).ready(function(){
 	lhsBdiv.style.align="center";
 	lhsBdiv.style.textAlign="center";
 	lhsBdiv.style.background=UNLOCKED_COLOR;
-	
+
 	lhsB=document.createElement("input");
 	lhsB.type="button";
 	lhsB.id="lhsB";
@@ -557,7 +557,7 @@ $(document).ready(function(){
 	lhsB.setAttribute("data-icon","carat-r");
 	lhsBdiv.appendChild(lhsB);
 	document.getElementById("footer_row").insertCell(-1).appendChild(lhsBdiv);
-	
+
 
 	//APACHE PANEL
 	apacheBdiv=document.createElement("div");
@@ -569,7 +569,7 @@ $(document).ready(function(){
 	apacheBdiv.style.align="center";
 	apacheBdiv.style.textAlign="center";
 	apacheBdiv.style.background=UNLOCKED_COLOR;
-	
+
 	apacheB=document.createElement("input");
 	apacheB.type="button";
 	apacheB.id="apacheB";
@@ -592,8 +592,8 @@ $(document).ready(function(){
 	auxBdiv.style.background=UNLOCKED_COLOR;
 	if(MAPLOCKED)
 		auxBdiv.style.background=LOCKED_COLOR;
-		
-	
+
+
 	auxB=document.createElement("input");
 	auxB.type="button";
 	auxB.id="auxB";
@@ -602,9 +602,9 @@ $(document).ready(function(){
 	auxB.setAttribute("data-iconpos","notext");
 	auxB.setAttribute("data-icon","lock");
 	auxBdiv.appendChild(auxB);
-	
+
 	document.getElementById("footer_row").insertCell(-1).appendChild(auxBdiv);
-		
+
 	$("#runB").click(function(){
 		if(RUNNING==true){
 			RUNNING=false;
@@ -616,7 +616,7 @@ $(document).ready(function(){
 			window.update();
 		}
 	});
-	
+
 	$("#lhs_panel").hide();
 	$("#lhsB").click(function(){
 		if(LHS_EXPANDED==true){
@@ -631,7 +631,7 @@ $(document).ready(function(){
 			width:'toggle'
 		},1000,function(){});
 	});
-	
+
 	$("#apache_panel").hide();
 	$("#apacheB").click(function(){
 		if(APACHE_EXPANDED==true){
@@ -665,28 +665,28 @@ $(document).ready(function(){
 			width:'toggle'
 		},1000,function(){});
 	});
-	
 
 
-	
+
+
 	$("#background_div").trigger("create");
 	$(window).trigger('resize');
 });
 window.draw_radial=function(p1,p2){
-	
+
 	var c1=p1;
 	var c1x = ol.proj.transform(c1, 'EPSG:4326', 'EPSG:3857');
-	
+
 	var p1,p2,dx,dy,dX,dY;
-	
+
 	//for(var dummy=0;dummy<100;dummy++){
-		
+
 		//p2x=180.*(1.-2.*Math.random());
 		//p2y=75.*(1.-2.*Math.random());
 		//p2=[p2x,p2y];
-		
+
 		//console.log("p2x="+p2x);
-		
+
 		if(p2[0]>p1[0]+180.){//p1=c1
 			dY=p2[1]-p1[1];
 			dX=(180.-p2[0])+(180.+p1[0]);
@@ -707,9 +707,9 @@ window.draw_radial=function(p1,p2){
 		else{
 			window.draw_line(p1,p2);
 		}
-	
+
 	//}
-/*	
+/*
 	//TEST draw LHS of intl dateline -> las cruces, nm
 	for(var dummy=0;dummy<10;dummy++){
 		p1=c1;
@@ -722,7 +722,7 @@ window.draw_radial=function(p1,p2){
 		window.draw_line( [-180.,p2[1]-dy],p1);
 		window.draw_icon(ol.proj.transform([p2[0]-360,p2[1]], 'EPSG:4326', 'EPSG:3857'),"client_marker");
 	}
-	
+
 	for(var dummy=0;dummy<10;dummy++){
 		p1=c2;
 		p2=[-160.,66*(1.-2.*Math.random())];
@@ -750,18 +750,18 @@ window.make_bright_color=function(){
 window.draw_line=function(p1,p2){
 
 	var points=[p1,p2];
-	
+
 	for (var i = 0; i < points.length; i++) {
 		points[i] = ol.proj.transform(points[i], 'EPSG:4326', 'EPSG:3857');
 	}
-	
+
 	var featureLine = new ol.Feature({
 		geometry: new ol.geom.LineString(points)
 	});
-	
+
 	var vectorLine = new ol.source.Vector({});
 	vectorLine.addFeature(featureLine);
-	
+
 	var bright_color="#9999FF";//window.make_bright_color();//"#FFDD00";
 	var vectorLineLayer = new ol.layer.Vector({
 		source: vectorLine,
@@ -770,15 +770,15 @@ window.draw_line=function(p1,p2){
 			stroke: new ol.style.Stroke({ color: bright_color, width: 1 })
 		})
 	});
-	
-	THE_MAP.addLayer(vectorLineLayer);	
+
+	THE_MAP.addLayer(vectorLineLayer);
 }
 
 window.draw_icon=function(ctr,p,icon_id){
-	
+
 	if(p[0]>ctr[0]+180)
 		p[0]-=360.;
-	
+
 	var mdiv=document.createElement("div");
 	mdiv.id=icon_id;
 	document.getElementById("map_div").appendChild(mdiv);
@@ -809,7 +809,7 @@ for(var dummy=0;dummy<20;dummy++){
 
 <div id="content_table_div">
 	<table id="content_table" class="content_table" cellPadding="0" cellSpacing="0">
-	
+
 	<tr>
 		<td colSpan="100" id="header_cell" class="header_cell" height="25">
 		<div id="lanwatch_header" class="lanwatch_header" data-role="header">
@@ -823,7 +823,7 @@ for(var dummy=0;dummy<20;dummy++){
 		</div>
 		</td>
 	</tr>
-	
+
 	<tr>
 		<td id="c00">
 		<div id="map_div" class="map_div"></div>
@@ -831,7 +831,7 @@ for(var dummy=0;dummy<20;dummy++){
 		<td id="c01">
 		</td>
 	</tr>
-	
+
 	<tr>
 		<td id="c10">
 		<div id="buttons" class="buttons" >BUTTONS</div>
@@ -839,7 +839,7 @@ for(var dummy=0;dummy<20;dummy++){
 		<td id="c11">
 		</td>
 	</tr>
-	
+
 	<tr>
 		<td colSpan="100" id="footer_cell" class="footer_cell">
 		<div data-role="footer" id="lanwatch_footer" class="lanwatch_footer" >
@@ -868,7 +868,7 @@ for(var dummy=0;dummy<20;dummy++){
 
 
 	<div data-role="main" class="ui-content">
-	
+
 	<center>
 	<h3>LAN-Watch</h3>
 		<div>
@@ -877,7 +877,7 @@ for(var dummy=0;dummy<20;dummy++){
 			</a>
 		</div>
 	</center>
-	
+
 	<ul>
 		<li> Control gross traffic and tcpdump separately
 		<li> Should it use a database?  flatfile?
@@ -888,4 +888,3 @@ for(var dummy=0;dummy<20;dummy++){
 </body>
 
 </html>
-
