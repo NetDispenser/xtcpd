@@ -140,7 +140,7 @@ window.render_data=function(x){
 				GEOIP_DATA['keys'].push(key);
 				//plot the new destination on map overlay:
 
-				var p2=[parseFloat(GEOIP_DATA[key]['lon']),parseFloat(GEOIP_DATA[key]['lat'])];
+				var p2=[parseFloat(GEOIP_DATA[key]['longitude']),parseFloat(GEOIP_DATA[key]['lattitude'])];
 				window.draw_radial(HOME_LONLAT,p2);
 
 				//var p2 = ol.proj.transform(p2, 'EPSG:4326', 'EPSG:3857');
