@@ -147,7 +147,9 @@ window.render_data=function(x){
 				rdiv=window.draw_icon(HOME_LONLAT,p2,"client_marker");
 				var rdiv_title=key+" ";
 				for(var kidx=0;kidx<GEOIP_DATA['keys'].length;kidx++){
+					console.log("kidx="+kidx);
 					var gkey=GEOIP_DATA['keys'][kidx];
+					console.log("gkey="+gkey);
 					rdiv_title+=gkey+":"+GEOIP_DATA[gkey]+" "+;
 				}
 				//rdiv.title=key+" "+GEOIP_DATA[key]['city'];
