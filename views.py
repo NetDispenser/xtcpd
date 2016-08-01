@@ -8,7 +8,7 @@ from lanwatch.daemons.service_utils import *
 from django.contrib.auth.decorators import login_required
 
 FORMAT = '%(asctime)-15s %(message)s'
-logging.basicConfig(filename='/var/log/lanwatch/lanwatch.log',level=logging.DEBUG, format=FORMAT)
+logging.basicConfig(filename='/var/log/lanwatch/lanwatch.log',level=logging.INFO, format=FORMAT)
 
 @login_required
 def home(request):

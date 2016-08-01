@@ -8,7 +8,7 @@ var LAYOUTS={
 };
 
 var W_TCP_RECT=5;
-var HOME_LONLAT=[-121.9,37.333333];//[-106.,32.];
+var HOME_LONLAT=[-121.9,37.333];//[-106.,32.];
 var H_HEADER=35;
 var H_FOOTER=50;
 var H_BUTTON=40;

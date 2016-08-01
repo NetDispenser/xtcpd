@@ -92,14 +92,15 @@ class DaemonProcess(Daemon):
 				logging.debug("tcp_daemon self-stopping")
 				
 			line=p.readline()
-			logging.debug(line)
+			#logging.debug(line)
 			
 			a=rexp.match(line)
 			if not a:
-				logging.debug("NO MATCH")
+				#logging.debug("NO MATCH")
 				continue
 			else:
-				logging.debug("Match")
+				pass
+				#logging.debug("Match")
 				
 			tstamp=mktstamp()
 			
@@ -116,7 +117,7 @@ class DaemonProcess(Daemon):
 			try:
 				if not self.ips.has_key(dest):
 					
-					logging.debug("adding "+dest)
+					#logging.debug("adding "+dest)
 					g=pygip.record_by_addr(dest)
 					if not g:
 						logging.debug("skipping: "+dest)
@@ -127,14 +128,14 @@ class DaemonProcess(Daemon):
 						city=g['country_name']
 						if not city:city="unknown"
 					self.ips[dest]={'lat':g['latitude'],'lon':g['longitude'],'city':city}
-					logging.debug("okay")
+					logging.debug(g)
 					
 			except Exception,e:
 				logging.exception("exception getting geoip info")
 				logging.debug(dest)
 				
 			msg="%.02f,%s,%s,%s"%(time.time(),tstamp,src,dest)
-			logging.debug(msg)
+			#logging.debug(msg)
 			self.buffer.append(msg)
 			
 			#scenerio: nobody's expired,large buffer, then trickle of traffic and only removing 10x per matched line
