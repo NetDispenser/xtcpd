@@ -145,7 +145,7 @@ window.render_data=function(x){
 
 				//var p2 = ol.proj.transform(p2, 'EPSG:4326', 'EPSG:3857');
 				rdiv=window.draw_icon(HOME_LONLAT,p2,"client_marker");
-				var rdiv_title=key+" ";
+				var rdiv_title=key+" "+GEOIP_DATA[key]['dest_port']+" ";
 
 				for(var gkidx=0;gkidx<GEOIP_DATA[key]['keys'].length;gkidx++){
 					//console.log("gkidx="+gkidx);
@@ -207,7 +207,7 @@ window.render_data=function(x){
 			var src_device=msg[2];
 			var dst_device=msg[3];
 			var dst_port=msg[4];
-			
+
 			if(src_device=="0.0.0.0")continue;
 			if(dst_device=="0.0.0.0")continue;
 
