@@ -1,47 +1,36 @@
 	canvas.canvas1 {background:#333333;}
 	div.buttons {background:#4444FF;align:center;vertical-align:top;text-align:top;}
 	table{cell-padding:0;cell-spacing:0;border-collapse:collapse;border-spacing:0px;}
-		
+
 	div.lanwatch_header {background:cyan;}
 	div.lanwatch_footer {text-align:center;vertical-align:bottom;}
-	
+
 	td.header_cell{background:#005050;}
 	td.footer_cell{background:#005000;}//height:30px;
-	
+
 	div.auxBdiv {background:red;}
-	
+
 	div.lhs{position:absolute;left:0px;width:100%;background:green;color:white;opacity:0.6;}
 	div.apache{position:absolute;left:0px;width:100%;background:orange;color:white;opacity:0.6;overflow:auto;}
 	div.aux{position:absolute;left:0px;width:100%;opacity:1.0;}//clear overlay to "lock" map
-	
+
 	div.xvd {background:#005555;}
 	div.ovd {background:orange;}
 	.lanwatch_button {}
-	
+
 	.content_table {width:100%;align:center;}
 	.map_div {background:silver;opacity:1.0;}
-	
+
+	.marker{width: 8px;height: 8px;border-radius: 8px;opacity:1.0;}
 	#home_marker {
-		width: 8px;
-		height: 8px;
 		border: 4px solid yellow;
-		border-radius: 8px;
 		background-color: red;
-		opacity:1.0;
 	}
 	#client_marker {
-		width: 8px;
-		height: 8px;
 		border: 4px solid green;
-		border-radius: 8px;
 		background-color: yellow;
-		opacity:1.0;
 	}
-	#robot_marker {
-		width: 8px;
-		height: 8px;
-		border: 4px solid white;
-		border-radius: 8px;
+	#marker23 {
+		border: 4px solid orange;
 		background-color: gray;
-		opacity:1.0;
 	}
