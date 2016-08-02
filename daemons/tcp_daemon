@@ -111,7 +111,7 @@ class DaemonProcess(Daemon):
 			if src=='0.0.0.0':continue
 
 			amsg="a="
-			for aidx in range(2,12):
+			for aidx in range(1,12):
 				try:amsg+=a.group(aidx)+" "
 				except:pass
 			logging.debug(amsg)
@@ -123,6 +123,7 @@ class DaemonProcess(Daemon):
 			dest=a.group(6)
 			#dest="0.0.0.0"
 
+			dest_port=a.group(7)
 
 			try:
 				if not self.ips.has_key(dest):
@@ -133,8 +134,8 @@ class DaemonProcess(Daemon):
 						logging.debug("skipping: "+dest)
 						continue
 
-					gkeys=['city','region_code','area_code','time_zone','dma_code','metro_code','country_code3','latitude','postal_code','longitude','country_code','country_name','continent']
-					self.ips[dest]={'keys':gkeys,'ip':dest,}
+					gkeys=['dest_port','city','region_code','area_code','time_zone','dma_code','metro_code','country_code3','latitude','postal_code','longitude','country_code','country_name','continent']
+					self.ips[dest]={'keys':gkeys,'ip':dest,'dest_port':dest_port}
 					for gidx in range(len(gkeys)):
 						gkey=gkeys[gidx]
 						gval=g[gkey]
@@ -147,7 +148,7 @@ class DaemonProcess(Daemon):
 				logging.exception("exception getting geoip info")
 				logging.debug(dest)
 
-			msg="%.02f,%s,%s,%s"%(time.time(),tstamp,src,dest)
+			msg="%.02f,%s,%s,%s,%s"%(time.time(),tstamp,src,dest,dest_port)
 			#logging.debug(msg)
 			self.buffer.append(msg)
 

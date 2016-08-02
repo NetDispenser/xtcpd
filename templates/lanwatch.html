@@ -206,7 +206,8 @@ window.render_data=function(x){
 
 			var src_device=msg[2];
 			var dst_device=msg[3];
-
+			var dst_port=msg[4];
+			
 			if(src_device=="0.0.0.0")continue;
 			if(dst_device=="0.0.0.0")continue;
 
