@@ -95,7 +95,7 @@ class DaemonProcess(Daemon):
 				logging.debug("tcp_daemon self-stopping")
 
 			line=p.readline()
-			logging.debug(line)
+			#logging.debug(line)
 
 			a=rexp.match(line)
 			if not a:
@@ -111,7 +111,7 @@ class DaemonProcess(Daemon):
 			if src=='0.0.0.0':continue
 
 			amsg="a="
-			for aidx in range(12):
+			for aidx in range(2,12):
 				try:amsg+=a.group(aidx)+" "
 				except:pass
 			logging.debug(amsg)
