@@ -46,7 +46,10 @@ class DaemonProcess(Daemon):
 		#logging.debug("get_geoip")
 		rval=copy.copy(self.ips)
 		rval['keys']=rval.keys()
+
 		logging.debug(rval)
+		logging.debug(" ")
+
 		self.ips={}
 		return rval
 
