@@ -171,10 +171,11 @@ window.render_data=function(x){
 		document.getElementById("message_div").innerHTML=msg;
 	}
 	*/
-	msg="Traffic: "+TRAFFIC_DATA.length+"<br>TCP: "+TCP_DATA.length+"<br>";
+
+	//msg="Traffic: "+TRAFFIC_DATA.length+"<br>TCP: "+TCP_DATA.length+"<br>";
 	//document.getElementById("message_div").innerHTML=msg;
 
-	msg="Traffic: "+TRAFFIC_DATA.length+"<br>TCP: "+TCP_DATA.length+"<br>";
+	//msg="Traffic: "+TRAFFIC_DATA.length+"<br>TCP: "+TCP_DATA.length+"<br>";
 	//document.getElementById("tcp_div").innerHTML=msg;
 
 	//window.traffic_stuff(pyld['t1']);
@@ -239,7 +240,7 @@ window.render_data=function(x){
 
 		var SORTED_SRCS=new Array();
 		for(var sidx=0;sidx<SRCS.length;sidx++){
-			if(SRC_COUNTS[SRCS[sidx]]>0){
+			if(SRC_COUNTS[SRCS[sidx]]>-1){
 				SORTED_SRCS.push(SRCS[sidx]);
 			}
 		}
