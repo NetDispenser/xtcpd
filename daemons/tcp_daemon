@@ -134,7 +134,7 @@ class DaemonProcess(Daemon):
 						logging.debug("skipping: "+dest)
 						continue
 
-					gkeys=['dest_port','city','region_code','area_code','time_zone','dma_code','metro_code','country_code3','latitude','postal_code','longitude','country_code','country_name','continent']
+					gkeys=['city','region_code','area_code','time_zone','dma_code','metro_code','country_code3','latitude','postal_code','longitude','country_code','country_name','continent']
 					self.ips[dest]={'keys':gkeys,'ip':dest,'dest_port':dest_port}
 					for gidx in range(len(gkeys)):
 						gkey=gkeys[gidx]
