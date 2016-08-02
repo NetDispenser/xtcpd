@@ -144,7 +144,15 @@ window.render_data=function(x){
 				window.draw_radial(HOME_LONLAT,p2);
 
 				//var p2 = ol.proj.transform(p2, 'EPSG:4326', 'EPSG:3857');
-				rdiv=window.draw_icon(HOME_LONLAT,p2,"client_marker");
+				var marker_id="client_marker";
+				if(GEOIP_DATA[key]['src_port']=='.23')
+					marker_id="marker23";
+				else if(GEOIP_DATA[key]['src_port']=='.53')
+						marker_id="marker53";
+				else if(GEOIP_DATA[key]['src_port']=='.80')
+						marker_id="marker80";
+
+				rdiv=window.draw_icon(HOME_LONLAT,p2,marker_id);
 
 
 				var rdiv_title=key+" "+GEOIP_DATA[key]['src_port']+" -> "+GEOIP_DATA[key]['dest_port']+" ";
