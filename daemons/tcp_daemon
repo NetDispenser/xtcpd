@@ -37,7 +37,7 @@ class DaemonProcess(Daemon):
 		#cmd="tcpdump -i %s -l -s 0 -nn not dst net 192.168.66"%(INTERFACE)#udp video data (mucho data!)
 
 		#cmd="tcpdump -i %s -l -s 0 -nn not dst net 208.111.39.69"%(INTERFACE)#udp video data (mucho data!)
-		cmd="tcpdump -i eth0 -l -s 0 -n |grep 39.69|grep -v 80.8.24"#not src net 70.210 and not dst net 70.210|grep  39.69"
+		cmd="tcpdump -i eth0 -l -s 0 -n |grep 39.69|grep -v 76.115.171.141"#not src net 70.210 and not dst net 70.210|grep  39.69"
 
 		self.tcpdump_cmd=cmd
 		self.t_last_call=time.time()
@@ -95,7 +95,7 @@ class DaemonProcess(Daemon):
 				logging.debug("tcp_daemon self-stopping")
 
 			line=p.readline()
-			#logging.debug(line)
+			logging.debug(line)
 
 			a=rexp.match(line)
 			if not a:
@@ -117,7 +117,7 @@ class DaemonProcess(Daemon):
 			dest=a.group(6)
 			#dest="0.0.0.0"
 
-			city="unknown"
+
 			try:
 				if not self.ips.has_key(dest):
 
@@ -146,7 +146,7 @@ class DaemonProcess(Daemon):
 			self.buffer.append(msg)
 
 			#scenerio: nobody's expired,large buffer, then trickle of traffic and only removing 10x per matched line
-			#i.e. not clearing out fast enough ... hence dangerour while loop:
+			#i.e. not clearing out fast enough ... hence dangerous while loop:
 			while True:
 				try:
 					x=eval(string.split(self.buffer[0],",")[0])
