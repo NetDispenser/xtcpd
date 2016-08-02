@@ -43,7 +43,7 @@ class DaemonProcess(Daemon):
 		self.t_last_call=time.time()
 
 	def get_geoip(self,*args):
-		logging.debug("get_geoip")
+		#logging.debug("get_geoip")
 		rval=copy.copy(self.ips)
 		rval['keys']=rval.keys()
 		logging.debug(rval)
@@ -132,7 +132,7 @@ class DaemonProcess(Daemon):
 						if not gval:gval=""
 						self.ips[dest][gkey]=gval
 
-					logging.debug(g)
+					#logging.debug(self.ips[dest])
 
 			except Exception,e:
 				logging.exception("exception getting geoip info")
