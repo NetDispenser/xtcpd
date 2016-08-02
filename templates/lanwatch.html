@@ -250,7 +250,7 @@ window.render_data=function(x){
 			dummy=document.createElement("div");
 			b=document.createElement("b");
 			skey=SORTED_SRCS[sidx];
-			t=document.createTextNode(SORTED_SRCS[sidx]+" @ "+GEOIP_DATA[skey]['dest_port']+" "+GEOIP_DATA[skey]['city']+", "+GEOIP_DATA[skey]['metro_code']+", "+GEOIP_DATA[skey]['country_name']);
+			t=document.createTextNode(SORTED_SRCS[sidx]+" @ "+GEOIP_DATA[skey]['src_port']+" -> "+GEOIP_DATA[skey]['dest_port']+" "+GEOIP_DATA[skey]['city']+", "+GEOIP_DATA[skey]['metro_code']+", "+GEOIP_DATA[skey]['country_name']);
 			b.appendChild(t);
 
 			b.id=SORTED_SRCS[sidx];

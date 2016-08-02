@@ -123,6 +123,7 @@ class DaemonProcess(Daemon):
 			dest=a.group(6)
 			#dest="0.0.0.0"
 
+			src_port=a.group(5)
 			dest_port=a.group(7)
 
 			try:
@@ -135,7 +136,7 @@ class DaemonProcess(Daemon):
 						continue
 
 					gkeys=['city','region_code','area_code','time_zone','dma_code','metro_code','country_code3','latitude','postal_code','longitude','country_code','country_name','continent']
-					self.ips[dest]={'keys':gkeys,'ip':dest,'dest_port':dest_port}
+					self.ips[dest]={'keys':gkeys,'ip':dest,'src_port':src_port,'dest_port':dest_port}
 					for gidx in range(len(gkeys)):
 						gkey=gkeys[gidx]
 						gval=g[gkey]
@@ -148,7 +149,7 @@ class DaemonProcess(Daemon):
 				logging.exception("exception getting geoip info")
 				logging.debug(dest)
 
-			msg="%.02f,%s,%s,%s,%s"%(time.time(),tstamp,src,dest,dest_port)
+			msg="%.02f,%s,%s,%s,%s,%s"%(time.time(),tstamp,src,dest,src_port,dest_port)
 			#logging.debug(msg)
 			self.buffer.append(msg)
 
