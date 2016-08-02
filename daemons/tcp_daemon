@@ -95,7 +95,7 @@ class DaemonProcess(Daemon):
 				logging.debug("tcp_daemon self-stopping")
 
 			line=p.readline()
-			logging.debug(line)
+			#logging.debug(line)
 
 			a=rexp.match(line)
 			if not a:
@@ -109,6 +109,8 @@ class DaemonProcess(Daemon):
 
 			src=a.group(4)
 			if src=='0.0.0.0':continue
+
+			logging.debug("a="+a.group(1)+" "+a.group(2)+" "+a.group(3)+" "+a.group(4)+" "+a.group(5)+" "+a.group(6))
 
 			#function at service_utils.py but refers to gentoo router.  demo mode had hard coded leases.
 			#this iteration just skipping altogether for simplicity.
