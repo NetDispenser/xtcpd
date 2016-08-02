@@ -37,7 +37,7 @@ class DaemonProcess(Daemon):
 		#cmd="tcpdump -i %s -l -s 0 -nn not dst net 192.168.66"%(INTERFACE)#udp video data (mucho data!)
 
 		#cmd="tcpdump -i %s -l -s 0 -nn not dst net 208.111.39.69"%(INTERFACE)#udp video data (mucho data!)
-		cmd="tcpdump -i eth0 -l -s 0 -n |grep 39.69|grep -v 76.115.171.141"#not src net 70.210 and not dst net 70.210|grep  39.69"
+		cmd="tcpdump -i eth0 -l -s 0 -n |grep 39.69"#not src net 70.210 and not dst net 70.210|grep  39.69"
 
 		self.tcpdump_cmd=cmd
 		self.t_last_call=time.time()
