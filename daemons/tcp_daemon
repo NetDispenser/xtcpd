@@ -95,7 +95,7 @@ class DaemonProcess(Daemon):
 				logging.debug("tcp_daemon self-stopping")
 
 			line=p.readline()
-			#logging.debug(line)
+			logging.debug(line)
 
 			a=rexp.match(line)
 			if not a:
