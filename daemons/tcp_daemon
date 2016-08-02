@@ -110,7 +110,11 @@ class DaemonProcess(Daemon):
 			src=a.group(4)
 			if src=='0.0.0.0':continue
 
-			logging.debug("a="+a.group(1)+" "+a.group(2)+" "+a.group(3)+" "+a.group(4)+" "+a.group(5)+" "+a.group(6))
+			amsg="a="
+			for aidx in range(12):
+				try:amsg+=a.group(aidx)+" "
+				except:pass
+			logging.debug(amsg)
 
 			#function at service_utils.py but refers to gentoo router.  demo mode had hard coded leases.
 			#this iteration just skipping altogether for simplicity.
