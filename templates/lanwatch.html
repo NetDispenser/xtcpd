@@ -146,6 +146,8 @@ window.render_data=function(x){
 				//var p2 = ol.proj.transform(p2, 'EPSG:4326', 'EPSG:3857');
 				var marker_id="client_marker";
 				if(false){;}
+				else if(GEOIP_DATA[key]['dest_port']=='.53')
+						marker_id="marker53";
 				else if(GEOIP_DATA[key]['src_port']=='.80')
 						marker_id="marker80";
 				else if(GEOIP_DATA[key]['src_port']=='.23')
