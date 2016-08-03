@@ -54,3 +54,7 @@
 		border: 4px solid red;
 		background-color: orange;
 	}
+	#marker_default {
+		border: 4px solid black;
+		background-color: white;
+	}
