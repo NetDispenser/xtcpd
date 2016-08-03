@@ -156,12 +156,16 @@ window.render_data=function(x){
 						marker_id="marker53";
 				else if(GEOIP_DATA[key]['src_port']=='.179')
 						marker_id="marker179";
+				else if(GEOIP_DATA[key]['src_port']=='.445')
+						marker_id="marker445";
 				else if(GEOIP_DATA[key]['src_port']=='.1433')
 						marker_id="marker1433";
 				else if(GEOIP_DATA[key]['src_port']=='.22')
 						marker_id="marker22";
 				else if(GEOIP_DATA[key]['src_port']=='.4200')
 						marker_id="marker4200";
+				else if(GEOIP_DATA[key]['src_port']=='.5901')
+						marker_id="marker5901";
 				else marker_id="marker_default";
 
 				rdiv=window.draw_icon(HOME_LONLAT,p2,marker_id);
