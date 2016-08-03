@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 from daemon import Daemon
 from service_utils import *
+from country_codes import *
 import logging
 
 #import GeoIP
@@ -136,7 +137,12 @@ class DaemonProcess(Daemon):
 						continue
 
 					gkeys=['city','region_code','area_code','time_zone','dma_code','metro_code','country_code3','latitude','postal_code','longitude','country_code','country_name','continent']
-					self.ips[dest]={'keys':gkeys,'ip':dest,'src_port':src_port,'dest_port':dest_port}
+					self.ips[dest]={
+						'keys':gkeys,
+						'ip':dest,'src_port':src_port,
+						'dest_port':dest_port,
+						'idn_country':COUNTRY_CODES[g['country_code']],
+					}
 					for gidx in range(len(gkeys)):
 						gkey=gkeys[gidx]
 						gval=g[gkey]
