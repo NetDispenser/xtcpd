@@ -4,13 +4,13 @@ import os
 from tinymce.models import HTMLField
 
 class NetworkEvent(models.Model):
-    src_ip=models.GenricIPAddressField()
+    src_ip=models.GenericIPAddressField()
     src_idn=models.PositiveIntegerField()
-    dst_ip=models.GenricIPAddressField()
+    dst_ip=models.GenericIPAddressField()
     dst_idn=models.PositiveIntegerField()
     src_port=models.PositiveIntegerField()
     dst_port=models.PositiveIntegerField()
     tstamp=TimeField(auto_now=True)
     country_idn=models.PositiveIntegerField()
-    lat	= models.FloatField(blank=True)
-	lon	= models.FloatField(blank=True)
+    lat=models.FloatField(blank=True)
+    lon=models.FloatField(blank=True)
