@@ -136,7 +136,7 @@ class DaemonProcess(Daemon):
 			if not IP_IDNS.has_key(dest):
 				IP_IDNS['idn_last']+=1
 				IP_IDNS[dest]=IP_IDNS['idn_last']
-				logging.debug(dest+" -> "+IP_IDNS['idn_last'])
+				logging.debug(dest+" -> "+`IP_IDNS['idn_last']`)
 
 			try:
 				if not self.ips.has_key(dest):
