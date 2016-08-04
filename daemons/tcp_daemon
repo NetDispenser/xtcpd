@@ -163,7 +163,7 @@ class DaemonProcess(Daemon):
 						if not gval:gval=""
 						self.ips[dest][gkey]=gval
 
-					#logging.debug(self.ips[dest])
+					logging.debug(self.ips[dest])
 
 			except Exception,e:
 				logging.exception("exception getting geoip info")
