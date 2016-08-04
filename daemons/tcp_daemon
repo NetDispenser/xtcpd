@@ -2,14 +2,14 @@
 from daemon import Daemon
 from service_utils import *
 from country_codes import *
-import logging
+#from ip_idns import *
+import logging,json
 
 #import GeoIP
 import pygeoip
 
 #gip=GeoIP.open("/usr/share/GeoIP/GeoLiteCity.dat",GeoIP.GEOIP_STANDARD)
 pygip=pygeoip.GeoIP("/usr/share/GeoIP/GeoLiteCity.dat")
-
 
 FORMAT = '%(message)s'
 logging.basicConfig(filename=TCP_LOG,level=logging.DEBUG,format=FORMAT)
@@ -22,6 +22,11 @@ logging.basicConfig(filename=TCP_LOG,level=logging.DEBUG,format=FORMAT)
 #tcpdump -i eth0 -l -s 0 -nn not src net 70.210 and not dst net 70.210|grep  208.111.39.69
 #13:46:51.841958 IP 66.249.67.78.49772 > 208.111.39.69.80: Flags [.], ack 5673, win 424, options [nop,nop,TS val 2125410414 ecr 839918059], length 0
 rexp=re.compile('(\d+:\d+:\d+)(\.\d+) (IP) (.*)(\.\d+) > (\d+\.\d+\.\d+\.\d+)(\.\d+)(.*)')
+
+ipfname="ip_idns.py"
+ipf=open(ipfname)
+IP_IDNS=json.load(ipf)
+ipf.close()
 
 class DaemonProcess(Daemon):
 	"""
@@ -127,6 +132,11 @@ class DaemonProcess(Daemon):
 			src_port=a.group(5)
 			dest_port=a.group(7)
 
+			if not IP_IDNS.has_key(dest):
+				IP_IDNS['idn_last']+=1
+				IP_IDNS[dest]=IP_IDNS['idn_last']
+				logging.debug(dest+" -> "+IP_IDNS['idn_last'])
+
 			try:
 				if not self.ips.has_key(dest):
 
@@ -142,6 +152,7 @@ class DaemonProcess(Daemon):
 						'ip':dest,'src_port':src_port,
 						'dest_port':dest_port,
 						'idn_country':COUNTRY_CODES[g['country_code']],
+						'ip_idn':IP_IDNS[dest],
 					}
 					for gidx in range(len(gkeys)):
 						gkey=gkeys[gidx]

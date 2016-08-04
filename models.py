@@ -3,7 +3,7 @@ from django.db import models
 import os
 
 class NetworkEvent(models.Model):
-    tstamp=models.TimeField(auto_now=True)
+    tstamp=models.FloatField(blank=False)
     src_ip=models.GenericIPAddressField(blank=False)
     dest_ip=models.GenericIPAddressField(blank=False)
     src_idn=models.PositiveIntegerField(blank=False)
