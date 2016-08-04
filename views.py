@@ -6,7 +6,6 @@ import logging,xmlrpclib,json,time,os,string
 
 from lanwatch.daemons.service_utils import *
 from lanwatch.models import NetworkEvent
-from country_codes import *
 from django.contrib.auth.decorators import login_required
 
 FORMAT = '%(asctime)-15s %(message)s'
