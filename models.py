@@ -15,4 +15,4 @@ class NetworkEvent(models.Model):
     lon	= models.FloatField(blank=False)
 
     def __unicode__(self):
-        return self.tstamp
+        return `self.tstamp`
