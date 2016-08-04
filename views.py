@@ -55,14 +55,14 @@ def home(request):
 				ev=NetworkEvent()
 				ev.tstamp=time.time()
 				ev.src_ip='208.111.39.69'
-			    ev.dest_ip=overview_pyld['geoip_buffer'][ip]
-			    ev.src_idn=0
-			    ev.dest_idn=overview_pyld['geoip_buffer']['ip_idn']
-			    ev.src_port=overview_pyld['geoip_buffer']['src_port']
-			    ev.dest_port=overview_pyld['geoip_buffer']['dest_port']
-			    ev.ctry_idn=overview_pyld['geoip_buffer']['idn_country']
-			    ev.lat=overview_pyld['geoip_buffer']['latitude']
-			    ev.lon=overview_pyld['geoip_buffer']['longitude']
+			    	ev.dest_ip=overview_pyld['geoip_buffer'][ip]
+			    	ev.src_idn=0
+			    	ev.dest_idn=overview_pyld['geoip_buffer']['ip_idn']
+			    	ev.src_port=overview_pyld['geoip_buffer']['src_port']
+			    	ev.dest_port=overview_pyld['geoip_buffer']['dest_port']
+			    	ev.ctry_idn=overview_pyld['geoip_buffer']['idn_country']
+			    	ev.lat=overview_pyld['geoip_buffer']['latitude']
+			    	ev.lon=overview_pyld['geoip_buffer']['longitude']
 				ev.save()
 				logging.debug("NetworkEvent saved:"+ev.tstamp)
 				#msg="%s\t%d\t%d"%(qs,len(overview_pyld['tcp_data']),len(overview_pyld['traffic_data']))
