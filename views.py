@@ -53,8 +53,8 @@ def home(request):
 
 				ev=NetworkEvent()
 				ev.tstamp=time.time()
-				ev.src_ip='208.111.39.69'
-				ev.dest_ip=overview_pyld['geoip_buffer']['ip']
+				ev.src_ip=overview_pyld['geoip_buffer']['src']
+				ev.dest_ip=overview_pyld['geoip_buffer']['dest']
 				ev.src_idn=0
 				ev.dest_idn=overview_pyld['geoip_buffer']['ip_idn']
 				ev.src_port=overview_pyld['geoip_buffer']['src_port']

@@ -150,7 +150,9 @@ class DaemonProcess(Daemon):
 					gkeys=['city','region_code','area_code','time_zone','dma_code','metro_code','country_code3','latitude','postal_code','longitude','country_code','country_name','continent']
 					self.ips[dest]={
 						'keys':gkeys,
-						'ip':dest,'src_port':src_port,
+						'src':src,
+						'dest':dest,
+						'src_port':src_port,
 						'dest_port':dest_port,
 						'idn_country':COUNTRY_CODES[g['country_code']],
 						'ip_idn':IP_IDNS[dest],
