@@ -23,10 +23,11 @@ logging.basicConfig(filename=TCP_LOG,level=logging.DEBUG,format=FORMAT)
 #13:46:51.841958 IP 66.249.67.78.49772 > 208.111.39.69.80: Flags [.], ack 5673, win 424, options [nop,nop,TS val 2125410414 ecr 839918059], length 0
 rexp=re.compile('(\d+:\d+:\d+)(\.\d+) (IP) (.*)(\.\d+) > (\d+\.\d+\.\d+\.\d+)(\.\d+)(.*)')
 
-ipfname="ip_idns.py"
+ipfname="ip_idns.dat"
 ipf=open(ipfname)
-IP_IDNS=json.load(ipf)
+IP_IDNS=json.loads(ipf.read())
 ipf.close()
+logging.debug('IP_IDNS loaded')
 
 class DaemonProcess(Daemon):
 	"""
