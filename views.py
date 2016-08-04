@@ -50,23 +50,25 @@ def home(request):
 				p=os.popen('date')
 				overview_pyld['server_date']=string.strip(p.readline())
 				p.close()
-
-				ev=NetworkEvent()
-				ev.tstamp=time.time()
-				ev.src_ip=overview_pyld['geoip_buffer']['src']
-				ev.dest_ip=overview_pyld['geoip_buffer']['dest']
-				ev.src_idn=0
-				ev.dest_idn=overview_pyld['geoip_buffer']['ip_idn']
-				ev.src_port=overview_pyld['geoip_buffer']['src_port']
-				ev.dest_port=overview_pyld['geoip_buffer']['dest_port']
-				ev.ctry_idn=overview_pyld['geoip_buffer']['idn_country']
-				ev.lat=overview_pyld['geoip_buffer']['latitude']
-				ev.lon=overview_pyld['geoip_buffer']['longitude']
-				ev.save()
-				logging.debug("NetworkEvent saved:"+ev.tstamp)
-				#msg="%s\t%d\t%d"%(qs,len(overview_pyld['tcp_data']),len(overview_pyld['traffic_data']))
-				#logging.debug(msg)
-
+				"""
+				for msg in overview_pyld['tcp_data']:
+					ev=NetworkEvent()
+					ev.tstamp=time.time()
+					smsg=string.split(msg,",")
+					ev.src_ip=smsg[2]
+					ev.dest_ip=smsg[3]
+					ev.src_idn=0
+					ev.dest_idn=overview_pyld['geoip_buffer']['ip_idn']
+					ev.src_port=overview_pyld['geoip_buffer']['src_port']
+					ev.dest_port=overview_pyld['geoip_buffer']['dest_port']
+					ev.ctry_idn=overview_pyld['geoip_buffer']['idn_country']
+					ev.lat=overview_pyld['geoip_buffer']['latitude']
+					ev.lon=overview_pyld['geoip_buffer']['longitude']
+					ev.save()
+					logging.debug("NetworkEvent saved:"+ev.tstamp)
+					#msg="%s\t%d\t%d"%(qs,len(overview_pyld['tcp_data']),len(overview_pyld['traffic_data']))
+					#logging.debug(msg)
+				"""
 				return HttpResponse( json.dumps(overview_pyld) )
 
 	except Exception,e:
