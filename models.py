@@ -13,3 +13,6 @@ class NetworkEvent(models.Model):
     ctry_idn=models.PositiveIntegerField(blank=False)
     lat	= models.FloatField(blank=False)
     lon	= models.FloatField(blank=False)
+
+    def __unicode__(self):
+        return self.tstamp
