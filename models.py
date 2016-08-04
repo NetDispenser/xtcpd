@@ -13,4 +13,4 @@ class NetworkEvent(models.Model):
     tstamp=TimeField(auto_now=True)
     country_idn=models.PositiveIntegerField()
     lat	= models.FloatField(blank=True)
-	lon	= models.FloatField(blank=True)
+    lon	= models.FloatField(blank=True)
