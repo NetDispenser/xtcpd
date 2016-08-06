@@ -308,7 +308,7 @@ window.render_data=function(x){
 		var ap=document.getElementById("apache_panel");
 		//.innerHTML="<h1>ACCESSLOG DATA</h1>";
 		for(var aidx=0;aidx<APACHE_DATA.length;aidx++){
-			ap.innerHTML+=APACHE_DATA[aidx]+"<br>";
+			ap.innerHTML+=APACHE_DATA[aidx]+"<br><br>";
 		}
 
 		//END: tcp_stuff relocated here
@@ -708,9 +708,6 @@ $(document).ready(function(){
 			width:'toggle'
 		},1000,function(){});
 	});
-
-
-
 
 	$("#background_div").trigger("create");
 	$(window).trigger('resize');

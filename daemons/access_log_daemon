@@ -40,7 +40,7 @@ class DaemonProcess(Daemon):
 		cmd="tail -0f %s"%args[0]
 		logging.debug(cmd)
 
-	s	which_file=os.path.basename(args[0])
+		which_file=os.path.basename(args[0])
 
 		p=os.popen(cmd)
 		self.t_last_call=time.time()
@@ -56,18 +56,21 @@ class DaemonProcess(Daemon):
 			a=rexp.match(line)
 			if not a:continue
 
-			ip=string.strip(a.group(1))
-
-			rval={'which_file':which_file,'ip':ip,'isbot':0,'ishack':0,}
-
 			rdict={}
-			try:rdict=ProcessLine(a)
-			except Exception,e:pass
+			try:
+				rdict=ProcessLine(a)
+				ip=string.strip(a.group(1))
+				if ip!=rdict['ip']:logging.debug("EMERGENCY!")
+				rdict['which_file']=which_file
+				rdict['tstamp']=mktstamp()
+				rdict['time']=time.time()
 
-			tstamp=mktstamp()
-			msg="%.02f,%s,%s,%s,%s"%(time.time(),tstamp,which_file,rval,`rdict`)
-			logging.debug(msg)
-			self.buffer.append(msg)
+			except Exception,e:
+				logging.debug(e)
+
+			strdict=json.dumps(rdict)
+			logging.debug(strdict)
+			self.buffer.append(strdict)
 
 		p.close()
 
