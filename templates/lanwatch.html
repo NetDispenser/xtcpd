@@ -306,7 +306,7 @@ window.render_data=function(x){
 		}
 
 		var ap=document.getElementById("apache_panel");
-		ap.innerHTML="";
+		//.innerHTML="<h1>ACCESSLOG DATA</h1>";
 		for(var aidx=0;aidx<APACHE_DATA.length;aidx++){
 			ap.innerHTML+=APACHE_DATA[aidx]+"<br>";
 		}

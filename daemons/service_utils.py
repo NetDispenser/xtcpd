@@ -48,9 +48,9 @@ ERROR_LOGS=[
 	'/var/log/apache2/error.pac',	#pac
 ]
 ACCESS_LOGS=[
-	'/var/log/apache2/access.log',	#geonode
-	'/var/log/apache2/access.const',#const
-	'/var/log/apache2/access.aorg',	#aorg
+	'/var/log/apache2/access.dev',	#geonode
+#	'/var/log/apache2/access.',#const
+#	'/var/log/apache2/access.aorg',	#aorg
 	'/var/log/apache2/access.pac',	#pac
 ]
 
