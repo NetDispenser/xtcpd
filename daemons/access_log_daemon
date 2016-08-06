@@ -68,7 +68,7 @@ class DaemonProcess(Daemon):
 			except Exception,e:
 				logging.debug(e)
 
-			strdict=json.dumps(rdict)
+			strdict="%0.2f,%s"%(time.time(),json.dumps(rdict))
 			logging.debug(strdict)
 			self.buffer.append(strdict)
 
