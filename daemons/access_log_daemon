@@ -10,18 +10,18 @@ logging.basicConfig(filename=ACCESS_LOG,level=logging.DEBUG,format=FORMAT)
 BOT_STRINGS=['bot','sleuth','checker','spider','slurp','search','crawl','siteexplorer','java']
 HACK_STRINGS=[]
 
-rexp = re.compile('([^ ]*) ([^ ]*) ([^ ]*) \[([^]]*)\] "([^"]*)" ([^ ]*) ([^ ]*)' ' "([^"]*)" "([^"]*)"')	
+rexp = re.compile('([^ ]*) ([^ ]*) ([^ ]*) \[([^]]*)\] "([^"]*)" ([^ ]*) ([^ ]*)' ' "([^"]*)" "([^"]*)"')
 
 class DaemonProcess(Daemon):
 	def __init__(self,pidfile):
 		Daemon.__init__(self,pidfile)
 		self.t_last_call=time.time()
 		self.buffer=[]
-		
+
 	def get_data(self,*args):
 
 		self.t_last_call=time.time()
-		
+
 		if not self.RUNNING:
 			self.RUNNING=True
 			logging.debug("access_log_daemon self-starting")
@@ -34,47 +34,47 @@ class DaemonProcess(Daemon):
 		rval=copy.copy(self.buffer)
 		self.buffer.__init__()
 		return rval
-				
+
 	def while_running(self,*args):
-		
+
 		cmd="tail -0f %s"%args[0]
 		logging.debug(cmd)
-		
-		which_file=os.path.basename(args[0])
-		
+
+	s	which_file=os.path.basename(args[0])
+
 		p=os.popen(cmd)
 		self.t_last_call=time.time()
-		
+
 		while self.RUNNING:
-			
+
 			if self.t_last_call<time.time()-30:
 				self.RUNNING=False
 				logging.debug("access_log_daemon self-stopping")
-			
+
 			line=p.readline()
-			
+
 			a=rexp.match(line)
 			if not a:continue
-			
+
 			ip=string.strip(a.group(1))
-			
+
 			rval={'which_file':which_file,'ip':ip,'isbot':0,'ishack':0,}
-			
+
 			rdict={}
 			try:rdict=ProcessLine(a)
 			except Exception,e:pass
-			
+
 			tstamp=mktstamp()
 			msg="%.02f,%s,%s,%s,%s"%(time.time(),tstamp,which_file,rval,`rdict`)
 			logging.debug(msg)
 			self.buffer.append(msg)
-			
-		p.close()	
-		
+
+		p.close()
+
 	def run(self):
-		
+
 		self.RUNNING=False
-		
+
 		self.server=SimpleXMLRPCServer((get_rpc_hostname(),ACCESS_LOG_SERVICE_PORT))
 		self.server.register_introspection_functions()
 		self.server.register_instance(self)
@@ -85,7 +85,7 @@ class DaemonProcess(Daemon):
 if __name__=="__main__":
 
 	daemon=DaemonProcess('/var/run/access_log_daemon.pid')
-	
+
 	if len(sys.argv)==2:
 		if 'start'==sys.argv[1]:
 			daemon.start()
@@ -98,7 +98,7 @@ if __name__=="__main__":
 				print 'running'
 			else:
 				print 'stopped'
-				
+
 		else:
 			logging.debug("UNK")
 			print "Unknown command"
