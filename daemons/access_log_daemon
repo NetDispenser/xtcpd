@@ -74,6 +74,13 @@ class DaemonProcess(Daemon):
 
 		p.close()
 
+	"""
+	This is strdict:
+	{"ip": "12.34.56.78", "postal_code": "54321", "country_code": "US", "city": "Springfield", "orgname": "Comcast Cable Communications, Inc.", "dma_code": 820, "which_file": "access.dev", "latitude": 45.5222, "rcode": "200", "tod": "-", "refer": "ttp://dev.asymptopia.org/lanwatch", "area_code": 503, "country_name": "United States", "netrange": " 76.96.0.0 - 76.127.255.255", "region": "OR", "bytes": "433", "longitude": -122.85929999999999, "tstamp": "2016-08-05 22:57:01", "country_code3": "USA", "url": "/lanwatch/?get_data", "time": 1470463021.314798, "action": "ET", "browser": "ozilla/5.0 (Macintosh; Intel Mac OS X 10.9; rv:45.0) Gecko/20100101 Firefox/45."}
+	"""
+
+
+
 	def run(self):
 
 		self.RUNNING=False

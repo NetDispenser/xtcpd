@@ -670,9 +670,12 @@ $(document).ready(function(){
 			LHS_EXPANDED=true;
 			document.getElementById("lhsBdiv").style.background=LOCKED_COLOR;
 		}
+		$("#lhs_panel").toggleClass("show");
+		/*
 		$("#lhs_panel").animate({
 			width:'toggle'
 		},1000,function(){});
+		*/
 	});
 
 	$("#apache_panel").hide();

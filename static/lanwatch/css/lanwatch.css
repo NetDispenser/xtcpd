@@ -18,6 +18,12 @@
 	div.ovd {background:orange;}
 	.lanwatch_button {}
 
+	.show{left:0%;}
+	#lhs_panel{
+		left:-100%;
+		width:100%;
+	}
+	
 	.content_table {width:100%;align:center;}
 	.map_div {background:silver;opacity:1.0;}
 
