@@ -8,11 +8,12 @@ logging.basicConfig(filename=LISTENER_LOG,level=logging.DEBUG,format=FORMAT)
 
 
 class DaemonProcess(Daemon):
-	
+
 	def __init__(self,pidfile):
 		Daemon.__init__(self,pidfile)
 		self.t_last_call=time.time()
 		self.buffer=[]
+		self.RUNNING=False
 		
 		oufdb='/.approved'
 		if not os.path.exists(oufdb):
@@ -28,7 +29,7 @@ class DaemonProcess(Daemon):
 			p=os.popen(cmd)
 			rmac=string.strip(p.readline())
 			p.close()
-			logging.debug("received: %s"%rmac)	
+			logging.debug("received: %s"%rmac)
 			mac=self.determine_mac_rpi()
 			if rmac != mac:
 				logging.debug("!!!!          ALERT         !!!!")
@@ -37,13 +38,13 @@ class DaemonProcess(Daemon):
 				os.system("shutdown -h now")
 			else:
 				logging.debug("System cleared to run. Proceeding with boot ...")
-		
+
 	def get_data(self,*args):
-		
+
 		logging.debug("django_listener_daemon.get_data: %d"%len(self.buffer))
-		
+
 		self.t_last_call=time.time()
-		
+
 		if not self.RUNNING:
 			self.RUNNING=True
 			logging.debug("django_listener_daemon self-starting")
@@ -55,7 +56,7 @@ class DaemonProcess(Daemon):
 		rval=copy.copy(self.buffer)
 		self.buffer.__init__()
 		return rval
-				
+
 	def determine_mac_rpi(self):
 		cmd="ifconfig eth0"
 		p=os.popen(cmd)
@@ -64,44 +65,44 @@ class DaemonProcess(Daemon):
 		mac_line=p.readline()
 		for dummy in range(100):
 			mac_line=string.replace(mac_line,"  "," ")
-		
+
 		logging.debug(mac_line)
 		mac_line=string.split(mac_line," ",4)
 		mac=mac_line[2]
 		logging.debug('determined mac to be: %s'%mac)
 		return mac
-		
+
 	def while_running(self,*args):
-		
+
 		cmd="tail -0f %s"%DJANGO_LOG
 		p=os.popen(cmd)
 		self.t_last_call=time.time()
-		
+
 		while self.RUNNING:
-			
+
 			if self.t_last_call<time.time()-30:
 				self.RUNNING=False
 				logging.info("django_listener_daemon self-stopping")
-			
+
 			line=p.readline()
 			tstamp=mktstamp()
 			msg="%.02f,%s,%s,%s"%(time.time(),tstamp,"Django",line)
 			self.buffer.append(msg)
 			logging.debug(msg)
-			
-		p.close()	
-	
+
+		p.close()
+
 	def factory_reset(self,*args):
-		
+
 		if AM_DEMO:return 1
-		
+
 		newDB="/var/www/router/router/db.sqlite3_VIRGIN"
 		oldDB="/var/www/router/router/db.sqlite3"
 		cmd="cp %s %s"%(newDB,oldDB)
 		logging.debug(cmd)
 		os.system(cmd)
 		return 0
-		
+
 	def do_git_pull(self,*args):
 		try:
 			os.chdir('/var/www')
@@ -111,14 +112,14 @@ class DaemonProcess(Daemon):
 				logging.debug(cmd)
 			except:
 				logging.exception("Exception removing /var/www/router_OFF")
-			
+
 			try:
 				cmd='mv router router_OFF'
 				os.system(cmd)
 				logging.debug(cmd)
 			except:
 				logging.exception("Exception moving router to router_OFF")
-				
+
 			cmd='git clone https://github.com/ccosse/router.git'
 			logging.debug(cmd)
 			p=os.popen(cmd)
@@ -126,11 +127,11 @@ class DaemonProcess(Daemon):
 				line=p.readline()
 				if len(line)<1:
 					break
-			
+
 			cmd="chown -R apache /var/www/*"
 			os.system(cmd)
 			logging.debug(cmd)
-			
+
 		except Exception,e:
 			logging.exception("Exception during git pull")
 			return 1
@@ -151,10 +152,10 @@ class DaemonProcess(Daemon):
 					logging.debug("looks like the end")
 					break
 				logging.debug("%d: %s"%(count,line))
-			
-			p.close()	
-			
-			
+
+			p.close()
+
+
 			"""
 			#This section before chopping-out interactive prompt in manate.py ... now just sails through
 			foo = pexpect.spawn(cmd)
@@ -165,24 +166,24 @@ class DaemonProcess(Daemon):
 			except Exception,e:
 				logging.exception("Exception at pexpect.interact ... check /tmp/foo.log")
 			"""
-			
-			return 0	
+
+			return 0
 		except Exception,e:
 			logging.exception("Exception collecting static")
 			return 1
-		
+
 	def reboot(self,*args):
 		#NEED: history entry
 		logging.debug("reboot")
 		os.system("reboot")
 		return 0
-	
+
 	def cp_default_wifi_configs(self,*args):
 		os.system('cp /var/www/router/os/etc/dnsmasq.conf /etc/')
 		os.system('cp /var/www/router/os/etc/conf.d/net /etc/conf.d/')
 		os.system('cp /var/www/router/os/etc/hostapd/hostapd.conf /etc/hostapd/')
 		return 0
-		 
+
 	def write_wifi_configs(self,pyld):
 		try:
 			logging.debug("write_wifi_configs")
@@ -196,27 +197,27 @@ class DaemonProcess(Daemon):
 			config_wlan0=pyld['config_wlan0']
 			wifi_mode=pyld['wifi_mode']
 			enable_security=pyld['enable_security']
-			
+
 			dhcp_range="%s,%s,12h"%(iprange[0],iprange[1])
 			ouf=open('/etc/dnsmasq.conf','w')
 			line='dhcp-range=%s\n'%dhcp_range
 			ouf.write(line)
 			ouf.write('interface=wlan0\n')
 			ouf.close()
-			
+
 			ouf=open('/etc/hostapd/hostapd.conf','w')
 			ouf.write('interface=wlan0\n')
-			
-			
+
+
 			line='ssid=%s\n'%ssid
 			ouf.write(line)
 			if wifi_mode=='b':ouf.write('hw_mode=b\n')
 			elif wifi_mode=='g':ouf.write('hw_mode=g\n')
 			else:ouf.write('hw_mode=g\n')#yes, even for n
-			
+
 			line='channel=%s\n'%channel
 			ouf.write(line)
-			
+
 			if  wifi_mode=="n":
 				ouf.write('driver=%s\n'%driver)
 				ouf.write('auth_algs=1\n')
@@ -227,7 +228,7 @@ class DaemonProcess(Daemon):
 				ouf.write('#auth_algs=1\n')
 				ouf.write('#wmm_enabled=0\n')
 				#ouf.write('#ieee80211n=1\n')
-			
+
 			if enable_security=='on':
 				wpa=2
 				line='wpa=%d\n'%(wpa)
@@ -239,7 +240,7 @@ class DaemonProcess(Daemon):
 				ouf.write('wpa_group_rekey=600\n')
 				ouf.write('wpa_gmk_rekey=86400\n')
 				ouf.close()
-			
+
 			else:
 				wpa=2
 				line='#wpa=%d\n'%(wpa)
@@ -251,12 +252,12 @@ class DaemonProcess(Daemon):
 				ouf.write('#wpa_group_rekey=600\n')
 				ouf.write('#wpa_gmk_rekey=86400\n')
 				ouf.close()
-			
+
 			ouf=open('/etc/conf.d/net','w')
 			ouf.write('config_eth0="dhcp"\n')
-			ouf.write('modules=("!iwconfig !wpa_supplicant")\n')	
+			ouf.write('modules=("!iwconfig !wpa_supplicant")\n')
 			line='essid_wlan0="%s"\n'%ssid
-			ouf.write(line)	
+			ouf.write(line)
 			ouf.write('mode_wlan0="master"\n')
 			line='config_wlan0="%s"\n'%config_wlan0
 			ouf.write(line)
@@ -267,9 +268,9 @@ class DaemonProcess(Daemon):
 			return 1
 
 	def run(self):
-		
+
 		self.RUNNING=False
-		
+
 		self.server=SimpleXMLRPCServer((get_rpc_hostname(),DJANGO_SERVICE_PORT))
 		self.server.register_introspection_functions()
 		self.server.register_instance(self)
@@ -280,7 +281,7 @@ class DaemonProcess(Daemon):
 if __name__=="__main__":
 
 	daemon=DaemonProcess('/var/run/django_listener_daemon.pid')
-	
+
 	if len(sys.argv)==2:
 		if 'start'==sys.argv[1]:
 			daemon.start()
@@ -293,7 +294,7 @@ if __name__=="__main__":
 				print 'running'
 			else:
 				print 'stopped'
-				
+
 		else:
 			logging.debug("UNK")
 			print "Unknown command"

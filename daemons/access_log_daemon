@@ -15,6 +15,7 @@ rexp = re.compile('([^ ]*) ([^ ]*) ([^ ]*) \[([^]]*)\] "([^"]*)" ([^ ]*) ([^ ]*)
 class DaemonProcess(Daemon):
 	def __init__(self,pidfile):
 		Daemon.__init__(self,pidfile)
+		self.RUNNING=False
 		self.t_last_call=time.time()
 		self.buffer=[]
 
@@ -43,7 +44,7 @@ class DaemonProcess(Daemon):
 		which_file=os.path.basename(args[0])
 
 		p=os.popen(cmd)
-		
+
 
 		while self.RUNNING:
 

@@ -48,6 +48,7 @@ class DaemonProcess(Daemon):
 
 		self.tcpdump_cmd=cmd
 		self.t_last_call=time.time()
+		self.RUNNING=False
 
 	def get_geoip(self,*args):
 		#logging.debug("get_geoip")

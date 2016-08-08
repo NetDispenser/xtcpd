@@ -7,15 +7,16 @@ logging.basicConfig(filename=MEMORY_LOG,level=logging.DEBUG,format=FORMAT)
 
 
 class DaemonProcess(Daemon):
-	
+
 	def __init__(self,pidfile):
 		Daemon.__init__(self,pidfile)
 		self.buffer=[]
-		
+		self.RUNNING=False
+
 	def get_data(self,*args):
-		
+
 		self.t_last_call=time.time()
-		
+
 		if not self.RUNNING:
 			self.RUNNING=True
 			logging.debug("tcp_daemon self-starting")
@@ -25,72 +26,72 @@ class DaemonProcess(Daemon):
 		assume only 1 client and clear data each time requested
 		"""
 		rval=copy.copy(self.buffer)
-		
+
 		if AM_DEMO:
 			pass
 		else:
 			self.buffer.__init__()
-		
+
 		return rval
-				
+
 	def get_mem(self):
 		rval=[]
-		
+
 		cmd="free"
 		p=os.popen(cmd);
-		
+
 		dummy=p.readline()
-		
+
 		r0_raw=p.readline()
 		for dummy in range(20):
 			r0_raw=string.replace(r0_raw,"  "," ")
-			
+
 		r0_vals=r0_raw.split(" ")
 		rval.append(r0_vals[2])
 		rval.append(r0_vals[1])
-		
+
 		dummy=p.readline()
-		
+
 		r0_raw=p.readline()
 		for dummy in range(20):
 			r0_raw=string.replace(r0_raw,"  "," ")
-			
+
 		r0_vals=r0_raw.split(" ")
 		rval.append(r0_vals[2])
 		rval.append(r0_vals[1])
-		
+
 		p.close()
-		
+
 		cmd="cat /proc/loadavg"
 		p=os.popen(cmd)
 		dummy=p.readline()
 		split_dummy=dummy.split(" ")
 		rval.append(split_dummy[0])
 		p.close()
-		
+
 		return rval
-		
+
 	def while_running(self,*args):
-		
+
 		t_last=time.time()
 		time.sleep(TSLEEP)
-		
+
 		while self.RUNNING:
-			
+
 			if self.t_last_call<time.time()-30:
 				self.RUNNING=False
 				logging.info("memory_daemon self-stopping")
-		
+
 			tstamp=mktstamp()
-			
+
 			t_now=time.time()
 			dt=t_now-t_last
-			
+
 			mem=self.get_mem()
 			msg="%.02f,%s,%s,%s,%s,%s,%s"%(t_now,tstamp,mem[0],mem[1],mem[2],mem[3],mem[4])
 			self.buffer.append(msg)
-			
-			
+
+
 			#scenerio: nobody's expired,large buffer, then trickle of traffic and only removing 10x per matched line
 			#i.e. not clearing out fast enough ... hence dangerour while loop:
 			while True:
@@ -103,15 +104,15 @@ class DaemonProcess(Daemon):
 				except Exception,e:
 					logging.exception("exception clearing tcp buffer")
 					break
-				
+
 			t_last=t_now
 			time.sleep(1)
-			
-		
+
+
 	def run(self):
-		
+
 		self.RUNNING=False
-		
+
 		self.server=SimpleXMLRPCServer((get_rpc_hostname(),MEMORY_PORT))
 		self.server.register_introspection_functions()
 		self.server.register_instance(self)
@@ -122,7 +123,7 @@ class DaemonProcess(Daemon):
 if __name__=="__main__":
 
 	daemon=DaemonProcess('/var/run/memory_daemon.pid')
-	
+
 	if len(sys.argv)==2:
 		if 'start'==sys.argv[1]:
 			daemon.start()
@@ -135,7 +136,7 @@ if __name__=="__main__":
 				print 'running'
 			else:
 				print 'stopped'
-				
+
 		else:
 			logging.debug("UNK")
 			print "Unknown command"
