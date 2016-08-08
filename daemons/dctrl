@@ -10,7 +10,7 @@ dnames=[
 	'django_listener_daemon',
 	'network_traffic_daemon',
 	'tcp_daemon',
-	'credit_meter_daemon',
+	#'credit_meter_daemon',
 	#'messages_daemon',
 ]
 
@@ -36,11 +36,11 @@ if __name__=='__main__':
 	if len(sys.argv)<2:
 		show_usage()
 		sys.exit()
-	
+
 	if dcmds.count(sys.argv[1])<1:
 		#print sys.argv[1]
 		show_usage()
 		sys.exit()
-	
+
 	x=DCTRL(sys.argv[1])
 	sys.exit()

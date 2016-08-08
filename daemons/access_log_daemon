@@ -43,7 +43,7 @@ class DaemonProcess(Daemon):
 		which_file=os.path.basename(args[0])
 
 		p=os.popen(cmd)
-		self.t_last_call=time.time()
+		
 
 		while self.RUNNING:
 
@@ -71,7 +71,7 @@ class DaemonProcess(Daemon):
 			strdict="%0.2f,%s"%(time.time(),json.dumps(rdict))
 			logging.debug(strdict)
 			self.buffer.append(strdict)
-			
+
 
 		p.close()
 
