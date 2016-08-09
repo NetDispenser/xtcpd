@@ -144,6 +144,12 @@ class DaemonProcess(Daemon):
 
 			try:
 				if not self.ips.has_key(dest):
+					
+					gkeys=None
+					if USE_PYGEOIP:
+						gkeys=['city','region_code','area_code','time_zone','dma_code','metro_code','country_code3','latitude','postal_code','longitude','country_code','country_name','continent']
+					else:
+						gkeys=['city','region_name','area_code','time_zone','metro_code','country_code3','latitude','postal_code','longitude','country_code','country_name']
 
 					logging.debug("adding "+dest)
 					g=gip.record_by_addr(dest)
@@ -171,11 +177,6 @@ class DaemonProcess(Daemon):
 							logging.debug("skipping: "+dest)
 						continue
 
-					gkeys=None
-					if USE_PYGEOIP:
-						gkeys=['city','region_code','area_code','time_zone','dma_code','metro_code','country_code3','latitude','postal_code','longitude','country_code','country_name','continent']
-					else:
-						gkeys=['city','region_name','area_code','time_zone','metro_code','country_code3','latitude','postal_code','longitude','country_code','country_name']
 
 					self.ips[dest]={
 						'keys':gkeys,
