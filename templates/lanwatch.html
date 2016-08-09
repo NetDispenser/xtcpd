@@ -177,7 +177,7 @@ window.render_data=function(x){
 				rdiv=window.draw_icon(HOME_LONLAT,p2,marker_id);
 
 
-				var rdiv_title=GEOIP_DATA[key]['src']+":"+GEOIP_DATA[key]['src_port']+" -> "+key+":"+GEOIP_DATA[key]['dest_port']+" CTRY_IDN="+GEOIP_DATA[key]['idn_country']+" IP_IDN = FIXME";
+				var rdiv_title=GEOIP_DATA[key]['src']+":"+GEOIP_DATA[key]['src_port']+" -> "+key+":"+GEOIP_DATA[key]['dest_port']+" CTRY_IDN="+GEOIP_DATA[key]['idn_country']+" IP_IDN = "+GEOIP_DATA[key]['ip_idn'];
 
 				for(var gkidx=0;gkidx<GEOIP_DATA[key]['keys'].length;gkidx++){
 					//console.log("gkidx="+gkidx);

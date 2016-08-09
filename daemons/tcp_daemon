@@ -138,13 +138,18 @@ class DaemonProcess(Daemon):
 			dest_port=a.group(7)
 
 			if not IP_IDNS.has_key(dest):
-				IP_IDNS['idn_last']+=1
-				IP_IDNS[dest]=IP_IDNS['idn_last']
-				logging.debug(dest+" -> "+`IP_IDNS['idn_last']`)
+				IP_IDNS["last_idn"]+=1
+				IP_IDNS[dest]=IP_IDNS["last_idn"]
+				logging.debug("added :"+dest+" as IP_IDNS IDN="+IP_IDNS[dest])
 
+			if not IP_IDNS.has_key(src):
+				IP_IDNS["last_idn"]+=1
+				IP_IDNS[src]=IP_IDNS["last_idn"]
+				logging.debug("added :"+src+" as IP_IDNS IDN="+IP_IDNS[src])
+				
 			try:
 				if not self.ips.has_key(dest):
-					
+
 					gkeys=None
 					if USE_PYGEOIP:
 						gkeys=['city','region_code','area_code','time_zone','dma_code','metro_code','country_code3','latitude','postal_code','longitude','country_code','country_name','continent']
