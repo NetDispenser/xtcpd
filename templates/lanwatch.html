@@ -144,39 +144,40 @@ window.render_data=function(x){
 				var p2=[parseFloat(GEOIP_DATA[key]['longitude']),parseFloat(GEOIP_DATA[key]['latitude'])];
 				window.draw_radial(HOME_LONLAT,p2);
 
-				//var p2 = ol.proj.transform(p2, 'EPSG:4326', 'EPSG:3857');
-				var marker_id="client_marker";
+
+				var marker_id="marker_default";
+				var PORT='src_port';
 				if(false){;}
-				else if(GEOIP_DATA[key]['dest_port']=='.53')
+				else if(GEOIP_DATA[key][PORT]=='.53')
 						marker_id="marker53";
-				else if(GEOIP_DATA[key]['src_port']=='.80')
+				else if(GEOIP_DATA[key][PORT]=='.80')
 						marker_id="marker80";
-				else if(GEOIP_DATA[key]['src_port']=='.23')
+				else if(GEOIP_DATA[key][PORT]=='.23')
 						marker_id="marker23";
-				else if(GEOIP_DATA[key]['src_port']=='.25')
+				else if(GEOIP_DATA[key][PORT]=='.25')
 						marker_id="marker25";
-				else if(GEOIP_DATA[key]['src_port']=='.53')
+				else if(GEOIP_DATA[key][PORT]=='.53')
 						marker_id="marker53";
-				else if(GEOIP_DATA[key]['src_port']=='.179')
+				else if(GEOIP_DATA[key][PORT]=='.179')
 						marker_id="marker179";
-				else if(GEOIP_DATA[key]['src_port']=='.443')
+				else if(GEOIP_DATA[key][PORT]=='.443')
 						marker_id="marker443";
-				else if(GEOIP_DATA[key]['src_port']=='.445')
+				else if(GEOIP_DATA[key][PORT]=='.445')
 						marker_id="marker445";
-				else if(GEOIP_DATA[key]['src_port']=='.1433')
+				else if(GEOIP_DATA[key][PORT]=='.1433')
 						marker_id="marker1433";
-				else if(GEOIP_DATA[key]['src_port']=='.22')
+				else if(GEOIP_DATA[key][PORT]=='.22')
 						marker_id="marker22";
-				else if(GEOIP_DATA[key]['src_port']=='.4200')
+				else if(GEOIP_DATA[key][PORT]=='.4200')
 						marker_id="marker4200";
-				else if(GEOIP_DATA[key]['src_port']=='.5901')
+				else if(GEOIP_DATA[key][PORT]=='.5901')
 						marker_id="marker5901";
 				else marker_id="marker_default";
 
 				rdiv=window.draw_icon(HOME_LONLAT,p2,marker_id);
 
 
-				var rdiv_title=key+" "+GEOIP_DATA[key]['src_port']+" -> "+GEOIP_DATA[key]['dest_port']+" CTRY_IDN="+GEOIP_DATA[key]['idn_country']+" IP_IDN = FIXME";
+				var rdiv_title=key+":"+GEOIP_DATA[key]['src_port']+" -> "+GEOIP_DATA[key]['dest']+":"+GEOIP_DATA[key]['dest_port']+" CTRY_IDN="+GEOIP_DATA[key]['idn_country']+" IP_IDN = FIXME";
 
 				for(var gkidx=0;gkidx<GEOIP_DATA[key]['keys'].length;gkidx++){
 					//console.log("gkidx="+gkidx);
@@ -287,7 +288,7 @@ window.render_data=function(x){
 			t=document.createTextNode(SORTED_SRCS[sidx]+" @ "+GEOIP_DATA[skey]['src_port']+" -> "+GEOIP_DATA[skey]['dest_port']+" "+GEOIP_DATA[skey]['city']+", "+GEOIP_DATA[skey]['region_name']+", "+GEOIP_DATA[skey]['country_name']);
 			}catch(e){console.log("skipping");continue;}
 			b.appendChild(t);
-	
+
 			b.id=SORTED_SRCS[sidx];
 			b.className="traffic_src";
 			b.style.color=SRC_COLORS[sidx];
@@ -677,7 +678,7 @@ $(document).ready(function(){
 		$("#lhs_panel").animate({
 			width:'toggle'
 		},1000,function(){});
-		
+
 	});
 
 	$("#apache_panel").hide();

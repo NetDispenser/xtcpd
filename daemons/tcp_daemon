@@ -150,24 +150,24 @@ class DaemonProcess(Daemon):
 					if not g:
 						if dest=='10.0.0.13':
 							self.ips[dest]={
-                                                		'keys':gkeys,
-                                                		'src':src,
-                                                		'dest':dest,
-                                                		'src_port':src_port,
-                                                		'dest_port':dest_port,
-                                                		'idn_country':'US',
-                                                		'ip_idn':0,
+                                'keys':gkeys,
+                                'src':src,
+                                'dest':dest,
+                                'src_port':src_port,
+                            	'dest_port':dest_port,
+                                'idn_country':'US',
+                                'ip_idn':0,
 								'city':'Beaverton',
 								'region_name':'Oregon',
 								'area_code':503,
 								'time_zone':'Pacific',
-								'latitude':37.333,
-								'longitude':-121.9,
+								'latitude':45.4871,
+								'longitude':-122.803,
 								'country_code':232,
 								'country_name':'United States',
-                                        		}
-                                        		
-						else:	
+                            }
+
+						else:
 							logging.debug("skipping: "+dest)
 						continue
 
@@ -176,7 +176,7 @@ class DaemonProcess(Daemon):
 						gkeys=['city','region_code','area_code','time_zone','dma_code','metro_code','country_code3','latitude','postal_code','longitude','country_code','country_name','continent']
 					else:
 						gkeys=['city','region_name','area_code','time_zone','metro_code','country_code3','latitude','postal_code','longitude','country_code','country_name']
-			
+
 					self.ips[dest]={
 						'keys':gkeys,
 						'src':src,
