@@ -146,7 +146,7 @@ window.render_data=function(x){
 
 
 				var marker_id="marker_default";
-				var PORT='src_port';
+				var PORT='dest_port';
 				if(false){;}
 				else if(GEOIP_DATA[key][PORT]=='.53')
 						marker_id="marker53";
@@ -177,7 +177,7 @@ window.render_data=function(x){
 				rdiv=window.draw_icon(HOME_LONLAT,p2,marker_id);
 
 
-				var rdiv_title=key+":"+GEOIP_DATA[key]['dest_port']+" -> "+GEOIP_DATA[key]['src']+":"+GEOIP_DATA[key]['src_port']+" CTRY_IDN="+GEOIP_DATA[key]['idn_country']+" IP_IDN = FIXME";
+				var rdiv_title=GEOIP_DATA[key]['src']+":"+GEOIP_DATA[key]['src_port']+" -> "+key+":"+GEOIP_DATA[key]['dest_port']+" CTRY_IDN="+GEOIP_DATA[key]['idn_country']+" IP_IDN = FIXME";
 
 				for(var gkidx=0;gkidx<GEOIP_DATA[key]['keys'].length;gkidx++){
 					//console.log("gkidx="+gkidx);
