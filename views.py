@@ -15,12 +15,10 @@ logging.basicConfig(filename='/var/log/xtcpd/xtcpd.log',level=logging.DEBUG, for
 
 def home(request):
 	s=xmlrpc.client.Server("http://localhost:8000")
-	rval=s.is_even(3)
+	rval=s.get_data()
 	return render_to_response(
-                'xtcpd.html',
-                {
-                        'title':'xtcpd',
+	    'xtcpd.html',{
+            'title':'xtcpd',
 			'rval':rval,
-                },
-#                context_instance=RequestContext(request)
+        },
 	)
