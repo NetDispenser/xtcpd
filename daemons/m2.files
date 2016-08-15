@@ -1,8 +1,0 @@
-#/var/log/lanwatch/tcp_daemon.log
-#/var/log/lanwatch/network_traffic_daemon.log
-#/tmp/develop.log
-/var/log/apache2/access.geonode
-/var/log/apache2/access.log
-/var/log/apache2/access.aorg
-/var/log/apache2/access.parks
-

@@ -1,5 +1,0 @@
-1. 	In network traffic daemon. getRxTx need to examine
-	/proc/self/net/dev for how many lines (2-?) and set
-	manually.  default is only 2 lines, for safety, but
-	typically 3 for router.
-	
