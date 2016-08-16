@@ -3,7 +3,7 @@ from daemon import Daemon
 #from service_utils import *
 #from country_codes import *
 #from ip_idns import *
-import logging,json,time,sys,os
+import logging,json,time,sys,os,re,copy
 from xmlrpc.server import SimpleXMLRPCServer
 import threading
 from queue import Queue
@@ -14,6 +14,10 @@ logging.disable(logging.DEBUG)
 
 lock = threading.Lock()
 
+import GeoIP
+gip=GeoIP.open("/usr/share/GeoIP/GeoLiteCity.dat",GeoIP.GEOIP_STANDARD)
+
+rexp=re.compile('(\d+:\d+:\d+)(\.\d+) (IP) (.*)(\.\d+) > (\d+\.\d+\.\d+\.\d+)(\.\d+)(.*)')
 
 class DaemonProcess(Daemon):
 
@@ -26,33 +30,64 @@ class DaemonProcess(Daemon):
 		self.RUNNING=False
 		self.tids=[]
 		self.DEBUG=False
+		self.main_thread=None
+		self.NUM_THREADS=5
+		self.buffer=[]
 
 	def harvest(self):
 		cmd="tcpdump -i eth0 -l -s 0 -n"
 		p=os.popen(cmd)
 		while True:
-			self.q.put(p.readline())
-			for dummy in range(3-len(self.tids)):
+			if self.RUNNING:self.q.put(p.readline())
+			else:time.sleep(1)
+
+			for dummy in range(self.NUM_THREADS-len(self.tids)):
+					logging.debug("creating thread")
 					t=threading.Thread(target=self.process)
 					t.daemon=True
 					t.start()
 					self.tids.append(t)
 					self.create_count+=1
 
-
 	def process(self):
 		while True:
 			with lock:
+				#if self.q.qsize()==0:
+				#	logging.debug(threading.current_thread().name+" EXITING")
+				#	self.tids.remove(threading.current_thread())
+				#	threading.current_thread().exit()
+				#	self.exit_count+=1
+
 				logging.debug(threading.current_thread().name+" getting item")
 				item=self.q.get()
-				if item:
-					logging.debug(threading.current_thread().name+" got item "+item)
-					self.pcount+=1
+				logging.debug(threading.current_thread().name+" got item "+item)
+				a=rexp.match(item)
+				if not a:
+					logging.debug("NO MATCH")
+					continue
 				else:
-					logging.debug(threading.current_thread().name+" EXITING")
-					self.tids.remove(threading.current_thread())
-					threading.current_thread().exit()
-					self.exit_count+=1
+					logging.debug("Match")
+					self.pcount+=1
+				src=a.group(4)
+				sport=a.group(5)
+				dst=a.group(6)
+				dport=a.group(7)
+				msg="%s %s -> %s %s"%(src,sport,dst,dport)
+				logging.debug(msg)
+				pval=gip.record_by_addr(dst)
+				try:pval['keys']=list(pval.keys())
+				except:logging.debug("ERROR")#b/c g(192.168) DNE
+				pval["keys"].append("src")
+				pval["keys"].append("sport")
+				pval["keys"].append("dst")
+				pval["keys"].append("dport")
+				pval['src']=src
+				pval['sport']=sport
+				pval['dst']=dst
+				pval['dport']=dport
+				self.buffer.append(pval)
+				self.q.task_done()
+
 
 	def toggle_debug(self,*args):
 		if not self.DEBUG:
@@ -61,27 +96,45 @@ class DaemonProcess(Daemon):
 		else:
 			self.DEBUG=False
 			logging.disable(logging.DEBUG)
+		rval={'keys':['debug'],'debug':self.DEBUG}
+		return json.dumps(rval)
 
-		return self.DEBUG
+	def toggle_running(self,*args):
+		if not self.RUNNING:
+			self.RUNNING=True
+			logging.debug("xtcpd starting")
+			self.main_thread = threading.Thread(target=self.harvest)
+			self.main_thread.daemon = True  # thread dies when main thread (only non-daemon thread) exits.
+			self.main_thread.start()
+
+		else:
+			#self.main_thread.exit()
+			#self.main_thread=None
+			self.RUNNING=False
+			self.tids.__init__()
+			#self.main_thread.exit()
+			#self.q.join()
+
+
+		rval={'keys':['running'],'running':self.RUNNING}
+		return json.dumps(rval)
 
 	def get_data(self,*args):
 		logging.debug("get_data")
 		self.t_last_call=time.time()
-		if not self.RUNNING:
-			self.RUNNING=True
-			logging.debug("tcp_daemon self-starting")
-			t = threading.Thread(target=self.harvest)
-			t.daemon = True  # thread dies when main thread (only non-daemon thread) exits.
-			t.start()
 
 		rval={
+			'keys':['time','qsize','pcount','exit_count','create_count','len(tids)','running','buffer'],
 			'time':time.time(),
 			'qsize':self.q.qsize(),
 			'pcount':self.pcount,
 			'exit_count':self.exit_count,
 			'create_count':self.create_count,
 			'len(tids)':len(self.tids),
+			'running':self.RUNNING,
+			'buffer':copy.copy(self.buffer),
 		}
+		self.buffer.__init__()
 		return json.dumps(rval)
 
 	def run(self):
@@ -89,6 +142,7 @@ class DaemonProcess(Daemon):
 		self.server=SimpleXMLRPCServer(('localhost',8000))
 		self.server.register_introspection_functions()
 		self.server.register_function(self.toggle_debug)
+		self.server.register_function(self.toggle_running)
 		self.server.register_instance(self)
 		self.server.serve_forever()
 

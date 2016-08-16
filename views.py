@@ -13,12 +13,37 @@ from django.contrib.auth.decorators import login_required
 FORMAT = '%(asctime)-15s %(message)s'
 logging.basicConfig(filename='/var/log/xtcpd/xtcpd.log',level=logging.DEBUG, format=FORMAT)
 
-def home(request):
-	s=xmlrpc.client.Server("http://localhost:8000")
-	rval=s.get_data()
+def xtcpd(request):
+	try:
+		qs=request.META['QUERY_STRING']
+		if len(qs)>1:
+			s=xmlrpc.client.Server("http://localhost:8000")
+			if qs=='get_data':
+				rval=s.get_data()
+			elif qs=='toggle_debug':
+				rval=s.toggle_debug()
+			elif qs=='toggle_running':
+				rval=s.toggle_running()
+			return HttpResponse( rval )
+	except:pass
+
 	return render_to_response(
 	    'xtcpd.html',{
-            'title':'xtcpd',
+            'title':'XTCPD',
+			'rval':{},
+        },
+	)
+
+def home(request):
+
+	s=xmlrpc.client.Server("http://localhost:8000")
+	rval=None
+	try:rval=s.get_data()
+	except:rval={}
+
+	return render_to_response(
+	    'xtcpd.html',{
+            'title':'XTCPD',
 			'rval':rval,
         },
 	)
