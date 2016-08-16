@@ -3,7 +3,7 @@ from daemon import Daemon
 #from service_utils import *
 #from country_codes import *
 #from ip_idns import *
-import logging,json,time,sys,os,re,copy
+import logging,json,time,sys,os,re,copy,datetime
 from xmlrpc.server import SimpleXMLRPCServer
 import threading
 from queue import Queue
@@ -16,67 +16,80 @@ lock = threading.Lock()
 
 import GeoIP
 gip=GeoIP.open("/usr/share/GeoIP/GeoLiteCity.dat",GeoIP.GEOIP_STANDARD)
-
 rexp=re.compile('(\d+:\d+:\d+)(\.\d+) (IP) (.*)(\.\d+) > (\d+\.\d+\.\d+\.\d+)(\.\d+)(.*)')
+tcpdump_cmd="tcpdump -i eth0 -l -s 0 -n"
 
 class DaemonProcess(Daemon):
 
 	def __init__(self,pidfile):
 		Daemon.__init__(self,pidfile)
+		self.CONFIG=None
+		self.reload_config()
 		self.q = Queue()
 		self.pcount=0
 		self.create_count=0
 		self.RUNNING=False
 		self.DEBUG=False
-		self.NUM_THREADS=5
 		self.buffer=[]
 		self.ips={}
 		self.t=None
+		self.t_last=time.perf_counter()
+		self.cities=[]
+		self.countries=[]
 
 	def harvest(self):
-		cmd="tcpdump -i eth0 -l -s 0 -n"
-		p=os.popen(cmd)
+		p=os.popen(tcpdump_cmd)
 		while True:
 			if self.RUNNING:
 				self.q.put(p.readline())
-				for dummy in range(self.NUM_THREADS-threading.active_count()):
+				for dummy in range(self.CONFIG['num_threads']-threading.active_count()):
 					logging.debug("creating thread")
 					t=threading.Thread(target=self.process)
 					t.daemon=True
 					t.start()
 					self.create_count+=1
-			else:time.sleep(1)
+			else:
+				p.flush()
+				time.sleep(.2)
 
 	def process(self):
 		while True:
-			#with lock:
-			try:
+			with lock:
 				item=self.q.get()
 				a=rexp.match(item)
 				if not a:continue
 				else:self.pcount+=1
+
 				src=a.group(4)
 				sport=a.group(5)
 				dst=a.group(6)
 				dport=a.group(7)
+				"""
+				if src in self.ips:
+					self.ips[src]['count']+=1
+				else:
+					g=gip.record_by_addr(src)
+					if g:
+						g['count']=1
+						self.ips[src]=g
+						self.buffer.append(src)
+						self.cities.append(g['city'])
+						self.countries.append(g['country_code'])
+					else:self.ips[src]={'count':1,}
+				"""
+				if dst in self.ips:
+					self.ips[dst]['count']+=1
+				else:
+					g=gip.record_by_addr(dst)
+					if g:
+						g['count']=1
+						self.ips[dst]=g
+						self.buffer.append(dst)
+						self.cities.append(g['city'])
+						self.countries.append(g['country_code'])
+					else:self.ips[dst]={'count':1,}
+
 				msg="%s %s -> %s %s"%(src,sport,dst,dport)
-				logging.debug(msg)
-				pval=gip.record_by_addr(dst)
-				if not pval:continue
-				try:pval['keys']=list(pval.keys())
-				except:pass#b/c g(192.168) DNE
-				pval["keys"].append("src")
-				pval["keys"].append("sport")
-				pval["keys"].append("dst")
-				pval["keys"].append("dport")
-				pval['src']=src
-				pval['sport']=sport
-				pval['dst']=dst
-				pval['dport']=dport
-				self.buffer.append(pval)
-				#self.q.task_done()
-			except:
-				logging.exception("exception processing")
 
 	def toggle_debug(self,*args):
 		if not self.DEBUG:
@@ -104,21 +117,47 @@ class DaemonProcess(Daemon):
 
 	def get_data(self,*args):
 		#logging.debug("get_data")
-		self.t_last_call=time.time()
+		t_now=time.perf_counter()
+		dt=t_now-self.t_last
+		self.t_last=t_now
 
 		rval={
-			'keys':['time','qsize','pcount','create_count','running','debug','active','buffer'],
-			'time':time.time(),
+			'keys':['server_time','dt','qsize','pcount','create_count','running','debug','active','buffer','ipkeys','cities','countries'],
+			'server_time':"%s"%datetime.datetime.now(),
+			'dt':"%.3f"%dt,
 			'qsize':self.q.qsize(),
 			'pcount':self.pcount,
 			'create_count':self.create_count,
 			'running':self.RUNNING,
 			'active':threading.active_count(),
-			'buffer':copy.copy(self.buffer),
+			'buffer':json.dumps(self.buffer),
 			'debug':self.DEBUG,
+			'ipkeys':json.dumps(list(self.ips.keys())),
+			'cities':json.dumps(self.cities),
+			'countries':json.dumps(self.countries),
 		}
 		self.buffer.__init__()
 		return json.dumps(rval)
+
+	def reload_config(self,*args):
+		try:
+			logging.debug("reload_config")
+			inf=open('/var/www/rpi/xtcpd/daemons/xtcpd.config','r')
+			self.CONFIG=eval(inf.readline().rstrip())
+			inf.close()
+			logging.debug('config reloaded')
+			return {'keys':['rval'],'rval':True}
+		except:
+			logging.exception(sys.exc_info())
+			return {'keys':['rval'],'rval':False}
+
+	def reset(self,*args):
+		self.ips={}
+		self.pcount=0
+		self.cities.__init__()
+		self.countries.__init__()
+		self.buffer.__init__()
+		return {'keys':['rval'],'rval':True}
 
 	def run(self):
 		self.RUNNING=False
@@ -126,6 +165,8 @@ class DaemonProcess(Daemon):
 		self.server.register_introspection_functions()
 		self.server.register_function(self.toggle_debug)
 		self.server.register_function(self.toggle_running)
+		self.server.register_function(self.reload_config)
+		self.server.register_function(self.reset)
 		self.server.register_instance(self)
 		self.server.serve_forever()
 

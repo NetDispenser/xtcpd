@@ -24,6 +24,10 @@ def xtcpd(request):
 				rval=s.toggle_debug()
 			elif qs=='toggle_running':
 				rval=s.toggle_running()
+			elif qs=='reload_config':
+				rval=s.reload_config()
+			elif qs=='reset':
+				rval=s.reset()
 			return HttpResponse( rval )
 	except:pass
 
