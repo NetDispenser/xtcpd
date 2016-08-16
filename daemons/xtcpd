@@ -117,6 +117,7 @@ class DaemonProcess(Daemon):
 
 	def get_data(self,*args):
 		#logging.debug("get_data")
+		logging.debug(*args)
 		t_now=time.perf_counter()
 		dt=t_now-self.t_last
 		self.t_last=t_now
@@ -161,7 +162,7 @@ class DaemonProcess(Daemon):
 
 	def run(self):
 		self.RUNNING=False
-		self.server=SimpleXMLRPCServer(('localhost',8000))
+		self.server=SimpleXMLRPCServer(('hotspot.asymptopia.org',8000))
 		self.server.register_introspection_functions()
 		self.server.register_function(self.toggle_debug)
 		self.server.register_function(self.toggle_running)
