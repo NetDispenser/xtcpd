@@ -4,7 +4,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
 #bg{width:100%;height:90%;background-color:teal;color:white;}
-.button{width:120px;height:60px;background:red;color:white;}
+.button{width:100px;height:30px;background:red;color:white;}
 </style>
 <script type="text/javascript">
 
@@ -100,11 +100,20 @@ window.update();
 <div id="bg">
 	<h1>{{rval}}</h1>
 </div>
+
+<table>
+<tr>
+<td>
 <div id="debugB" class="button" onclick="debugCB()">
 <span>DeBug</span>
 </div>
+</td><td>
 <div id="runningB" class="button" onclick="runningCB()">
 <span>Running</span>
 </div>
+</td>
+</tr>
+</table>
+
 </body>
 </html>
