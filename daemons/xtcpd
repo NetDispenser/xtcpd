@@ -4,18 +4,49 @@ from daemon import Daemon
 #from country_codes import *
 #from ip_idns import *
 import logging,json,time,sys,os,re,copy,datetime
-from xmlrpc.server import SimpleXMLRPCServer
-import threading
-from queue import Queue
 
 FORMAT = '%(message)s'
 logging.basicConfig(filename='xtcpd.log',level=logging.DEBUG,format=FORMAT)
 logging.disable(logging.DEBUG)
 
-lock = threading.Lock()
+if sys.version_info[0]==3:
+	logging.debug("from xmlrpc.server import SimpleXMLRPCServer")
+	from xmlrpc.server import SimpleXMLRPCServer
+elif sys.version_info[0]==2:
+	logging.debug("from xmlrpclib import SimpleXMLRPCServer")
+	from xmlrpclib import SimpleXMLRPCServer
+else:
+	logging.debug("from xmlrpclib import SimpleXMLRPCServer")
+	from xmlrpclib import SimpleXMLRPCServer
 
-import GeoIP
-gip=GeoIP.open("/usr/share/GeoIP/GeoLiteCity.dat",GeoIP.GEOIP_STANDARD)
+import threading
+from queue import Queue
+
+
+XTCPD_PID='/var/run/xtcpd.pid'
+XTCPD_LOCK = threading.Lock()
+
+UBUNTU=False
+if UBUNTU:
+	XTCPD_HOSTNAME='xtcpd.asymptopia.org'
+	XTCPD_CONFIG='/var/www/xtcpd/xapp/daemons/xtcpd.config'
+	USE_PYGEOIP=True
+else:
+	XTCPD_HOSTNAME='hotspot.asymptopia.org'
+	XTCPD_CONFIG='/var/www/rpi/xtcpd/daemons/xtcpd.config'
+	USE_PYGEOIP=False
+
+
+gip=None
+if USE_PYGEOIP:
+	import pygeoip
+	gip=pygeoip.GeoIP("/usr/share/GeoIP/GeoLiteCity.dat")
+else:
+	import GeoIP
+	gip=GeoIP.open("/usr/share/GeoIP/GeoLiteCity.dat",GeoIP.GEOIP_STANDARD)
+
+#import GeoIP
+#gip=GeoIP.open("/usr/share/GeoIP/GeoLiteCity.dat",GeoIP.GEOIP_STANDARD)
 rexp=re.compile('(\d+:\d+:\d+)(\.\d+) (IP) (.*)(\.\d+) > (\d+\.\d+\.\d+\.\d+)(\.\d+)(.*)')
 tcpdump_cmd="tcpdump -i eth0 -l -s 0 -n"
 
@@ -55,7 +86,7 @@ class DaemonProcess(Daemon):
 
 	def process(self):
 		while True:
-			with lock:
+			with XTCPD_LOCK:
 				item=self.q.get()
 				a=rexp.match(item)
 				if not a:continue
@@ -149,7 +180,7 @@ class DaemonProcess(Daemon):
 	def reload_config(self,*args):
 		try:
 			logging.debug("reload_config")
-			inf=open('/var/www/rpi/xtcpd/daemons/xtcpd.config','r')
+			inf=open(XTCPD_CONFIG,'r')
 			self.CONFIG=eval(inf.readline().rstrip())
 			inf.close()
 			logging.debug('config reloaded')
@@ -169,8 +200,7 @@ class DaemonProcess(Daemon):
 
 	def run(self):
 		self.RUNNING=False
-		self.server=SimpleXMLRPCServer(('hotspot.asymptopia.org',8000))
-		#self.server=SimpleXMLRPCServer(('http://192.168.68.1',8000))
+		self.server=SimpleXMLRPCServer((XTCPD_HOSTNAME,8000))
 		self.server.register_introspection_functions()
 		self.server.register_function(self.toggle_debug)
 		self.server.register_function(self.toggle_running)
@@ -180,7 +210,7 @@ class DaemonProcess(Daemon):
 		self.server.serve_forever()
 
 if __name__=="__main__":
-	daemon=DaemonProcess('/var/run/xtcpd.pid')
+	daemon=DaemonProcess(XTCPD_PID)
 	if len(sys.argv)==2:
 		if 'start'==sys.argv[1]:
 			daemon.start()
@@ -189,7 +219,7 @@ if __name__=="__main__":
 		elif 'restart'==sys.argv[1]:
 			daemon.restart()
 		elif 'status'==sys.argv[1]:
-			if os.path.exists('/var/run/xtcpd.pid'):
+			if os.path.exists(XTCPD_PID):
 				print('running')
 			else:
 				print('stopped')

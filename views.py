@@ -4,14 +4,23 @@ from django.http import HttpResponse
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 import logging,json,time,os,string,sys
-import xmlrpc.client
+
+FORMAT = '%(asctime)-15s %(message)s'
+logging.basicConfig(filename='/var/log/xtcpd/xtcpd.log',level=logging.DEBUG, format=FORMAT)
+
+PY3=False
+if sys.version_info[0]==2:
+	import xmlrpclib
+elif sys.version_info[0]==3:
+	PY3=True
+	import xmlrpc.client
+else:
+	logging.debug("Unable to determine python version")
 
 #from lanwatch.daemons.service_utils import *
 #from lanwatch.models import NetworkEvent
 from django.contrib.auth.decorators import login_required
 
-FORMAT = '%(asctime)-15s %(message)s'
-logging.basicConfig(filename='/var/log/xtcpd/xtcpd.log',level=logging.DEBUG, format=FORMAT)
 
 def get_client_ip(request):
     x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
@@ -26,7 +35,11 @@ def xtcpd(request):
 	try:
 		qs=request.META['QUERY_STRING']
 		if len(qs)>1:
-			s=xmlrpc.client.Server("http://hotspot.asymptopia.org:8000")
+			s=None
+			if PY3:
+				s=xmlrpc.client.Server("http://hotspot.asymptopia.org:8000")
+			else:
+				s=xmlrpclib.Server("http://xtcpd.asymptopia.org:8000")
 			#s=xmlrpc.client.Server("http://192.168.68.1:8000")
 			if qs=='get_data':
 				client_ip=str(get_client_ip(request))
