@@ -36,6 +36,7 @@ class DaemonProcess(Daemon):
 		self.t_last=time.perf_counter()
 		self.cities=[]
 		self.countries=[]
+		self.clients={}
 
 	def harvest(self):
 		p=os.popen(tcpdump_cmd)
@@ -84,7 +85,8 @@ class DaemonProcess(Daemon):
 					if g:
 						g['count']=1
 						self.ips[dst]=g
-						self.buffer.append(dst)
+						for client in self.clients:
+							self.clients[client]['buffer'].append(dst)
 						self.cities.append(g['city'])
 						self.countries.append(g['country_code'])
 					else:self.ips[dst]={'count':1,}
@@ -117,13 +119,16 @@ class DaemonProcess(Daemon):
 
 	def get_data(self,*args):
 		#logging.debug("get_data")
-		logging.debug(*args)
+		client=args[0]
+		logging.debug("get_data: "+client)
+		if not client in self.clients:
+			self.clients[client]={'buffer':[]}
 		t_now=time.perf_counter()
 		dt=t_now-self.t_last
 		self.t_last=t_now
 
 		rval={
-			'keys':['server_time','dt','qsize','pcount','create_count','running','debug','active','buffer','ipkeys','cities','countries'],
+			'keys':['server_time','dt','qsize','pcount','create_count','running','debug','active','clients','buffer','ipkeys','cities','countries',],
 			'server_time':"%s"%datetime.datetime.now(),
 			'dt':"%.3f"%dt,
 			'qsize':self.q.qsize(),
@@ -131,13 +136,14 @@ class DaemonProcess(Daemon):
 			'create_count':self.create_count,
 			'running':self.RUNNING,
 			'active':threading.active_count(),
-			'buffer':json.dumps(self.buffer),
+			'buffer':json.dumps(self.clients[client]['buffer']),
 			'debug':self.DEBUG,
 			'ipkeys':json.dumps(list(self.ips.keys())),
 			'cities':json.dumps(self.cities),
 			'countries':json.dumps(self.countries),
+			'clients':json.dumps(self.clients),
 		}
-		self.buffer.__init__()
+		self.clients[client]['buffer'].__init__()
 		return json.dumps(rval)
 
 	def reload_config(self,*args):
@@ -157,7 +163,8 @@ class DaemonProcess(Daemon):
 		self.pcount=0
 		self.cities.__init__()
 		self.countries.__init__()
-		self.buffer.__init__()
+		for client in self.clients:
+			self.clients[client]['buffer'].__init__()
 		return {'keys':['rval'],'rval':True}
 
 	def run(self):

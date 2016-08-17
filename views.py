@@ -3,7 +3,7 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from django.shortcuts import render_to_response
 from django.template import RequestContext
-import logging,json,time,os,string
+import logging,json,time,os,string,sys
 import xmlrpc.client
 
 #from lanwatch.daemons.service_utils import *
@@ -27,8 +27,11 @@ def xtcpd(request):
 		qs=request.META['QUERY_STRING']
 		if len(qs)>1:
 			s=xmlrpc.client.Server("http://hotspot.asymptopia.org:8000")
+			#s=xmlrpc.client.Server("http://192.168.68.1:8000")
 			if qs=='get_data':
-				rval=s.get_data((get_client_ip(request),))
+				client_ip=str(get_client_ip(request))
+				logging.debug(client_ip)
+				rval=s.get_data((client_ip))
 			elif qs=='toggle_debug':
 				rval=s.toggle_debug()
 			elif qs=='toggle_running':
@@ -38,13 +41,11 @@ def xtcpd(request):
 			elif qs=='reset':
 				rval=s.reset()
 			return HttpResponse( rval )
-	except:pass
+	except:
+		logging.exception(sys.exc_info())
 
 	return render_to_response(
-	    'xtcpd.html',{
-            'title':'XTCPD',
-			'rval':{},
-        },
+	    'xtcpd.html',{},
 	)
 
 def home(request):
