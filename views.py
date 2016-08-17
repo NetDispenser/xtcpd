@@ -22,7 +22,7 @@ def get_client_ip(request):
     return ip
 
 def xtcpd(request):
-	logging.debug(request.META)
+	#logging.debug(request.META)
 	try:
 		qs=request.META['QUERY_STRING']
 		if len(qs)>1:

@@ -170,6 +170,7 @@ class DaemonProcess(Daemon):
 	def run(self):
 		self.RUNNING=False
 		self.server=SimpleXMLRPCServer(('hotspot.asymptopia.org',8000))
+		#self.server=SimpleXMLRPCServer(('http://192.168.68.1',8000))
 		self.server.register_introspection_functions()
 		self.server.register_function(self.toggle_debug)
 		self.server.register_function(self.toggle_running)

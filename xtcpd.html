@@ -6,7 +6,7 @@
 #bg{width:100%;height:90%;background-color:teal;color:white;overflow:auto;}
 .button{width:100px;height:30px;background:red;color:white;}
 </style>
-<script type="text/javascript" src="./static/xtcpd/js/config.js"></script>
+<script type="text/javascript" src="/static/xtcpd/js/config.js"></script>
 <script type="text/javascript">
 
 new_xhr=function(){
@@ -53,13 +53,13 @@ window.xajax=function(what){
 	xhr.onreadystatechange=function(){
 		if(xhr.readyState==4){
 			if(xhr.status==200){
-				console.log(what+" returned "+xhr.responseText);
+				//console.log(what+" returned "+xhr.responseText);
 			}
 		}
 	}
-	xhr.open('Get',"http://hotspot.asymptopia.org/xtcpd?"+what,true);
+	//xhr.open('Get',"http://hotspot.asymptopia.org/xtcpd?"+what,true);
 	//console.log(xtcpd_hostname+"/xtcpd?"+what);
-	//xhr.open('Get',xtcpd_hostname+"/xtcpd?"+what,true);
+	xhr.open('Get',xtcpd_hostname+"/xtcpd?"+what,true);
 	xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
 	xhr.send("");
 }
@@ -95,7 +95,7 @@ window.update=function(){
 		if(xhr.readyState==4){
 			if(xhr.status==200){
 				try{
-					console.log(xhr.responseText);
+					//console.log(xhr.responseText);
 					window.render_data(xhr.responseText);
 
 					if(RUNNING==true){
@@ -110,9 +110,9 @@ window.update=function(){
 			}
 		}
 	}
-	xhr.open('Get',"http://hotspot.asymptopia.org/xtcpd?get_data",true);
+//	xhr.open('Get',"http://hotspot.asymptopia.org/xtcpd?get_data",true);
 //	console.log(xtcpd_hostname+"/xtcpd?get_data");
-//	xhr.open('Get',xtcpd_hostname+"/xtcpd?get_data",true);
+	xhr.open('Get',xtcpd_hostname+"/xtcpd?get_data",true);
 	xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
 	xhr.send("");
 }
