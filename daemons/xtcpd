@@ -62,12 +62,95 @@ class DaemonProcess(Daemon):
 		self.RUNNING=False
 		self.DEBUG=False
 		self.buffer=[]
-		self.ips={}
 		self.t=None
 		self.t_last=time.perf_counter()
-		self.cities=[]
-		self.countries=[]
 		self.clients={}
+
+		#both start empty so existence in {ipnetranges} => existence in {dB}
+		self.ipnetranges={}
+		self.dB={}
+
+		self.first_whois=None
+		if True:
+			logging.debug("using first_whois.dat")
+			inf=open('first_whois.dat','r')
+			self.first_whois=eval(inf.read())
+			inf.close()
+			logging.debug(self.first_whois['NetRange'])
+
+		self.ignore=['192.168.68.1','192.168.68.37',]
+
+	#NEED:some py2.7 - 3.4 issues here
+	def mkwhois(self,ip):
+		"""
+		Another variation here could be to return ip every time; this would
+		get unique geoip records without hammering whois.
+		"""
+		if self.first_whois:
+			return self.first_whois
+		whois={'keys':[],}
+		cmd="whois %s"%ip
+		p=os.popen(cmd)
+		plines=p.readlines()
+		p.close()
+
+		for lidx in range(len(plines)):
+			try:
+				key,val=plines[lidx].split(":")
+				whois[key.strip()]=val.strip()
+				whois['keys'].append(key.strip())
+			except:pass
+
+		self.first_whois=copy.copy(whois)
+		#logging.debug(self.first_whois)
+
+		ouf=open('first_whois.dat','w')
+		ouf.write(json.dumps(self.first_whois))
+		ouf.close()
+
+		return whois
+
+	def add2dB(self,a):
+		src=a.group(4)
+		sport=a.group(5)
+		ip=dst=a.group(6)
+		dport=a.group(7)
+
+		netrange=None
+		whois=self.mkwhois(ip)
+		if 'NetRange' in whois:
+			netrange=whois['NetRange']
+		else:
+			netrange=ip
+
+		self.ipnetranges[ip]=netrange
+
+		#
+		if netrange in self.dB:
+			return netrange
+
+		#
+		logging.debug("creating %s"%netrange)
+		g=gip.record_by_addr(ip)
+		if g:g['keys']=list(g.keys())
+		else:g={'keys':[],}
+		self.dB[netrange]={
+			'ips':{
+				'keys':[ip,],
+				ip:{'count':1,},
+			},
+			'netrange':netrange,
+			'whois':whois,
+			'geoip':g,
+			'stats':{'keys':['count'],'count':1,},
+			'keys':['ips','netrange','whois','geoip','stats'],
+			'tcp':{
+				'keys':['src','dst','sport','dport','raw',],
+				'src':src,'dst':dst,'sport':sport,'dport':dport,'raw':item,
+			},
+		}
+		return netrange
+
 
 	def harvest(self):
 		p=os.popen(tcpdump_cmd)
@@ -92,37 +175,36 @@ class DaemonProcess(Daemon):
 				if not a:continue
 				else:self.pcount+=1
 
-				src=a.group(4)
-				sport=a.group(5)
+				#src=a.group(4)
+				#sport=a.group(5)
 				dst=a.group(6)
-				dport=a.group(7)
-				"""
-				if src in self.ips:
-					self.ips[src]['count']+=1
+				#dport=a.group(7)
+
+				if dst in self.ignore:continue
+
+				if dst in self.ipnetranges:
+					netrange=self.ipnetranges[dst]#ensure ipnetranges prog-const'd from dB.keys !!!
+
 				else:
-					g=gip.record_by_addr(src)
-					if g:
-						g['count']=1
-						self.ips[src]=g
-						self.buffer.append(src)
-						self.cities.append(g['city'])
-						self.countries.append(g['country_code'])
-					else:self.ips[src]={'count':1,}
-				"""
-				if dst in self.ips:
-					self.ips[dst]['count']+=1
-				else:
-					g=gip.record_by_addr(dst)
-					if g:
-						g['count']=1
-						self.ips[dst]=g
-						for client in self.clients:
-							self.clients[client]['buffer'].append(dst)
-						self.cities.append(g['city'])
-						self.countries.append(g['country_code'])
-					else:self.ips[dst]={'count':1,}
+					netrange=self.add2dB(a)#creates self.dB[netrange] and does GeoIP
+					if not ip in self.dB[netrange]['ips']:
+						logging.debug("adding %s"%ip)
+						self.dB[netrange]['ips'][ip]={'count':1,}
+						self.dB[netrange]['ips']['keys'].append(ip)
+					else:
+						logging.debug("incrementing %s"%ip)
+						self.dB[netrange]['ips'][ip]['count']+=1
+						self.dB[netrange]['stats']['count']+=1
+
+					for client in self.clients:
+						self.clients[client]['buffer'].append(self.dB[netrange])
+
+				self.dB[netrange]['stats']['count']+=1#NEED:add to buffer if requested
+
 
 				msg="%s %s -> %s %s"%(src,sport,dst,dport)
+				logging.debug(msg)
+				logging.debug(self.dB[netrange])
 
 	def toggle_debug(self,*args):
 		if not self.DEBUG:
@@ -159,7 +241,7 @@ class DaemonProcess(Daemon):
 		self.t_last=t_now
 
 		rval={
-			'keys':['server_time','dt','qsize','pcount','create_count','running','debug','active','clients','buffer','ipkeys','cities','countries',],
+			'keys':['server_time','dt','qsize','pcount','create_count','running','debug','active','clients','ipkeys',],
 			'server_time':"%s"%datetime.datetime.now(),
 			'dt':"%.3f"%dt,
 			'qsize':self.q.qsize(),
@@ -167,11 +249,8 @@ class DaemonProcess(Daemon):
 			'create_count':self.create_count,
 			'running':self.RUNNING,
 			'active':threading.active_count(),
-			'buffer':json.dumps(self.clients[client]['buffer']),
 			'debug':self.DEBUG,
-			'ipkeys':json.dumps(list(self.ips.keys())),
-			'cities':json.dumps(self.cities),
-			'countries':json.dumps(self.countries),
+			'ipkeys':json.dumps(list(self.dB.keys())),
 			'clients':json.dumps(self.clients),
 		}
 		self.clients[client]['buffer'].__init__()
@@ -190,12 +269,14 @@ class DaemonProcess(Daemon):
 			return {'keys':['rval'],'rval':False}
 
 	def reset(self,*args):
-		self.ips={}
+		self.dB={}
 		self.pcount=0
 		self.cities.__init__()
 		self.countries.__init__()
 		for client in self.clients:
+			if client==args[0]:continue
 			self.clients[client]['buffer'].__init__()
+			self.clients.remove(client)
 		return {'keys':['rval'],'rval':True}
 
 	def run(self):

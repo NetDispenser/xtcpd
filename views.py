@@ -41,8 +41,8 @@ def xtcpd(request):
 			else:
 				s=xmlrpclib.Server("http://xtcpd.asymptopia.org:8000")
 			#s=xmlrpc.client.Server("http://192.168.68.1:8000")
+			client_ip=str(get_client_ip(request))
 			if qs=='get_data':
-				client_ip=str(get_client_ip(request))
 				logging.debug(client_ip)
 				rval=s.get_data((client_ip))
 			elif qs=='toggle_debug':
@@ -52,7 +52,7 @@ def xtcpd(request):
 			elif qs=='reload_config':
 				rval=s.reload_config()
 			elif qs=='reset':
-				rval=s.reset()
+				rval=s.reset((client_ip))
 			return HttpResponse( rval )
 	except:
 		logging.exception(sys.exc_info())
