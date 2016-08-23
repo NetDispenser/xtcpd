@@ -37,7 +37,7 @@ def xtcpd(request):
 		if len(qs)>1:
 			s=None
 			if PY3:
-				s=xmlrpc.client.Server("http://hotspot.asymptopia.org:8000")
+				s=xmlrpc.client.Server("http://spytools.asymptopia.org:8000")
 			else:
 				s=xmlrpclib.Server("http://xtcpd.asymptopia.org:8000")
 			#s=xmlrpc.client.Server("http://192.168.68.1:8000")

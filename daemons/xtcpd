@@ -32,8 +32,8 @@ if UBUNTU:
 	XTCPD_CONFIG='/var/www/xtcpd/xapp/daemons/xtcpd.config'
 	USE_PYGEOIP=True
 else:
-	XTCPD_HOSTNAME='hotspot.asymptopia.org'
-	XTCPD_CONFIG='/var/www/rpi/xtcpd/daemons/xtcpd.config'
+	XTCPD_HOSTNAME='spytools.asymptopia.org'
+	XTCPD_CONFIG='/var/www/spytools/xtcpd/daemons/xtcpd.config'
 	USE_PYGEOIP=False
 
 
@@ -48,7 +48,7 @@ else:
 #import GeoIP
 #gip=GeoIP.open("/usr/share/GeoIP/GeoLiteCity.dat",GeoIP.GEOIP_STANDARD)
 rexp=re.compile('(\d+:\d+:\d+)(\.\d+) (IP) (.*)(\.\d+) > (\d+\.\d+\.\d+\.\d+)(\.\d+)(.*)')
-tcpdump_cmd="tcpdump -i eth0 -l -s 0 -n"
+tcpdump_cmd="tcpdump -i wlan0 -l -s 0 -n"
 
 class DaemonProcess(Daemon):
 
@@ -71,7 +71,7 @@ class DaemonProcess(Daemon):
 		self.dB={}
 
 		self.first_whois=None
-		if True:
+		if False:
 			logging.debug("using first_whois.dat")
 			inf=open('first_whois.dat','r')
 			self.first_whois=eval(inf.read())
