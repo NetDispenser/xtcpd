@@ -3,9 +3,10 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from django.shortcuts import render_to_response
 from django.template import RequestContext
-import logging,json,time,os,string,sys
+import logging,json,time,os,string,sys,datetime
 
-FORMAT = '%(asctime)-15s %(message)s'
+#FORMAT = '%(asctime)-15s %(message)s'
+FORMAT = 'VIEWS: %(message)s'
 logging.basicConfig(filename='/var/log/xtcpd/xtcpd.log',level=logging.DEBUG, format=FORMAT)
 
 PY3=False
@@ -30,6 +31,35 @@ def get_client_ip(request):
         ip = request.META.get('REMOTE_ADDR')
     return ip
 
+def procdev(request):
+	#logging.debug(request.META)
+	try:
+		qs=request.META['QUERY_STRING']
+		if len(qs)>1:
+			s=None
+			rval={
+			'keys':['tstamp','msg',],
+			'tstamp':str(datetime.datetime.now()),
+			'msg':'01 Next: rpc call to get ifstat from trafd',
+			}
+			s=xmlrpc.client.Server("http://spytools.asymptopia.org:8005")
+			client_ip=str(get_client_ip(request))
+			if qs=='get_data':
+				logging.debug(client_ip)
+				rval=s.get_data((client_ip))
+				logging.debug(rval)
+			return HttpResponse(rval);
+	except:
+		logging.exception("get_data failed")
+
+	return render_to_response(
+	    'procdev.html',{
+			'keys':['tstamp','msg',],
+			'tstamp':str(datetime.datetime.now()),
+			'msg':'00 Next: rpc call to get ifstat from trafd',
+		},
+	)
+
 def xtcpd(request):
 	#logging.debug(request.META)
 	try:
@@ -37,7 +67,7 @@ def xtcpd(request):
 		if len(qs)>1:
 			s=None
 			if PY3:
-				s=xmlrpc.client.Server("http://hotspot.asymptopia.org:8000")
+				s=xmlrpc.client.Server("http://spytools.asymptopia.org:8000")
 			else:
 				s=xmlrpclib.Server("http://xtcpd.asymptopia.org:8000")
 			#s=xmlrpc.client.Server("http://192.168.68.1:8000")
@@ -62,15 +92,6 @@ def xtcpd(request):
 	)
 
 def home(request):
-
-	s=xmlrpc.client.Server("http://localhost:8000")
-	rval=None
-	try:rval=s.get_data()
-	except:rval={}
-
 	return render_to_response(
-	    'xtcpd.html',{
-            'title':'XTCPD',
-			'rval':rval,
-        },
+	    'd3.html',{},
 	)

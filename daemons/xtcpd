@@ -4,6 +4,13 @@ from daemon import Daemon
 #from country_codes import *
 #from ip_idns import *
 import logging,json,time,sys,os,re,copy,datetime
+from idns.country_codes import *
+
+line='>pcount\ttstamp\tsrc_dst_idn\tport_port_idn\tnetrange_idn\tcountry_idn\tsrc_idn\tdst_idn\tlat\tlon\n'
+ouf=None
+if not os.path.exists('./ntuple.dat'):
+	ouf=open('ntuple.dat','w')
+	ouf.write(line)
 
 FORMAT = '%(message)s'
 logging.basicConfig(filename='xtcpd.log',level=logging.DEBUG,format=FORMAT)
@@ -32,8 +39,8 @@ if UBUNTU:
 	XTCPD_CONFIG='/var/www/xtcpd/xapp/daemons/xtcpd.config'
 	USE_PYGEOIP=True
 else:
-	XTCPD_HOSTNAME='hotspot.asymptopia.org'
-	XTCPD_CONFIG='/var/www/rpi/xtcpd/daemons/xtcpd.config'
+	XTCPD_HOSTNAME='spytools.asymptopia.org'
+	XTCPD_CONFIG='/var/www/spytools/xtcpd/daemons/xtcpd.config'
 	USE_PYGEOIP=False
 
 
@@ -71,14 +78,22 @@ class DaemonProcess(Daemon):
 		self.dB={}
 
 		self.first_whois=None
-		if True:
+		if False:
 			logging.debug("using first_whois.dat")
 			inf=open('first_whois.dat','r')
 			self.first_whois=eval(inf.read())
 			inf.close()
 			logging.debug(self.first_whois['NetRange'])
 
-		self.ignore=['192.168.68.1','192.168.68.37',]
+		#self.ignore=['192.168.68.1','192.168.68.37',]
+		self.ignore=[]
+
+		#src_dst_idn,port_port_idn,netrange_idn,country_idn,src_idn,dst_idn
+		self.src_dst_idns={}
+		self.port_port_idns={}
+		self.netrange_idns={}
+		self.src_idns={}
+		self.dst_idns={}
 
 	#NEED:some py2.7 - 3.4 issues here
 	def mkwhois(self,ip):
@@ -89,6 +104,9 @@ class DaemonProcess(Daemon):
 		if self.first_whois:
 			return self.first_whois
 		whois={'keys':[],}
+		if True:
+			return whois
+
 		cmd="whois %s"%ip
 		p=os.popen(cmd)
 		plines=p.readlines()
@@ -146,7 +164,7 @@ class DaemonProcess(Daemon):
 			'keys':['ips','netrange','whois','geoip','stats'],
 			'tcp':{
 				'keys':['src','dst','sport','dport','raw',],
-				'src':src,'dst':dst,'sport':sport,'dport':dport,'raw':item,
+				'src':src,'dst':dst,'sport':sport,'dport':dport,#'raw':item,
 			},
 		}
 		return netrange
@@ -169,42 +187,105 @@ class DaemonProcess(Daemon):
 
 	def process(self):
 		while True:
-			with XTCPD_LOCK:
+			#with XTCPD_LOCK:
+			try:
 				item=self.q.get()
 				a=rexp.match(item)
 				if not a:continue
 				else:self.pcount+=1
 
-				#src=a.group(4)
-				#sport=a.group(5)
+				src=a.group(4)
+				sport=a.group(5)
 				dst=a.group(6)
-				#dport=a.group(7)
+				dport=a.group(7)
+
+				msg="%s %s -> %s %s"%(a.group(4),a.group(5),a.group(6),a.group(7))
+				logging.debug(msg)
 
 				if dst in self.ignore:continue
 
 				if dst in self.ipnetranges:
 					netrange=self.ipnetranges[dst]#ensure ipnetranges prog-const'd from dB.keys !!!
-
 				else:
 					netrange=self.add2dB(a)#creates self.dB[netrange] and does GeoIP
-					if not ip in self.dB[netrange]['ips']:
-						logging.debug("adding %s"%ip)
-						self.dB[netrange]['ips'][ip]={'count':1,}
-						self.dB[netrange]['ips']['keys'].append(ip)
-					else:
-						logging.debug("incrementing %s"%ip)
-						self.dB[netrange]['ips'][ip]['count']+=1
-						self.dB[netrange]['stats']['count']+=1
 
-					for client in self.clients:
-						self.clients[client]['buffer'].append(self.dB[netrange])
+				if not dst in self.dB[netrange]['ips']:
+					logging.debug("adding %s"%dst)
+					self.dB[netrange]['ips'][dst]={'count':1,}
+					self.dB[netrange]['ips']['keys'].append(dst)
+				else:
+					logging.debug("incrementing %s"%dst)
+					self.dB[netrange]['ips'][dst]['count']+=1
+					self.dB[netrange]['stats']['count']+=1
 
-				self.dB[netrange]['stats']['count']+=1#NEED:add to buffer if requested
+				for client in self.clients:
+					self.clients[client]['buffer'].append(self.dB[netrange])
 
+				#logging.debug(self.dB[netrange])
+				tstamp=time.perf_counter()
+				src_dst="%s_%s"%(src,dst)
+				if src_dst in self.src_dst_idns:
+					src_dst_idn=self.src_dst_idns[src_dst]
+				else:
+					src_dst_idn=len(self.src_dst_idns)
+					self.src_dst_idns[src_dst]=src_dst_idn
+					cmd="echo '%s_%s:%d'|cat>>idns/src_dst.idn"%(src,dst,src_dst_idn)
+					os.system(cmd)
 
-				msg="%s %s -> %s %s"%(src,sport,dst,dport)
-				logging.debug(msg)
-				logging.debug(self.dB[netrange])
+				port_port="%s_%s"%(sport,dport)
+				if port_port in self.port_port_idns:
+					port_port_idn=self.port_port_idns[port_port]
+				else:
+					port_port_idn=len(self.port_port_idns)
+					self.port_port_idns[port_port]=port_port_idn
+					cmd="echo '%s_%s:%d'|cat>>idns/port_port.idn"%(sport,dport,port_port_idn)
+					os.system(cmd)
+
+				if netrange in self.netrange_idns:
+					netrange_idn=self.netrange_idns[netrange]
+				else:
+					netrange_idn=len(self.netrange_idns)
+					self.netrange_idns[netrange]=netrange_idn
+					cmd="echo '%s:%d'|cat>>idns/netrange.idn"%(netrange,netrange_idn)
+					os.system(cmd)
+
+				if 'country_code' in self.dB[netrange]['geoip']:
+					country_code=self.dB[netrange]['geoip']['country_code']
+					country_idn=COUNTRY_CODES[country_code]
+				else:
+					country_idn=-1
+
+				if src in self.src_idns:
+					src_idn=self.src_idns[src]
+				else:
+					src_idn=len(self.src_idns)
+					self.src_idns[src]=src_idn
+					cmd="echo '%s:%d'|cat>>idns/src.idn"%(src,src_idn)
+					os.system(cmd)
+
+				if dst in self.src_idns:
+					dst_idn=self.src_idns[dst]
+				else:
+					dst_idn=len(self.src_idns)
+					self.src_idns[dst]=dst_idn
+					cmd="echo '%s:%d'|cat>>idns/src.idn"%(dst,dst_idn)
+					os.system(cmd)
+
+				if 'latitude' in self.dB[netrange]['geoip']:
+					lat=self.dB[netrange]['geoip']['latitude']
+					lon=self.dB[netrange]['geoip']['longitude']
+				else:
+					lat=0.0
+					lon=0.0
+				#DATA FILE HEADER:
+				#>pcount\ttstamp\tsrc_dst_idn\tport_port_idn\tnetrange_idn\tcountry_idn\tsrc_idn\tdst_idn\tlat\tlon
+				event="%d\t%.03f\t%d\t%d\t%d\t%d\t%d\t%d\t%.03f\t%.03f\n"%(self.pcount,tstamp,src_dst_idn,port_port_idn,netrange_idn,country_idn,src_idn,dst_idn,lat,lon)
+				cmd="echo '%s'>>ntuple.dat"%event
+				#os.system(cmd)
+				ouf.write(event)
+
+			except:
+				logging.exception(sys.exc_info())
 
 	def toggle_debug(self,*args):
 		if not self.DEBUG:
@@ -241,7 +322,7 @@ class DaemonProcess(Daemon):
 		self.t_last=t_now
 
 		rval={
-			'keys':['server_time','dt','qsize','pcount','create_count','running','debug','active','clients','ipkeys',],
+			'keys':['server_time','dt','qsize','pcount','create_count','running','debug','active','dB.keys','clients',],
 			'server_time':"%s"%datetime.datetime.now(),
 			'dt':"%.3f"%dt,
 			'qsize':self.q.qsize(),
@@ -250,7 +331,7 @@ class DaemonProcess(Daemon):
 			'running':self.RUNNING,
 			'active':threading.active_count(),
 			'debug':self.DEBUG,
-			'ipkeys':json.dumps(list(self.dB.keys())),
+			'dB.keys':json.dumps(list(self.dB.keys())),
 			'clients':json.dumps(self.clients),
 		}
 		self.clients[client]['buffer'].__init__()
@@ -297,6 +378,7 @@ if __name__=="__main__":
 			daemon.start()
 		elif 'stop'==sys.argv[1]:
 			daemon.stop()
+			ouf.close()
 		elif 'restart'==sys.argv[1]:
 			daemon.restart()
 		elif 'status'==sys.argv[1]:

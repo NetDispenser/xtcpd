@@ -1,0 +1,121 @@
+#!/usr/bin/env python
+from daemon import Daemon
+import logging,json,time,sys,os,re,copy,datetime
+from xmlrpc.server import SimpleXMLRPCServer
+import threading
+from queue import Queue
+
+TRAFD_PID='/var/run/trafd.pid'
+TRAFD_LOCK = threading.Lock()
+TRAFD_HOSTNAME="spytools.asymptopia.org"
+
+TRAFD_CONFIG='/var/www/rpi/xtcpd/daemons/trafd.config'
+
+FORMAT = 'TRAFD: %(message)s'
+logging.basicConfig(filename='/var/log/xtcpd/xtcpd.log',level=logging.DEBUG, format=FORMAT)
+
+class DaemonProcess(Daemon):
+
+	def __init__(self,pidfile):
+		Daemon.__init__(self,pidfile)
+		self.CONFIG=None
+		self.RUNNING=False
+		self.DEBUG=False
+		self.buffer=[]
+		self.t=None
+		self.t_last=time.perf_counter()
+
+	def remove_space(self,line):
+		line=line.rstrip().lstrip()
+		line=line.split(' ')
+		for dummy in range(line.count(' ')):
+			line.remove(' ')
+		for dummy in range(line.count('')):
+			line.remove('')
+		return line
+
+	def harvest(self):
+		try:
+			logging.debug("harvest")
+			ifstat_cmd="ifstat -n -t"
+			logging.debug(ifstat_cmd)
+			p=os.popen(ifstat_cmd)
+			self.header_names=self.remove_space(p.readline())
+			self.header_units=self.remove_space(p.readline())
+			while True:
+				#NEED:header info kb/sec, header labels
+				if self.RUNNING:
+					line=self.remove_space(p.readline())
+					logging.debug(line)
+					self.buffer.append(line)
+				else:
+					p.flush()
+					time.sleep(.2)
+		except:
+			logging.exception("harvest failed")
+
+	def get_data(self,*args):
+		logging.debug("get_data")
+		t_now=time.perf_counter()
+		dt=t_now-self.t_last
+		self.t_last=t_now
+		rval={
+			'keys':['data','dt','names','units'],
+			'dt':dt,
+			'names':self.header_names,
+			'units':self.header_units,
+			'data':copy.copy(self.buffer)
+		}
+		self.buffer.__init__()
+		logging.debug(json.dumps(rval))
+		return json.dumps(rval)
+
+	def toggle_running(self,*args):
+		logging.debug("toggle_running")
+		if not self.t:
+			logging.debug("starting thread")
+			self.t = threading.Thread(target=self.harvest)
+			self.t.daemon = True
+			self.t.start()
+
+		if not self.RUNNING:
+			self.RUNNING=True
+			logging.debug("RUNNING True")
+		else:
+			self.RUNNING=False
+			logging.debug("RUNNING False")
+
+		rval={'keys':['running'],'running':self.RUNNING}
+		return json.dumps(rval)
+
+	def run(self):
+		logging.debug("run")
+		self.RUNNING=False
+		self.server=SimpleXMLRPCServer((TRAFD_HOSTNAME,8005))
+		self.server.register_introspection_functions()
+		self.server.register_instance(self)
+		self.toggle_running()
+		self.server.serve_forever()
+
+if __name__=="__main__":
+	daemon=DaemonProcess(TRAFD_PID)
+	if len(sys.argv)==2:
+		if 'start'==sys.argv[1]:
+			daemon.start()
+		elif 'stop'==sys.argv[1]:
+			daemon.stop()
+		elif 'restart'==sys.argv[1]:
+			daemon.restart()
+		elif 'status'==sys.argv[1]:
+			if os.path.exists(TRAFD_PID):
+				print('running')
+			else:
+				print('stopped')
+		else:
+			#logging.debug("UNK")
+			print("Unknown command")
+			sys.exit(2)
+		sys.exit(0)
+	else:
+		print("usage: %s start|stop|restart|status"%sys.argv[0])
+		sys.exit(2)

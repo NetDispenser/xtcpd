@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+/* CSS goes here. */
+.countries { fill: #650; }
+.Canada { fill: orange; }
+.Russia { fill: blue; }
+.Brazil { fill: green; }
+
+.subunit-label {
+	fill: #222;
+	fill-opacity: .8;
+	font-size: 5px;
+	font-weight: 300;
+	text-anchor: middle;
+}
+
+.country-boundary {
+  fill: none;
+  stroke: #FFF;
+  stroke-dasharray: 2,2;
+  stroke-linejoin: round;
+}
+</style>
+<body style="background-color:red;">
+	<script src="//d3js.org/d3.v3.min.js" charset="utf-8"></script>
+	<script src="//d3js.org/topojson.v1.min.js"></script>
+	<script>
+
+	/* JavaScript goes here. */
+	var width = 800,
+    height = 700;
+	//var width=screen.width,
+	//	height=screen.height;
+
+	var svg = d3.select("body").append("svg")
+    .attr("width", width)
+    .attr("height", height)
+    .attr("background",'#ccaa00');
+
+
+	d3.json("/static/xtcpd/json/subunits_places.json", function(error, data) {
+		if (error) return console.error(error);
+		console.log(data);
+
+	var countries = topojson.feature(data, data.objects.subunits);
+	var projection = d3.geo.mercator()
+    .scale(110)
+//		.center([-106, 33.4])
+    .translate([width / 2, height/2]);
+	var path = d3.geo.path()
+		.projection(projection);
+
+	svg.append("path")
+		.datum(countries)
+		.attr("d", path);
+/*
+	var projection = d3.geo.albers()
+		.center([0, 55.4])
+		.rotate([4.4, 0])
+		.parallels([50, 60])
+		.scale(6000)
+		.translate([width / 2, height / 2]);
+
+  svg.append("path")
+      .datum(topojson.feature(data, data.objects.countries))
+      .attr("d", d3.geo.path().projection(d3.geo.mercator()));
+*/
+
+	svg.selectAll(".countries")
+    .data(topojson.feature(data, data.objects.subunits).features)
+    .enter().append("path")
+    .attr("class", function(d) { console.log(d.properties.name);return "countries " + d.properties.name; })
+    .attr("d", path);
+
+	svg.append("path")
+		  .datum(topojson.mesh(data, data.objects.subunits, function(a, b) { return a !== b }))
+		  .attr("d", path)
+		  .attr("class", "country-boundary");
+
+	svg.selectAll(".subunit-label")
+			.data(topojson.feature(data, data.objects.subunits).features)
+			.enter().append("text")
+			.attr("class", function(d) { return "subunit-label " + d.id; })
+			.attr("transform", function(d) { return "translate(" + path.centroid(d) + ")"; })
+			.attr("dy", ".35em")
+			.text(function(d) { return d.properties.name; });
+
+});
+</script>
