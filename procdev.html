@@ -6,12 +6,44 @@
 <style>
 #status{width:100%;background-color:navy;color:white;overflow:auto;}
 .button{width:100px;height:50px;background:darkgreen;color:white;}
-.svg_background{background-color:#55AA55;}
+.svg_background{background-color:#333333;}
+.enter{fill:red;}
+.update{fill:yellow;}
+path {
+	stroke-width: 2;
+	fill: none;
+}
+.wlan0_RX {
+	stroke: #FFCC00;
+}
+.wlan0_TX {
+	stroke: #00FF00;
+}
+.wlan1_RX {
+	stroke: #FFCC00;
+}
+.wlan1_TX {
+	stroke: #00FF00;
+}
+.x.axis,
+.x.axis path,
+.x.axis line {
+  fill: none;
+  stroke: #FFF;
+	stroke-width:1;
+  shape-rendering: crispEdges;
+}
+
 </style>
 
 <script type="text/javascript" src="/static/xtcpd/js/d3.v4.min.js"></script>
 <script type="text/javascript" src="/static/xtcpd/js/config.js"></script>
 <script type="text/javascript">
+
+var W;
+var H=300;
+var g,G1,G2,G3;
+var svg=null;
 
 new_xhr=function(){
 	var xhr=null;
@@ -37,7 +69,7 @@ window.decode=function(str){
 }
 
 //Common command-sending function since does nothing with
-//whatever (nothing) may have been returned.  To send cmds only.
+//returned value.  This is to send cmds only.
 window.xajax=function(what){
 	var xhr=new_xhr();
 	xhr.onreadystatechange=function(){
@@ -48,26 +80,11 @@ window.xajax=function(what){
 		}
 	}
 	//xhr.open('Get',"http://xtcpd.asymptopia.org/xtcpd?"+what,true);
-	//console.log(xtcpd_hostname+"/xtcpd?"+what);
-	xhr.open('Get',xtcpd_hostname+"/procdev?"+what,true);
+	var procdev_hostname="";
+	console.log(procdev_hostname+"/procdev?"+what);
+	xhr.open('Get',procdev_hostname+"/procdev?"+what,true);
 	xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
 	xhr.send("");
-}
-var debugCB=function(e){
-	console.log("DEBUG_CALLBACK");
-	window.xajax("toggle_debug");
-}
-var runningCB=function(e){
-	console.log("RUNNING_CALLBACK");
-	window.xajax("toggle_running");
-}
-var reloadCB=function(e){
-	console.log("RELOAD_CALLBACK");
-	window.xajax("reload_config");
-}
-var resetCB=function(e){
-	console.log("RESET_CALLBACK");
-	window.xajax("reset");
 }
 var toggle_updatesCB=function(e){
 	console.log("TOGGLE_UPDATES");
@@ -80,8 +97,115 @@ var toggle_updatesCB=function(e){
 	}
 }
 
-//
 window.render_data=function(data){
+
+		var pyld=JSON.parse(window.decode(data));
+
+		g.selectAll("path").remove();
+		g.selectAll("line").remove();
+
+		var maxdat=1E-6;
+		for(var ii=0;ii<pyld['bufferlen'];ii++){
+			for(var jj=1;jj<pyld['data'][ii].length+1;jj++){
+					if(+pyld['data'][ii][jj]>maxdat){
+						maxdat=+pyld['data'][ii][jj];
+					}
+			}
+		}
+
+		var SF=0.9*(height/2)/maxdat;
+		var maxdatidx=pyld['data'].length-1;
+		var t_min=pyld['data'][maxdatidx][0]-pyld['bufferlen'];
+
+		//***************************
+		var tScale=d3
+			.scaleLinear()
+			.range([0,width])
+			.domain([t_min,pyld['data'][maxdatidx][0]]);
+
+		var tAxis=d3
+			.axisBottom(tScale)
+			.ticks(10);
+
+		G1
+			.attr("class","x axis")
+			.call(tAxis);
+
+		//***************************
+		//***************************
+		var kbLowerScale=d3
+			.scaleLinear()
+			.range([0,height/2])
+			.domain([maxdat,0]);
+
+		var kbUpperScale=d3
+			.scaleLinear()
+			.range([-height/2,0])
+			.domain([0,maxdat]);
+
+		var kbLowerAxis=d3
+			.axisLeft(kbLowerScale)
+			.ticks(5);
+		var kbUpperAxis=d3
+			.axisLeft(kbUpperScale)
+			.ticks(5);
+
+		G2
+			.attr("class","x axis")
+			.call(kbLowerAxis);
+		G3
+			.attr("class","x axis")
+			.call(kbUpperAxis);
+
+		//***************************
+
+		var wlan0_RX=d3.line()
+			.x(function(d,i) { return (d[0]-t_min)*width/pyld['bufferlen']; })
+			.y(function(d) { return -height/2+d[1]*SF; });
+		g.append("path")
+			.attr("class","wlan0_RX")
+			.attr("d", wlan0_RX(pyld['data']));
+
+		var wlan0_TX=d3.line()
+			.x(function(d,i) { return (d[0]-t_min)*width/pyld['bufferlen']; })
+			.y(function(d) { return -height/2+d[2]*SF; });
+		g.append("path")
+			.attr("class","wlan0_TX")
+			.attr("d", wlan0_TX(pyld['data']));
+
+		var wlan1_RX=d3.line()
+			.x(function(d,i) { return (d[0]-t_min)*width/pyld['bufferlen']; })
+			.y(function(d) { return height/2-d[3]*SF; });
+		g.append("path")
+			.attr("class","wlan1_RX")
+			.attr("d", wlan1_RX(pyld['data']));
+
+		var wlan1_TX=d3.line()
+			.x(function(d,i) { return (d[0]-t_min)*width/pyld['bufferlen']; })
+			.y(function(d) { return height/2-d[4]*SF; });
+		g.append("path")
+			.attr("class","wlan1_TX")
+			.attr("d", wlan1_TX(pyld['data']));
+
+		var pts=g.selectAll("circle")
+			.data(pyld['data']);
+
+		pts.attr('class','update')
+		.attr('cx',function(d,i){return (d[0]-t_min)*width/pyld['bufferlen'];})
+		.attr('cy',function(d){return -height/2+d[1]*SF;});
+
+		pts.enter().append('circle')
+			.attr('class','enter')
+			.attr('cx',function(d,i){return (d[0]-t_min)*width/pyld['bufferlen'];})
+			.attr('cy',function(d){return -height/2+d[1]*SF;;})
+			.attr('r',2)
+			.merge(pts);
+
+		pts.exit().remove();
+
+}
+//
+window.render_metadata=function(data){
 	var pyld=JSON.parse(window.decode(data));
 	var status=document.getElementById("status");
 	try{
@@ -117,7 +241,7 @@ window.render_data=function(data){
 	}
 }
 
-var TIMEOUT=5000;
+var TIMEOUT=1000;
 var RUNNING=true;
 window.update=function(){
 	var xhr=new_xhr();
@@ -125,9 +249,9 @@ window.update=function(){
 		if(xhr.readyState==4){
 			if(xhr.status==200){
 				try{
-					console.log(xhr.responseText);
+					//console.log(xhr.responseText);
+					window.render_metadata(xhr.responseText);
 					window.render_data(xhr.responseText);
-
 					if(RUNNING==true){
 						setTimeout("window.update()",TIMEOUT);
 					}
@@ -146,31 +270,40 @@ window.update=function(){
 	xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
 	xhr.send("");
 }
+function init(){
+	console.log('init');
+	var W=document.getElementById("svg_background").getBoundingClientRect().width;
+	svg = d3.select(".svg_background").append("svg").attr("width",W).attr("height",H),
+			width = W,
+			height = H,
+			G1 = svg.append("g").attr("transform", "translate(0," + (height / 2) + ")"),
+			G2 = svg.append("g").attr("transform", "translate("+(width) + "," + (height / 2) + ")"),
+			G3 = svg.append("g").attr("transform", "translate("+(width) + "," + (height / 2) + ")"),
+			g = svg.append("g").attr("transform", "translate(0," + (height / 2) + ")");
 
-window.update();
+	window.update();
+}
 </script>
+
+
+
 </head>
-<body>
+<body onload="init()">
 
 <center>
-	<div class="svg_background" style="width:400px;height:300px;">
-		<svg width="400" height="300"></svg>
-	</div>
+	<div id="svg_background" class="svg_background" style="width:100%;height:300px;"></div>
 </center>
 
-<div id="status">
-	<h1>ready ... </h1>
-</div>
 
 <center>
 <table>
 <tr>
 <td>
-<div id="debugB" class="button" onclick="debugCB()">
+<div id="debugB" class="button" onclick="window.xajax('toggle_debug')">
 <span>Toggle Debugging</span>
 </div>
 </td><td>
-<div id="runningB" class="button" onclick="runningCB()">
+<div id="runningB" class="button" onclick="window.xajax('toggle_running')">
 <span>Engage Daemon</span>
 </div>
 </td><td>
@@ -178,17 +311,21 @@ window.update();
 <span>Toggle Updates</span>
 </div>
 </td><td>
-<div id="reloadB" class="button" onclick="reloadCB()">
+<div id="reloadB" class="button" onclick="window.xajax('reload_config')">
 <span>Reload Config</span>
 </div>
 </td><td>
-<div id="resetB" class="button" onclick="resetCB()">
+<div id="resetB" class="button" onclick="window.xajax('reset')">
 <span>Reset</span>
 </div>
 </td>
 </tr>
 </table>
 </center>
+
+<div id="status">
+	<h1>ready ... </h1>
+</div>
 
 </body>
 </html>

@@ -24,6 +24,7 @@ class DaemonProcess(Daemon):
 		self.buffer=[]
 		self.t=None
 		self.t_last=time.perf_counter()
+		self.BUFFERLEN=100
 
 	def remove_space(self,line):
 		line=line.rstrip().lstrip()
@@ -37,17 +38,25 @@ class DaemonProcess(Daemon):
 	def harvest(self):
 		try:
 			logging.debug("harvest")
-			ifstat_cmd="ifstat -n -t"
+			ifstat_cmd="ifstat -n -t -i wlan0,wlan1"
 			logging.debug(ifstat_cmd)
 			p=os.popen(ifstat_cmd)
 			self.header_names=self.remove_space(p.readline())
 			self.header_units=self.remove_space(p.readline())
 			while True:
-				#NEED:header info kb/sec, header labels
 				if self.RUNNING:
 					line=self.remove_space(p.readline())
+					line[0]=time.perf_counter()
 					logging.debug(line)
 					self.buffer.append(line)
+					while len(self.buffer)<self.BUFFERLEN:
+						zeros=[time.perf_counter(),]
+						for zidx in range((len(self.header_names) - 1)*2):
+							zeros.append(0)
+						self.buffer.insert(0,zeros)
+					while len(self.buffer)>self.BUFFERLEN:
+						self.buffer.pop(0)
+
 				else:
 					p.flush()
 					time.sleep(.2)
@@ -60,13 +69,14 @@ class DaemonProcess(Daemon):
 		dt=t_now-self.t_last
 		self.t_last=t_now
 		rval={
-			'keys':['data','dt','names','units'],
+			'keys':['data','dt','names','units','bufferlen'],
 			'dt':dt,
 			'names':self.header_names,
 			'units':self.header_units,
-			'data':copy.copy(self.buffer)
+			'data':copy.copy(self.buffer),
+			'bufferlen':self.BUFFERLEN,
 		}
-		self.buffer.__init__()
+		#self.buffer.__init__()
 		logging.debug(json.dumps(rval))
 		return json.dumps(rval)
 
