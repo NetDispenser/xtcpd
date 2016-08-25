@@ -57,9 +57,9 @@ window.xajax=function(what){
 			}
 		}
 	}
-	//xhr.open('Get',"http://hotspot.asymptopia.org/xtcpd?"+what,true);
+	//xhr.open('Get',"http://xtcpd.asymptopia.org/xtcpd?"+what,true);
 	//console.log(xtcpd_hostname+"/xtcpd?"+what);
-	xhr.open('Get',xtcpd_hostname+"/?"+what,true);
+	xhr.open('Get',xtcpd_hostname+"/xtcpd?"+what,true);
 	xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
 	xhr.send("");
 }
@@ -110,9 +110,9 @@ window.update=function(){
 			}
 		}
 	}
-//	xhr.open('Get',"http://hotspot.asymptopia.org/xtcpd?get_data",true);
+//	xhr.open('Get',"http://xtcpd.asymptopia.org/xtcpd?get_data",true);
 //	console.log(xtcpd_hostname+"/xtcpd?get_data");
-	xhr.open('Get',xtcpd_hostname+"?get_data",true);
+	xhr.open('Get',xtcpd_hostname+"/xtcpd?get_data",true);
 	xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
 	xhr.send("");
 }
