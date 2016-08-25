@@ -55,7 +55,7 @@ else:
 #import GeoIP
 #gip=GeoIP.open("/usr/share/GeoIP/GeoLiteCity.dat",GeoIP.GEOIP_STANDARD)
 rexp=re.compile('(\d+:\d+:\d+)(\.\d+) (IP) (.*)(\.\d+) > (\d+\.\d+\.\d+\.\d+)(\.\d+)(.*)')
-tcpdump_cmd="tcpdump -i eth0 -l -s 0 -n"
+tcpdump_cmd="tcpdump -i wlan0 -l -s 0 -n"
 
 class DaemonProcess(Daemon):
 
