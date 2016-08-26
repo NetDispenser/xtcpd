@@ -44,6 +44,7 @@ var W;
 var H=300;
 var g,G1,G2,G3;
 var svg=null;
+var padd=20;
 
 new_xhr=function(){
 	var xhr=null;
@@ -113,76 +114,98 @@ window.render_data=function(data){
 			}
 		}
 
-		var SF=0.9*(height/2)/maxdat;
+		var SF=0.9*((height-2*padd)/2)/maxdat;
 		var maxdatidx=pyld['data'].length-1;
 		var t_min=pyld['data'][maxdatidx][0]-pyld['bufferlen'];
 
 		//***************************
 		var tScale=d3
 			.scaleLinear()
-			.range([0,width])
+			.range([padd,width-padd])
 			.domain([t_min,pyld['data'][maxdatidx][0]]);
 
-		var tAxis=d3
+		var topAxis=d3
+			.axisTop(tScale)
+			.ticks(10);
+
+		var botAxis=d3
 			.axisBottom(tScale)
 			.ticks(10);
 
-		G1
+		GXTOP
 			.attr("class","x axis")
-			.call(tAxis);
+			.call(topAxis);
+
+		GXBOT
+			.attr("class","x axis")
+			.call(botAxis);
 
 		//***************************
-		//***************************
+
 		var kbLowerScale=d3
 			.scaleLinear()
-			.range([0,height/2])
+			.range([-(height)/2+padd,0])
 			.domain([maxdat,0]);
 
 		var kbUpperScale=d3
 			.scaleLinear()
-			.range([-height/2,0])
+			.range([0,(height)/2-padd])
 			.domain([0,maxdat]);
 
-		var kbLowerAxis=d3
+		var kbLowerAxisR=d3
+			.axisRight(kbLowerScale)
+			.ticks(5);
+		var kbUpperAxisR=d3
+			.axisRight(kbUpperScale)
+			.ticks(5);
+
+		var kbLowerAxisL=d3
 			.axisLeft(kbLowerScale)
 			.ticks(5);
-		var kbUpperAxis=d3
+		var kbUpperAxisL=d3
 			.axisLeft(kbUpperScale)
 			.ticks(5);
 
-		G2
+		GYUPR
 			.attr("class","x axis")
-			.call(kbLowerAxis);
-		G3
+			.call(kbUpperAxisR);
+		GYDNR
 			.attr("class","x axis")
-			.call(kbUpperAxis);
+			.call(kbLowerAxisR);
+
+		GYUPL
+			.attr("class","x axis")
+			.call(kbUpperAxisL);
+		GYDNL
+			.attr("class","x axis")
+			.call(kbLowerAxisL);
 
 		//***************************
 
 		var wlan0_RX=d3.line()
-			.x(function(d,i) { return (d[0]-t_min)*width/pyld['bufferlen']; })
-			.y(function(d) { return -height/2+d[1]*SF; });
+			.x(function(d,i) { return padd+(d[0]-t_min)*(width-2*padd)/pyld['bufferlen']; })
+			.y(function(d) { return -height/2+padd+d[1]*SF; });
 		g.append("path")
 			.attr("class","wlan0_RX")
 			.attr("d", wlan0_RX(pyld['data']));
 
 		var wlan0_TX=d3.line()
-			.x(function(d,i) { return (d[0]-t_min)*width/pyld['bufferlen']; })
-			.y(function(d) { return -height/2+d[2]*SF; });
+			.x(function(d,i) { return padd+(d[0]-t_min)*(width-2*padd)/pyld['bufferlen']; })
+			.y(function(d) { return -height/2+padd+d[2]*SF; });
 		g.append("path")
 			.attr("class","wlan0_TX")
 			.attr("d", wlan0_TX(pyld['data']));
 
 		var wlan1_RX=d3.line()
-			.x(function(d,i) { return (d[0]-t_min)*width/pyld['bufferlen']; })
-			.y(function(d) { return height/2-d[3]*SF; });
+			.x(function(d,i) { return padd+(d[0]-t_min)*(width-2*padd)/pyld['bufferlen']; })
+			.y(function(d) { return height/2-padd-d[3]*SF; });
 		g.append("path")
 			.attr("class","wlan1_RX")
 			.attr("d", wlan1_RX(pyld['data']));
 
 		var wlan1_TX=d3.line()
-			.x(function(d,i) { return (d[0]-t_min)*width/pyld['bufferlen']; })
-			.y(function(d) { return height/2-d[4]*SF; });
+			.x(function(d,i) { return padd+(d[0]-t_min)*(width-2*padd)/pyld['bufferlen']; })
+			.y(function(d) { return height/2-padd-d[4]*SF; });
 		g.append("path")
 			.attr("class","wlan1_TX")
 			.attr("d", wlan1_TX(pyld['data']));
@@ -191,13 +214,13 @@ window.render_data=function(data){
 			.data(pyld['data']);
 
 		pts.attr('class','update')
-		.attr('cx',function(d,i){return (d[0]-t_min)*width/pyld['bufferlen'];})
-		.attr('cy',function(d){return -height/2+d[1]*SF;});
+		.attr('cx',function(d,i){return padd+(d[0]-t_min)*(width-2*padd)/pyld['bufferlen'];})
+		.attr('cy',function(d){return -height/2+padd+d[1]*SF;});
 
 		pts.enter().append('circle')
 			.attr('class','enter')
-			.attr('cx',function(d,i){return (d[0]-t_min)*width/pyld['bufferlen'];})
-			.attr('cy',function(d){return -height/2+d[1]*SF;;})
+			.attr('cx',function(d,i){return padd+(d[0]-t_min)*(width-2*padd)/pyld['bufferlen'];})
+			.attr('cy',function(d){return -height/2+padd+d[1]*SF;;})
 			.attr('r',2)
 			.merge(pts);
 
@@ -276,9 +299,12 @@ function init(){
 	svg = d3.select(".svg_background").append("svg").attr("width",W).attr("height",H),
 			width = W,
 			height = H,
-			G1 = svg.append("g").attr("transform", "translate(0," + (height / 2) + ")"),
-			G2 = svg.append("g").attr("transform", "translate("+(width) + "," + (height / 2) + ")"),
-			G3 = svg.append("g").attr("transform", "translate("+(width) + "," + (height / 2) + ")"),
+			GXTOP = svg.append("g").attr("transform", "translate(0," + ( padd ) + ")"),
+			GXBOT = svg.append("g").attr("transform", "translate(0," + (height -padd ) + ")"),
+			GYUPR = svg.append("g").attr("transform", "translate("+(width-padd) + "," + (padd) + ")"),
+			GYDNR = svg.append("g").attr("transform", "translate("+(width-padd) + "," + (height-padd) + ")"),
+			GYUPL = svg.append("g").attr("transform", "translate("+(padd) + "," + (padd) + ")"),
+			GYDNL = svg.append("g").attr("transform", "translate("+(padd) + "," + (height-padd) + ")"),
 			g = svg.append("g").attr("transform", "translate(0," + (height / 2) + ")");
 
 	window.update();
