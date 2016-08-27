@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<head>
+<title>Traffic</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<link rel="stylesheet" href="http://spytools.asymptopia.org/static/xtcpd/css/traffic.css">
+
+<script type="text/javascript" src="http://spytools.asymptopia.org/static/xtcpd/js/d3.v4.min.js"></script>
+<script type="text/javascript" src="http://spytools.asymptopia.org/static/xtcpd/js/util.js"></script>
+<script type="text/javascript" src="http://spytools.asymptopia.org/static/xtcpd/js/traffic.js"></script>
+<script type="text/javascript">
+
+function init(){
+	traffic_widget=new TrafficDaemonUI().setup();
+//	traffic_widget.setup();
+}
+</script>
+</head>
+
+<body onload="init()">
+
+<center>
+	<div id="svg_background" class="svg_background" style="width:100%;height:300px;"></div>
+</center>
+
+
+<center>
+<table><tr>
+<td>
+<div id="updateB" class="button" onclick="traffic_widget.toggle_updatesCB()">
+<span>Updates</span>
+</div>
+</td><td>
+<div id="pointsB" class="button" onclick="traffic_widget.toggle_pointsCB()">
+<span>Points</span>
+</div>
+</td><td>
+<div id="linesB" class="button" onclick="traffic_widget.toggle_linesCB()">
+<span>Lines</span>
+</div>
+</td><td>
+<div id="dataB" class="button" onclick="traffic_widget.toggle_dataCB()">
+<span>Data</span>
+</div>
+</td>
+</tr></table>
+</center>
+
+<div id="status"></div>
+
+</body>
+</html>

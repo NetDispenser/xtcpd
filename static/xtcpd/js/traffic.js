@@ -1,7 +1,16 @@
 var TrafficDaemonUI=function(){
 me={};
-//Common command-sending function since does nothing with
-//returned value.  This is to send cmds only.
+me.TIMEOUT=1000;
+me.RUNNING=true;
+var W;
+var H=300;
+var padd=50;
+var units="kB/s";
+var points=lines=true;
+var show_data=false;
+var t_min,pyld,SF,maxdat,maxdatidx;
+var traffic_hostname="http://spytools.asymptopia.org";
+
 me.xajax=function(what){
 	var xhr=new_xhr();
 	xhr.onreadystatechange=function(){
@@ -11,22 +20,18 @@ me.xajax=function(what){
 			}
 		}
 	}
-	//xhr.open('Get',"http://xtcpd.asymptopia.org/xtcpd?"+what,true);
-	console.log(traffic_hostname+"/traffic?"+what);
 	xhr.open('Get',traffic_hostname+"/traffic?"+what,true);
 	xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
 	xhr.send("");
 }
 
-
 me.render_data=function(pyld){
-
 		maxdat=1E-6;
 		for(var ii=0;ii<pyld['bufferlen'];ii++){
 			for(var jj=1;jj<pyld['data'][ii].length+1;jj++){
-					if(+pyld['data'][ii][jj]>maxdat){
-						maxdat=+pyld['data'][ii][jj];
-					}
+				if(+pyld['data'][ii][jj]>maxdat){
+					maxdat=+pyld['data'][ii][jj];
+				}
 			}
 		}
 
@@ -37,34 +42,38 @@ me.render_data=function(pyld){
 		//***************************
 		//AXES LABELS
 		//***************************
-		g_title.selectAll("text")
+		g_decor.selectAll(".title")
 			.data(['Network Traffic'])
 			.enter().append("text")
 			.attr('class','title')
-			.attr("dx", "-30")
-			.attr("dy", ".3em")
+			.attr("dx", "-2.5em")
+			.attr("dy", -(height/2-padd/3))
 			.text(function(d) { return d; });
 
-		g_units_left_up.selectAll("text")
+		g_decor.selectAll(".units_left_up")
 				.data([pyld['units'][1],])
 				.enter().append("text")
-				.attr("class", "axis_label")
+				.attr("class", "axis_label units_left_up")
+				.attr("dx", +(height/5))
+				.attr("dy", -(width/2-padd/3))
 				.attr("transform", function(d) { return "rotate(-90)"; })
-//				.attr("dx", "10")
 				.text(function(d) { return d; });
 
-		g_units_left_dn.selectAll("text")
+		g_decor.selectAll(".units_left_dn")
 				.data([pyld['units'][5],])
 				.enter().append("text")
-				.attr("class", "axis_label")
+				.attr("class", "axis_label units_left_dn")
+				.attr("dx", -(height/5))
+				.attr("dy", -(width/2-padd/3))
 				.attr("transform", function(d) { return "rotate(-90)"; })
 				.text(function(d) { return d; });
 
-		g_units_bottom.selectAll("text")
+		g_decor.selectAll(".bottom_label")
 				.data(['Time [s]',])
 				.enter().append("text")
-				.attr("class", "axis_label")
+				.attr("class", "bottom_label axis_label")
 				.attr("dx", "-15")
+				.attr("dy", (height/2-padd/3))
 				.text(function(d) { return d; });
 
 		//***************************
@@ -218,8 +227,6 @@ me.render_metadata=function(pyld){
 	}
 }
 
-me.TIMEOUT=1000;
-me.RUNNING=true;
 me.update=function(){
 	var xhr=new_xhr();
 	xhr.onreadystatechange=function(){
@@ -254,20 +261,15 @@ me.setup=function(){
 			height = H,
 			g_lines = svg.append("g").attr("transform", "translate(0," + (height / 2) + ")"),
 			g_points = svg.append("g").attr("transform", "translate(0," + (height / 2) + ")"),
+			g_decor = svg.append("g").attr("transform", "translate("+ (width / 2)+"," + (height / 2) + ")"),
 
-			g_x_axis_top = svg.append("g").attr("transform", "translate(0," + ( padd ) + ")"),
+			g_x_axis_top = svg.append("g").attr("transform", "translate(0,"+ (padd) + ")"),
 			g_x_axis_bottom = svg.append("g").attr("transform", "translate(0," + (height -padd ) + ")"),
 
 			g_y_axis_up_r = svg.append("g").attr("transform", "translate("+(width-padd) + "," + (padd) + ")"),
 			g_y_axis_dn_r = svg.append("g").attr("transform", "translate("+(width-padd) + "," + (height-padd) + ")"),
 			g_y_axis_up_l = svg.append("g").attr("transform", "translate("+(padd) + "," + (padd) + ")"),
 			g_y_axis_dn_l = svg.append("g").attr("transform", "translate("+(padd) + "," + (height-padd) + ")"),
-
-			g_units_left_up = svg.append("g").attr("transform", "translate("+(padd/3)+"," + (height / 3) + ")"),
-			g_units_left_dn = svg.append("g").attr("transform", "translate("+(padd/3)+"," + ( 3* height / 4) + ")"),
-			g_units_bottom = svg.append("g").attr("transform", "translate("+(width/2)+"," + (height-padd/4) + ")"),
-
-			g_title = svg.append("g").attr("transform", "translate("+(width/2)+"," + (padd/4) + ")");
 
 	me.update();
 	return me;

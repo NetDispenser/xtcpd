@@ -31,7 +31,7 @@ def get_client_ip(request):
         ip = request.META.get('REMOTE_ADDR')
     return ip
 
-def procdev(request):
+def traffic(request):
 	#logging.debug(request.META)
 	try:
 		qs=request.META['QUERY_STRING']
@@ -53,7 +53,7 @@ def procdev(request):
 		logging.exception("get_data failed")
 
 	return render_to_response(
-	    'procdev.html',{
+	    'traffic.html',{
 			'keys':['tstamp','msg',],
 			'tstamp':str(datetime.datetime.now()),
 			'msg':'00 Next: rpc call to get ifstat from trafd',
