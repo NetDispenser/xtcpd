@@ -79,18 +79,23 @@ me.render_data=function(pyld){
 		//***************************
 		//TOP,BOTTOM AXES
 		//***************************
-		var tScale=d3
+		var botScale=d3
+			.scaleLinear()
+			.range([padd,width-padd])
+			.domain([100,0]);
+//
+		var topScale=d3
 			.scaleLinear()
 			.range([padd,width-padd])
 			.domain([t_min,pyld['data'][maxdatidx][0]]);
 
 		var topAxis=d3
-			.axisTop(tScale)
-			.ticks(10);
+			.axisTop(topScale)
+			.ticks(5);
 
 		var botAxis=d3
-			.axisBottom(tScale)
-			.ticks(10);
+			.axisBottom(botScale)
+			.ticks(5);
 
 		g_x_axis_top
 			.attr("class","x axis")
@@ -116,17 +121,17 @@ me.render_data=function(pyld){
 
 		var kbLowerAxisR=d3
 			.axisRight(kbLowerScale)
-			.ticks(5);
+			.ticks(3);
 		var kbUpperAxisR=d3
 			.axisRight(kbUpperScale)
-			.ticks(5);
+			.ticks(3);
 
 		var kbLowerAxisL=d3
 			.axisLeft(kbLowerScale)
-			.ticks(5);
+			.ticks(3);
 		var kbUpperAxisL=d3
 			.axisLeft(kbUpperScale)
-			.ticks(5);
+			.ticks(3);
 
 		g_y_axis_up_r
 			.attr("class","x axis")
@@ -170,7 +175,7 @@ me.render_data=function(pyld){
 		//POINTS
 		//***************************
 		if(points){
-		for(var i=1;i<5;i++){
+		for(var i=1;i<pyld['data'][0].length;i++){
 			var SIGN=-1;
 			if(i>2)SIGN=+1;
 			var dot_class=".d"+i+"pts";
@@ -276,7 +281,6 @@ me.setup=function(){
 }
 
 me.toggle_updatesCB=function(e){
-//	console.log("TOGGLE_UPDATES");
 	if(me.RUNNING){
 		me.RUNNING=false;
 	}
