@@ -1,0 +1,73 @@
+#status{width:100%;background-color:navy;color:white;overflow:auto;}
+.svg_background{background-color:#333333;}
+.d1pts{fill:navy;}
+.d2pts{fill:maroon;}
+.d3pts{fill:purple;}
+.d4pts{fill:cyan;}
+
+path {
+	stroke-width: 2;
+	fill: none;
+}
+.wlan0_RX {stroke: #FFCC00;}
+.wlan0_TX {stroke: #00FF00;}
+.wlan1_RX {stroke: #FFCC00;}
+.wlan1_TX {stroke: #00FF00;}
+.title{
+	stroke:#fff;
+	fill:#fff;
+}
+.axis_label{
+	stroke:#fff;
+	fill:#fff;
+}
+.x.axis,
+.x.axis path,
+.x.axis line {
+  fill: none;
+  stroke: #FFF;
+	stroke-width:1;
+  shape-rendering: crispEdges;
+	text-shadow:none;
+}
+
+
+.button {
+  display: inline-block;
+  border-radius: 4px;
+  background-color: #228822;
+  border: none;
+  color: #FFFFFF;
+  text-align: center;
+  font-size: 14px;
+  padding: 12px;
+  width: 60px;
+  transition: all 0.5s;
+  cursor: pointer;
+  margin: 2px;
+}
+
+.button span {
+  cursor: pointer;
+  display: inline-block;
+  position: relative;
+  transition: 0.5s;
+}
+
+.button span:after {
+  content: '»';
+  position: absolute;
+  opacity: 0;
+  top: 0;
+  right: -15px;
+  transition: 0.5s;
+}
+
+.button:hover span {
+  padding-right: 15px;
+}
+
+.button:hover span:after {
+  opacity: 1;
+  right: 0;
+}
