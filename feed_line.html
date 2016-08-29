@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<head>
+<style>
+td{background-color:#333333;align:center;}
+.old{stroke:yellow;fill:rgba(255,0,0,1);}
+.new{stroke:red;fill:rgba(255,200,0,1);}
+svg{background-color:rgba(255,0,0,0.3);}
+#demo{background-color:navy;}
+.button {
+  display: inline-block;
+  border-radius: 4px;
+  background-color: #228822;
+  border: none;
+  color: #FFFFFF;
+  text-align: center;
+  font-size: 14px;
+  padding: 12px;
+  width: 60px;
+  transition: all 0.5s;
+  cursor: pointer;
+  margin: 2px;
+}
+</style>
+<script type="text/javascript" src="/static/xtcpd/js/d3.v4.min.js"></script>
+<script type="text/javascript">
+var width=600;
+var height=300;
+var day_idx=1;
+var month_idx=1;
+var init=function(){
+	var data=[];
+	var svg = d3.select("#demo").append("svg:svg")
+  	.attr("width", width)
+  	.attr("height", height);
+
+	var format = d3.timeFormat("%a %b %d %Y");
+	var tFn=function(d){return d.tval;}
+	var yFn=function(d){return d.yval;}
+
+	var t=d3.scaleTime()
+		.range([0,width])
+//		.domain(d3.extent(data,tFn));
+		.domain([new Date(2015,1,1),new Date(2017,1,1)]);
+
+	var y=d3.scaleLinear()
+		.range([0,height])
+		.domain([-1000,1000]);
+
+	var refresh=function(){
+		console.log("refresh:"+data.length);
+
+		t.domain(d3.extent(data, tFn));
+		y.domain(d3.extent(data, yFn));
+
+		var circles=svg.selectAll("circle")
+			.data(data,tFn);
+
+		circles.transition()
+			.attr("cx", function(d) { return t(d.tval) })
+			.attr("cy", function(d) { return y(d.yval) })
+			.attr("class","old")
+
+		circles.enter()
+			.append("svg:circle")
+			.attr("class","new")
+			.attr("r", 6)
+			.attr("cx", function(d) { return t(d.tval) })
+			.attr("cy", function(d) { return y(d.yval) })
+
+	}
+
+	d3.selectAll(".step-button")
+		.on("click", function() {
+			//Investigate 1) add 1 point 2) replace entire line data
+			//Goal: dynamic data with mouseover meta info
+			new_event={
+				'tval':new Date(2015,month_idx,day_idx),
+				'yval':100*Math.random()
+			};
+			day_idx+=5;
+			month_idx+=1;
+			data.push(new_event);
+			refresh();
+		});
+
+
+}//init
+
+
+</script>
+</head>
+<body onload="init()">
+
+	<table align="center">
+	<tr><td colspan="2" align="center">
+		<div id="demo"></div>
+	</td></tr>
+	<tr><td align="center">
+		<div class="button step-button">
+		<span>Step</span>
+		</div>
+	</td></tr>
+	</table>
+
+
+</body>
+</html>
