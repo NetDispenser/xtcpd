@@ -21,6 +21,11 @@ svg{background-color:rgba(255,0,0,0.3);}
   cursor: pointer;
   margin: 2px;
 }
+.overlay {
+  fill: none;
+  pointer-events: all;
+}
+
 </style>
 <script type="text/javascript" src="/static/xtcpd/js/d3.v4.min.js"></script>
 <script type="text/javascript">
@@ -34,18 +39,17 @@ var init=function(){
   	.attr("width", width)
   	.attr("height", height);
 
-	var format = d3.timeFormat("%a %b %d %Y");
+//	var format = d3.timeFormat("%a %b %d %Y");
 	var tFn=function(d){return d.tval;}
 	var yFn=function(d){return d.yval;}
 
 	var t=d3.scaleTime()
 		.range([0,width])
-//		.domain(d3.extent(data,tFn));
-		.domain([new Date(2015,1,1),new Date(2017,1,1)]);
+		.domain(d3.extent(data,tFn));
 
 	var y=d3.scaleLinear()
 		.range([0,height])
-		.domain([-1000,1000]);
+		.domain(d3.extent(data,yFn));
 
 	var refresh=function(){
 		console.log("refresh:"+data.length);
@@ -53,37 +57,77 @@ var init=function(){
 		t.domain(d3.extent(data, tFn));
 		y.domain(d3.extent(data, yFn));
 
-		var circles=svg.selectAll("circle")
+		var circles=svg.selectAll(".dat-circle")
 			.data(data,tFn);
 
 		circles.transition()
 			.attr("cx", function(d) { return t(d.tval) })
 			.attr("cy", function(d) { return y(d.yval) })
-			.attr("class","old")
+			.attr("class","old dat-circle")
 
 		circles.enter()
 			.append("svg:circle")
-			.attr("class","new")
+			.attr("class","new dat-circle")
 			.attr("r", 6)
 			.attr("cx", function(d) { return t(d.tval) })
 			.attr("cy", function(d) { return y(d.yval) })
 
 	}
+	var add_event=function(){
+		new_event={
+			'tval':new Date(2015,month_idx,day_idx),
+			'yval':100*Math.random()
+		};
+		day_idx+=5;
+		month_idx+=1;
+		data.push(new_event);
+		refresh();
+	}
+
+	for(var dummy=0;dummy<10;dummy++)
+		add_event();
 
 	d3.selectAll(".step-button")
 		.on("click", function() {
 			//Investigate 1) add 1 point 2) replace entire line data
 			//Goal: dynamic data with mouseover meta info
-			new_event={
-				'tval':new Date(2015,month_idx,day_idx),
-				'yval':100*Math.random()
-			};
-			day_idx+=5;
-			month_idx+=1;
-			data.push(new_event);
-			refresh();
+			add_event();
 		});
 
+
+	var focus = svg.append("g")
+		  .attr("class", "focus")
+		  .style("display", "none");
+
+	focus.append("circle")
+		  .attr("r", 4.5);
+
+
+	focus.append("text")
+		  .attr("x", 9)
+		  .attr("dy", ".35em");
+
+	svg.append("rect")
+		  .attr("class", "overlay")
+		  .attr("width", width)
+		  .attr("height", height)
+		  .on("mouseover", function() { focus.style("display", null); })
+		  .on("mouseout", function() { focus.style("display", "none"); })
+		  .on("mousemove", mousemove);
+
+	var bisectDate = d3.bisector(function(d) { return d.tval; }).left;
+
+	function mousemove() {
+		try{
+	  var t0 = t.invert(d3.mouse(this)[0]),
+		  i = bisectDate(data, t0, 1),
+		  d0 = data[i - 1],
+		  d1 = data[i],
+		  x = t0 - d0.tval > d1.tval - t0 ? d1 : d0;
+		focus.attr("transform", "translate(" + t(x.tval) + "," + y(x.yval) + ")");
+		focus.select("text").text(x.tval);
+		}catch(e){console.log(e);}
+	}
 
 }//init
 
