@@ -1,14 +1,19 @@
 #status{width:100%;background-color:navy;color:white;overflow:auto;}
 .svg_background{background-color:#333333;}
-.d1pts{fill:navy;}
-.d2pts{fill:maroon;}
-.d3pts{fill:purple;}
-.d4pts{fill:cyan;}
+
+.d1pts{fill:#44FFAA;}
+.d2pts{fill:#44AAFF;}
+.d3pts{fill:#FF44AA;}
+.d4pts{fill:#AA44FF;}
 
 path {
 	stroke-width: 2;
 	fill: none;
 }
+path:hover {
+  stroke: orangered ;
+}
+
 .wlan0_RX {stroke: #FFCC00;}
 .wlan0_TX {stroke: #00FF00;}
 .wlan1_RX {stroke: #FFCC00;}
@@ -70,4 +75,18 @@ path {
 .button:hover span:after {
   opacity: 1;
   right: 0;
+}
+div.tooltip {
+    position: absolute;
+    text-align: center;
+    #width: 60px;
+    #height: 28px;
+    padding: 2px;
+    font: 12px sans-serif;
+    background: #888888;
+		padding:10px;
+		color:#FFFFFF;
+    border: 0px;
+    border-radius: 8px;
+    pointer-events: none;
 }

@@ -47,7 +47,7 @@ class DaemonProcess(Daemon):
 				if self.RUNNING:
 					line=self.remove_space(p.readline())
 					line[0]=time.perf_counter()
-					logging.debug(line)
+					#logging.debug(line)
 					self.buffer.append(line)
 					while len(self.buffer)<self.BUFFERLEN:
 						zeros=[time.perf_counter(),]
@@ -64,7 +64,7 @@ class DaemonProcess(Daemon):
 			logging.exception("harvest failed")
 
 	def get_data(self,*args):
-		logging.debug("get_data")
+		#logging.debug("get_data")
 		t_now=time.perf_counter()
 		dt=t_now-self.t_last
 		self.t_last=t_now
@@ -77,7 +77,7 @@ class DaemonProcess(Daemon):
 			'bufferlen':self.BUFFERLEN,
 		}
 		#self.buffer.__init__()
-		logging.debug(json.dumps(rval))
+		#logging.debug(json.dumps(rval))
 		return json.dumps(rval)
 
 	def toggle_running(self,*args):

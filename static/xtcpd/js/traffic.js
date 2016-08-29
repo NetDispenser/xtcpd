@@ -2,6 +2,7 @@ var TrafficDaemonUI=function(){
 me={};
 me.TIMEOUT=1000;
 me.RUNNING=true;
+var svg;
 var W;
 var H=300;
 var padd=50;
@@ -26,6 +27,7 @@ me.xajax=function(what){
 }
 
 me.render_data=function(pyld){
+		console.log(pyld);
 		maxdat=1E-6;
 		for(var ii=0;ii<pyld['bufferlen'];ii++){
 			for(var jj=1;jj<pyld['data'][ii].length+1;jj++){
@@ -83,7 +85,7 @@ me.render_data=function(pyld){
 			.scaleLinear()
 			.range([padd,width-padd])
 			.domain([100,0]);
-//
+//			.domain([t_min,pyld['data'][maxdatidx][0]]);
 		var topScale=d3
 			.scaleLinear()
 			.range([padd,width-padd])
@@ -150,10 +152,11 @@ me.render_data=function(pyld){
 		//***************************
 		//LINES
 		//***************************
-		if(lines){
-		g_lines.selectAll("path").remove();
 		var dot_classes=[".wlan0_RX",".wlan0_TX",".wlan1_RX",".wlan1_TX"];
 		var classnames=["wlan0_RX","wlan0_TX","wlan1_RX","wlan1_TX",];
+
+		if(lines){
+		g_lines.selectAll("path").remove();
 		for(var i=1;i<5;i++){
 
 		var SIGN=-1;
@@ -165,36 +168,73 @@ me.render_data=function(pyld){
 			.x(function(d,i) { return padd+(d[0]-t_min)*(width-2*padd)/pyld['bufferlen']; })
 			.y(function(d) { return SIGN*(height/2-padd-d[i]*SF); });
 		var paths=g_lines.selectAll(dot_class)
-			.attr("d",dataline(pyld['data']));
+			.attr("d",dataline(pyld['data']))
+			.on("mouseover", me.handleMouseOver)
+			.on("mouseout", me.handleMouseOut);
+
 		g_lines.append("path")
 			.attr("class",classname)
-			.attr("d", dataline(pyld['data']));
+			.attr("d", dataline(pyld['data']))
+			.on("mouseover", me.handleMouseOver)
+			.on("mouseout", me.handleMouseOut);
 		}}
 
 		//***************************
 		//POINTS
 		//***************************
 		if(points){
-		for(var i=1;i<pyld['data'][0].length;i++){
+		for(var ii=1;ii<pyld['data'][0].length;ii++){
 			var SIGN=-1;
-			if(i>2)SIGN=+1;
-			var dot_class=".d"+i+"pts";
-			var classname="d"+i+"pts";
+			if(ii>2)SIGN=+1;
+			var dot_class=".d"+ii+"pts";
+			var classname="d"+ii+"pts";
+
 			var pts=g_points.selectAll(dot_class)
 				.data(pyld['data']);
+
 			pts.attr('class',classname)
 				.attr('cx',function(d,i){return padd+(d[0]-t_min)*(width-2*padd)/pyld['bufferlen'];})
-				.attr('cy',function(d){return SIGN*(height/2-padd-d[i]*SF);});
+				.attr('cy',function(d){return SIGN*(height/2-padd-d[ii]*SF);});
+
 			pts.enter().append('circle')
 				.attr('class',classname)
 				.attr('cx',function(d,i){return padd+(d[0]-t_min)*(width-2*padd)/pyld['bufferlen'];})
-				.attr('cy',function(d){return SIGN*(height/2-padd-d[i]*SF);})
+				.attr('cy',function(d){return SIGN*(height/2-padd-d[ii]*SF);})
 				.attr('r',2)
 				.merge(pts);
 			pts.exit().remove();
 		}}
 
 }//render_data
+
+me.handleMouseOver=function(d, i) {  // Add interactivity
+			console.log(i);
+			// Use D3 to select element, change color and size
+			d3.select(this).attr({
+				fill: "orange",
+				r: 3
+			});
+
+			// Specify where to put label of text
+			g_lines.append("text")
+				.attr('id', "t" + i)
+				.attr('x', width/2)
+				.attr('y', 0)
+			.text(function() {
+				return "Hi! "+i+","+d;  // Value of the text
+			});
+		}
+
+me.handleMouseOut=function(d, i) {
+			// Use D3 to select element, change color back to normal
+			d3.select(this).attr({
+//				fill: "black",
+//				r: radius
+			});
+
+			// Select text by id and then remove
+			d3.select("#t" + i).remove();  // Remove text location
+		}
 
 //
 me.render_metadata=function(pyld){
@@ -276,6 +316,7 @@ me.setup=function(){
 			g_y_axis_up_l = svg.append("g").attr("transform", "translate("+(padd) + "," + (padd) + ")"),
 			g_y_axis_dn_l = svg.append("g").attr("transform", "translate("+(padd) + "," + (height-padd) + ")"),
 
+	me.svg=svg;
 	me.update();
 	return me;
 }

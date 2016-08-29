@@ -8,13 +8,14 @@ from idns.country_codes import *
 
 line='>pcount\ttstamp\tsrc_dst_idn\tport_port_idn\tnetrange_idn\tcountry_idn\tsrc_idn\tdst_idn\tlat\tlon\n'
 ouf=None
-if not os.path.exists('./ntuple.dat'):
-	ouf=open('ntuple.dat','w')
-	ouf.write(line)
+
+#if not os.path.exists('./ntuple.dat'):
+#	ouf=open('ntuple.dat','w')
+#	ouf.write(line)
 
 FORMAT = '%(message)s'
 logging.basicConfig(filename='xtcpd.log',level=logging.DEBUG,format=FORMAT)
-logging.disable(logging.DEBUG)
+#logging.disable(logging.DEBUG)
 
 if sys.version_info[0]==3:
 	logging.debug("from xmlrpc.server import SimpleXMLRPCServer")
@@ -121,11 +122,11 @@ class DaemonProcess(Daemon):
 
 		self.first_whois=copy.copy(whois)
 		#logging.debug(self.first_whois)
-
+		"""
 		ouf=open('first_whois.dat','w')
 		ouf.write(json.dumps(self.first_whois))
 		ouf.close()
-
+		"""
 		return whois
 
 	def add2dB(self,a):
@@ -282,7 +283,7 @@ class DaemonProcess(Daemon):
 				event="%d\t%.03f\t%d\t%d\t%d\t%d\t%d\t%d\t%.03f\t%.03f\n"%(self.pcount,tstamp,src_dst_idn,port_port_idn,netrange_idn,country_idn,src_idn,dst_idn,lat,lon)
 				cmd="echo '%s'>>ntuple.dat"%event
 				#os.system(cmd)
-				ouf.write(event)
+				#ouf.write(event)
 
 			except:
 				logging.exception(sys.exc_info())
@@ -312,7 +313,7 @@ class DaemonProcess(Daemon):
 		return json.dumps(rval)
 
 	def get_data(self,*args):
-		#logging.debug("get_data")
+		logging.debug("get_data")
 		client=args[0]
 		logging.debug("get_data: "+client)
 		if not client in self.clients:

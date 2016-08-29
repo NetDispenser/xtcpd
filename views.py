@@ -45,9 +45,9 @@ def traffic(request):
 			s=xmlrpc.client.Server("http://spytools.asymptopia.org:8005")
 			client_ip=str(get_client_ip(request))
 			if qs=='get_data':
-				logging.debug(client_ip)
+				#logging.debug(client_ip)
 				rval=s.get_data((client_ip))
-				logging.debug(rval)
+				#logging.debug(rval)
 			return HttpResponse(rval);
 	except:
 		logging.exception("get_data failed")

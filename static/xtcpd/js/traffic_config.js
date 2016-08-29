@@ -6,3 +6,5 @@ var points=lines=true;
 var show_data=false;
 var t_min,pyld,SF,maxdat,maxdatidx;
 var traffic_hostname="http://spytools.asymptopia.org";
+
+var TRAFFIC_CONFIG={}
