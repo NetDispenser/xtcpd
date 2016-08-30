@@ -73,18 +73,20 @@ var t=d3.scaleTime()
 
 var y=d3.scaleLinear()
 	.range([0,height])
-	.domain(d3.extent(data,yFn));
+//	.domain(d3.extent(data,yFn));
+	.domain([-100,100]);
 
 var refresh=function(){
 		console.log("refresh:"+data.length);
 
 		t.domain(d3.extent(data, tFn));
-		y.domain(d3.extent(data, yFn));
+		//y.domain(d3.extent(data, yFn));
+		y.domain([-100,100]);
 
 		var circles=svg.selectAll(".dat-circle")
 			.data(data,tFn);
 
-		circles.transition()
+		circles//.transition()
 			.attr("cx", function(d) { return t(d.tval) })
 			.attr("cy", function(d) { return y(d.yval) })
 			.attr("class","old dat-circle")
@@ -101,11 +103,15 @@ var refresh=function(){
 		var paths=g_lines.selectAll(dot_class)
 			.attr("d",dataline(data));
 
+//		paths.transition()
+//			.x(function(d,i) { return t(d.tval); })
+//			.y(function(d) { return y(d.yval); });
+
 }
 var add_event=function(){
 		new_event={
 			'tval':new Date(2015,month_idx,day_idx),
-			'yval':100*Math.random()
+			'yval':50*Math.random()
 		};
 		day_idx+=5;
 		month_idx+=1;
