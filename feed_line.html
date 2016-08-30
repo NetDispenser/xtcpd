@@ -21,10 +21,33 @@ svg{background-color:rgba(255,0,0,0.3);}
   cursor: pointer;
   margin: 2px;
 }
+.focus circle {
+  fill: green;
+  stroke: #00FF00;
+	z-index:0;
+}
 .overlay {
   fill: none;
   pointer-events: all;
 }
+.line {
+  fill: none;
+  stroke: steelblue;
+  stroke-width: 2px;
+}
+.tooltip{
+	stroke:white;
+	fill:white;
+}
+path {
+	stroke-width: 2;
+	stroke:orange;
+}
+path:hover {
+  stroke: orangered ;
+}
+
+.wlan0_RX {stroke: #FFCC00;}
 
 </style>
 <script type="text/javascript" src="/static/xtcpd/js/d3.v4.min.js"></script>
@@ -39,7 +62,6 @@ var init=function(){
   	.attr("width", width)
   	.attr("height", height);
 
-//	var format = d3.timeFormat("%a %b %d %Y");
 	var tFn=function(d){return d.tval;}
 	var yFn=function(d){return d.yval;}
 
@@ -72,6 +94,8 @@ var init=function(){
 			.attr("cx", function(d) { return t(d.tval) })
 			.attr("cy", function(d) { return y(d.yval) })
 
+		circles.exit().remove();
+
 	}
 	var add_event=function(){
 		new_event={
@@ -81,12 +105,31 @@ var init=function(){
 		day_idx+=5;
 		month_idx+=1;
 		data.push(new_event);
+		var BUFFERLEN=15;
+		while(data.length>BUFFERLEN){
+			var discard=data.shift();
+			console.log("discarded: "+discard);
+		}
 		refresh();
 	}
-
 	for(var dummy=0;dummy<10;dummy++)
 		add_event();
 
+	//Nowj that there is some data, instantiate the line
+	var line = d3.line()
+	  .x(function(d) { return d.tval; })
+	  .y(function(d) { return d.yval; });
+
+/*LEAVE OFF
+
+	svg.append("path")
+		.attr("class","line")
+		.attr("d", line(data))
+		//.attr("d",data)
+		//.datum(data)
+		//.attr("class", "line")
+		.attr("d", line);
+*/
 	d3.selectAll(".step-button")
 		.on("click", function() {
 			//Investigate 1) add 1 point 2) replace entire line data
@@ -94,18 +137,17 @@ var init=function(){
 			add_event();
 		});
 
-
 	var focus = svg.append("g")
 		  .attr("class", "focus")
 		  .style("display", "none");
 
 	focus.append("circle")
-		  .attr("r", 4.5);
-
+		  .attr("r", 10);
 
 	focus.append("text")
-		  .attr("x", 9)
-		  .attr("dy", ".35em");
+			.attr("class","tooltip")
+		  .attr("x",20)
+		  .attr("dy", ".4em");
 
 	svg.append("rect")
 		  .attr("class", "overlay")
@@ -116,6 +158,7 @@ var init=function(){
 		  .on("mousemove", mousemove);
 
 	var bisectDate = d3.bisector(function(d) { return d.tval; }).left;
+	var format=d3.timeFormat("%a %b %d %Y");
 
 	function mousemove() {
 		try{
@@ -125,7 +168,7 @@ var init=function(){
 		  d1 = data[i],
 		  x = t0 - d0.tval > d1.tval - t0 ? d1 : d0;
 		focus.attr("transform", "translate(" + t(x.tval) + "," + y(x.yval) + ")");
-		focus.select("text").text(x.tval);
+		focus.select("text").text(format(x.tval));
 		}catch(e){console.log(e);}
 	}
 
