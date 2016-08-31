@@ -70,18 +70,60 @@ var day_idx=1;
 var month_idx=1;
 var focus;
 var data=[];
-var g_lines;
+var g_lines,g_points;
 var dot_class=".myclass";
 var classname="myclass";
 var dataline=d3.line()
 	.x(function(d,i) { return t(d.tval); })
 	.y(function(d) { return y(d.yval); });
-var tFn=function(d){return d.tval;}
-var yFn=function(d){return d.yval;}
 var t=d3.scaleTime()
 	.range([0,width]);
 var y=d3.scaleLinear()
 	.range([0,height]);
+var bisectDate = d3.bisector(function(d) { return d.tval; }).left;
+var format=d3.timeFormat("%a %b %d %Y");
+var mousemove=function() {
+	console.log("mousemove");
+	try{
+	var t0 = t.invert(d3.mouse(this)[0]),
+		i = bisectDate(data, t0, 1),
+		d0 = data[i - 1],
+		d1 = data[i],
+		x = t0 - d0.tval > d1.tval - t0 ? d1 : d0;
+	focus.attr("transform", "translate(" + t(x.tval) + "," + y(x.yval) + ")");
+	focus.select("text").text(format(x.tval));
+	}catch(e){console.log(e);}
+}
+var lineMouseOver=function(d) {
+	console.log('lineMouseOver'+this.id);//handle to meta info popup
+	d3.select(this)
+	.style("stroke","#AAAAFF");
+}
+var lineMouseOut=function(d) {
+	console.log('lineMouseOut');
+	d3.select(this)
+	.style("stroke","orange");
+}
+var lineMouseMove=function(d) {
+	console.log('lineMouseMove');
+}
+var tFn=function(d){return d.tval;}
+var yFn=function(d){return d.yval;}
+var add_event=function(){
+		new_event={
+			'tval':new Date(2015,month_idx,day_idx),
+			'yval':50*Math.random()
+		};
+		day_idx+=5;
+		month_idx+=1;
+		data.push(new_event);
+		var BUFFERLEN=15;
+		while(data.length>BUFFERLEN){
+			var discard=data.shift();
+			console.log("discarded: "+discard);
+		}
+		refresh();
+}
 var refresh=function(){
 		console.log("refresh:"+data.length);
 
@@ -89,7 +131,7 @@ var refresh=function(){
 		y.domain([-100,100]);
 		//y.domain(d3.extent(data, yFn));
 
-		var circles=svg.selectAll(".dat-circle")
+		var circles=g_points.selectAll(".dat-circle")
 			.data(data,tFn);
 
 		circles//.transition()
@@ -112,21 +154,6 @@ var refresh=function(){
 			.on("mouseout", lineMouseOut)
 			.on("mousemove",lineMouseMove);
 }
-var add_event=function(){
-		new_event={
-			'tval':new Date(2015,month_idx,day_idx),
-			'yval':50*Math.random()
-		};
-		day_idx+=5;
-		month_idx+=1;
-		data.push(new_event);
-		var BUFFERLEN=15;
-		while(data.length>BUFFERLEN){
-			var discard=data.shift();
-			console.log("discarded: "+discard);
-		}
-		refresh();
-}
 var init=function(){
  	svg = d3.select("#demo").append("svg:svg")
   	.attr("width", width)
@@ -141,6 +168,7 @@ var init=function(){
 		.on("mousemove", mousemove);
 
 	g_lines=svg.append("g");
+	g_points=svg.append("g");
 
 	for(var dummy=0;dummy<10;dummy++)
 		add_event();
@@ -176,34 +204,6 @@ var init=function(){
 		.on("mousemove",lineMouseMove);
 
 }//init
-var lineMouseOver=function(d) {  // Add interactivity
-	console.log('lineMouseOver'+this.id);//handle to meta info popup
-	d3.select(this)
-	.style("stroke","#AAAAFF");
-}
-var lineMouseOut=function(d) {
-	console.log('lineMouseOut');
-	d3.select(this)
-	.style("stroke","orange");
-}
-var lineMouseMove=function(d) {
-	console.log('lineMouseMove');
-}
-var bisectDate = d3.bisector(function(d) { return d.tval; }).left;
-var format=d3.timeFormat("%a %b %d %Y");
-var mousemove=function() {
-	console.log("mousemove");
-	try{
-	var t0 = t.invert(d3.mouse(this)[0]),
-		i = bisectDate(data, t0, 1),
-		d0 = data[i - 1],
-		d1 = data[i],
-		x = t0 - d0.tval > d1.tval - t0 ? d1 : d0;
-	focus.attr("transform", "translate(" + t(x.tval) + "," + y(x.yval) + ")");
-	focus.select("text").text(format(x.tval));
-	}catch(e){console.log(e);}
-}
-
 </script>
 </head>
 <body onload="init()">
