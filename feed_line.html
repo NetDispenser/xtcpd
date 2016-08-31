@@ -12,11 +12,24 @@ hilite and hilite_off (default) are only 2 class names used.
 -->
 <head>
 <style>
-td{background-color:#333333;align:center;}
-.old{stroke:yellow;fill:rgba(255,0,0,1);}
-.new{stroke:green;fill:rgba(255,200,0,1);}
-svg{background-color:rgba(255,0,0,0.0);}
-#demo{background-color:#000033;}
+td{
+	background-color:#333333;
+	align:center;
+}
+.old{
+	stroke:yellow;
+	fill:rgba(255,0,0,1);
+}
+.new{
+	stroke:green;
+	fill:rgba(255,200,0,1);
+}
+svg{
+	background-color:rgba(255,0,0,0.0);
+}
+#demo{
+	background-color:#000033;
+}
 .button {
   display: inline-block;
   border-radius: 4px;
@@ -38,8 +51,7 @@ svg{background-color:rgba(255,0,0,0.0);}
 .point_info circle {
   fill: #00FF00;
   stroke: #005500;
-	position:fixed;
-	z-index:0;
+	stroke-width:6;
 }
 .overlay {
   fill: none;
@@ -49,16 +61,27 @@ svg{background-color:rgba(255,0,0,0.0);}
 	stroke:white;
 	fill:white;
 }
-.hilite{stroke:#00FF00;fill:none;stroke-width:4;}
-.hilite_off{stroke:orange;fill:none;stroke-width:3;}
+.hilite{
+	stroke:#00FF00;
+	fill:none;
+	stroke-width:4;
+}
+.hilite_off{
+	stroke:orange;
+	fill:none;
+	stroke-width:3;
+}
 </style>
-<script type="text/javascript" src="/static/xtcpd/js/d3.v4.min.js"></script>
-<script type="text/javascript">
+<script
+	type="text/javascript" src="/static/xtcpd/js/d3.v4.min.js">
+</script>
+<script
+	type="text/javascript">
 var width=600;
 var height=300;
 var day_idx=1;
 var month_idx=1;
-var point_info;
+var point_info,line_info;
 var data=[];
 var g_lines,g_points;
 var dot_class=".hilite_off";
@@ -87,15 +110,17 @@ var mousemove=function() {
 var lineMouseOver=function(d) {
 	console.log('lineMouseOver'+this.id);//handle to meta info popup
 	d3.select(this)
-	.attr("class","hilite");
+		.attr("class","hilite");
+
+	line_info.attr("transform", "translate(" + width/2.5 + "," + height/4 + ")");
+	line_info.select("text").text("Line Info Goes Here");
+	console.log("line_info set");
 }
 var lineMouseOut=function(d) {
 	console.log('lineMouseOut');
 	d3.select(this)
-	.attr("class","hilite_off");
-}
-var lineMouseMove=function(d) {
-	console.log('lineMouseMove');
+		.attr("class","hilite_off");
+	line_info.select("text").text("");
 }
 var tFn=function(d){return d.tval;}
 var yFn=function(d){return d.yval;}
@@ -141,8 +166,7 @@ var refresh=function(){
 		var paths=g_lines.selectAll(dot_class)//How to transition??
 			.attr("d",dataline(data))
 			.on("mouseover", lineMouseOver)
-			.on("mouseout", lineMouseOut)
-			.on("mousemove",lineMouseMove);
+			.on("mouseout", lineMouseOut);
 }
 var init=function(){
  	svg = d3.select("#demo").append("svg:svg")
@@ -168,7 +192,6 @@ var init=function(){
 		.attr("id","greatgooglymoogly")
 		.attr("d", dataline(data));
 
-
 	d3.selectAll(".step-button")
 		.on("click", function() {
 			//Investigate 1) add 1 point 2) replace entire line data
@@ -179,19 +202,23 @@ var init=function(){
 	point_info = svg.append("g")
 		  .attr("class", "point_info")
 		  .style("display", "none");
-
 	point_info.append("circle")
 		  .attr("r", 10);
-
 	point_info.append("text")
 			.attr("class","tooltip")
 		  .attr("x",20)
 		  .attr("dy", ".4em");
 
+	line_info = svg.append("g")
+	  .attr("class", "line_info")
+		.attr("hidden",null)
+		.style("display", "display");
+	line_info.append("text")
+		.attr("class","tooltip");
+
 	var paths=g_lines.selectAll(dot_class)
 		.on("mouseover", lineMouseOver)
-		.on("mouseout", lineMouseOut)
-		.on("mousemove",lineMouseMove);
+		.on("mouseout", lineMouseOut);
 
 }//init
 </script>
