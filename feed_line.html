@@ -1,5 +1,14 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
+<!--
+This example started with the article/example at:
+http://pothibo.com/2013/09/d3-js-how-to-handle-dynamic-json-data/
+
+Then I added a dynamic line and that re-used its data, rather than
+my first attempt which re-created the full data window each update.
+This example maintains a data buffer of length 10.
+This also shows the minimum amount of code for everything going on.
+-->
 <head>
 <style>
 td{background-color:#333333;align:center;}
@@ -24,30 +33,34 @@ svg{background-color:rgba(255,0,0,0.3);}
 .focus circle {
   fill: green;
   stroke: #00FF00;
+	position:fixed;
 	z-index:0;
 }
 .overlay {
   fill: none;
   pointer-events: all;
 }
-.myline {
-  stroke: steelblue;
-  stroke-width: 2px;
-}
 .tooltip{
 	stroke:white;
 	fill:white;
 }
-path {
-	stroke-width: 2;
+.xpath {
+	stroke-width: 3;
 	stroke:orange;
 	fill:none;
 }
-path:hover {
+.xpath:hover {
   stroke: orangered ;
 }
-.myline {stroke: #FFCC00;}
-
+.myclass{
+	stroke-width: 3;
+	stroke:orange;
+	fill:none;
+}
+.xmyclass:hover{
+	stroke:green;
+	stroke-width: 4;
+}
 </style>
 <script type="text/javascript" src="/static/xtcpd/js/d3.v4.min.js"></script>
 <script type="text/javascript">
@@ -63,16 +76,12 @@ var classname="myclass";
 var dataline=d3.line()
 	.x(function(d,i) { return t(d.tval); })
 	.y(function(d) { return y(d.yval); });
-
 var tFn=function(d){return d.tval;}
 var yFn=function(d){return d.yval;}
-
 var t=d3.scaleTime()
 	.range([0,width]);
-
 var y=d3.scaleLinear()
 	.range([0,height]);
-
 var refresh=function(){
 		console.log("refresh:"+data.length);
 
@@ -97,15 +106,11 @@ var refresh=function(){
 
 		circles.exit().remove();
 
-		var paths=g_lines.selectAll(dot_class)
+		var paths=g_lines.selectAll(dot_class)//How to transition??
 			.attr("d",dataline(data))
 			.on("mouseover", lineMouseOver)
-			.on("mouseout", lineMouseOut);
-
-//		paths.transition()
-//			.x(function(d,i) { return t(d.tval); })
-//			.y(function(d) { return y(d.yval); });
-
+			.on("mouseout", lineMouseOut)
+			.on("mousemove",lineMouseMove);
 }
 var add_event=function(){
 		new_event={
@@ -122,21 +127,6 @@ var add_event=function(){
 		}
 		refresh();
 }
-var bisectDate = d3.bisector(function(d) { return d.tval; }).left;
-var format=d3.timeFormat("%a %b %d %Y");
-
-function mousemove() {
-	try{
-	var t0 = t.invert(d3.mouse(this)[0]),
-		i = bisectDate(data, t0, 1),
-		d0 = data[i - 1],
-		d1 = data[i],
-		x = t0 - d0.tval > d1.tval - t0 ? d1 : d0;
-	focus.attr("transform", "translate(" + t(x.tval) + "," + y(x.yval) + ")");
-	focus.select("text").text(format(x.tval));
-	}catch(e){console.log(e);}
-}
-
 var init=function(){
  	svg = d3.select("#demo").append("svg:svg")
   	.attr("width", width)
@@ -157,6 +147,7 @@ var init=function(){
 
 	g_lines.append("path")
 		.attr("class",classname)
+		.attr("id","greatgooglymoogly")
 		.attr("d", dataline(data));
 
 
@@ -179,22 +170,40 @@ var init=function(){
 		  .attr("x",20)
 		  .attr("dy", ".4em");
 
-//rect originally here
-/*
-	svg.selectAll("circle")
-	.on("mouseover", function(d) { console.log("mouseover:"+d.tval+" "+d.yval); return 1;})
-	.on("mouseout", function(d) { console.log("mouseout"); return 1;})
-	.on("mousemove", mousemove);
-*/
+	var paths=g_lines.selectAll(dot_class)
+		.on("mouseover", lineMouseOver)
+		.on("mouseout", lineMouseOut)
+		.on("mousemove",lineMouseMove);
+
 }//init
 var lineMouseOver=function(d) {  // Add interactivity
+	console.log('lineMouseOver'+this.id);//handle to meta info popup
 	d3.select(this)
-		.style("stroke","#00FF00");
+	.style("stroke","#AAAAFF");
 }
 var lineMouseOut=function(d) {
+	console.log('lineMouseOut');
 	d3.select(this)
-		.style("stroke",orange);
+	.style("stroke","orange");
 }
+var lineMouseMove=function(d) {
+	console.log('lineMouseMove');
+}
+var bisectDate = d3.bisector(function(d) { return d.tval; }).left;
+var format=d3.timeFormat("%a %b %d %Y");
+var mousemove=function() {
+	console.log("mousemove");
+	try{
+	var t0 = t.invert(d3.mouse(this)[0]),
+		i = bisectDate(data, t0, 1),
+		d0 = data[i - 1],
+		d1 = data[i],
+		x = t0 - d0.tval > d1.tval - t0 ? d1 : d0;
+	focus.attr("transform", "translate(" + t(x.tval) + "," + y(x.yval) + ")");
+	focus.select("text").text(format(x.tval));
+	}catch(e){console.log(e);}
+}
+
 </script>
 </head>
 <body onload="init()">
