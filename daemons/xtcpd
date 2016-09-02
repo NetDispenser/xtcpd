@@ -14,7 +14,7 @@ ouf=None
 #	ouf.write(line)
 
 FORMAT = '%(message)s'
-logging.basicConfig(filename='xtcpd.log',level=logging.DEBUG,format=FORMAT)
+logging.basicConfig(filename='/var/log/xtcpd/xtcpd.log',level=logging.DEBUG,format=FORMAT)
 #logging.disable(logging.DEBUG)
 
 if sys.version_info[0]==3:

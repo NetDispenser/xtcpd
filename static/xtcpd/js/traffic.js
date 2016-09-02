@@ -1,3 +1,8 @@
+/*
+Charles Cosse, Asymptopia Software
+ccosse@gmail.com | www.asymptopia.org
+September 12, 2016
+*/
 var TrafficDaemonUI=function(){
 me={};
 me.TIMEOUT=1000;
@@ -81,13 +86,11 @@ me.render_data=function(pyld){
 		//***************************
 		//TOP,BOTTOM AXES
 		//***************************
-		var botScale=d3
-			.scaleLinear()
+		var botScale=d3.scaleLinear()
 			.range([padd,width-padd])
 			.domain([100,0]);
 //			.domain([t_min,pyld['data'][maxdatidx][0]]);
-		var topScale=d3
-			.scaleLinear()
+		var topScale=d3.scaleLinear()
 			.range([padd,width-padd])
 			.domain([t_min,pyld['data'][maxdatidx][0]]);
 
@@ -156,7 +159,7 @@ me.render_data=function(pyld){
 		var classnames=["wlan0_RX","wlan0_TX","wlan1_RX","wlan1_TX",];
 
 		if(lines){
-		g_lines.selectAll("path").remove();
+		g_lines.selectAll("path").remove();//Not the D3 way!
 		for(var i=1;i<5;i++){
 
 		var SIGN=-1;
@@ -183,6 +186,7 @@ me.render_data=function(pyld){
 		//POINTS
 		//***************************
 		if(points){
+		var pFn = function(d){return d[0];}
 		for(var ii=1;ii<pyld['data'][0].length;ii++){
 			var SIGN=-1;
 			if(ii>2)SIGN=+1;
@@ -190,7 +194,7 @@ me.render_data=function(pyld){
 			var classname="d"+ii+"pts";
 
 			var pts=g_points.selectAll(dot_class)
-				.data(pyld['data']);
+				.data(pyld['data'],pFn);
 
 			pts.attr('class',classname)
 				.attr('cx',function(d,i){return padd+(d[0]-t_min)*(width-2*padd)/pyld['bufferlen'];})

@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<!--
+http://pothibo.com/2013/09/d3-js-how-to-handle-dynamic-json-data/
+-->
+<head>
+<style>
+td{background-color:#333333;align:center;}
+.old{stroke:yellow;fill:rgba(0,0,0,0);}
+.new{stroke:red;fill:rgba(0,0,0,0);}
+svg{background-color:rgba(255,0,0,0.3);}
+#demo{background-color:navy;}
+.button {
+  display: inline-block;
+  border-radius: 4px;
+  background-color: #228822;
+  border: none;
+  color: #FFFFFF;
+  text-align: center;
+  font-size: 14px;
+  padding: 12px;
+  width: 60px;
+  transition: all 0.5s;
+  cursor: pointer;
+  margin: 2px;
+}
+</style>
+<script type="text/javascript" src="/static/xtcpd/js/d3.v4.min.js"></script>
+<script type="text/javascript">
+
+var JSONData = [
+  { "id": 3, "xval": "111", "yval": 12000},
+  { "id": 1, "xval": "222", "yval": 2000},
+  { "id": 2, "xval": "333", "yval": 17000},
+  { "id": 4, "xval": "444", "yval": 15000},
+  { "id": 5, "xval": "555", "yval": 16000},
+	{ "id": 5, "xval": "666", "yval": 12000},
+	{ "id": 5, "xval": "777", "yval": 11000},
+	{ "id": 5, "xval": "888", "yval": 6000},
+];
+
+
+function init(){
+  var data = JSONData//.slice()
+	console.log(data)
+  var format = d3.timeFormat("%a %b %d %Y")
+  var yFn = function(d) { return d.yval }
+  var xFn = function(d) { return d.xval }
+
+  var x = d3.scaleLinear()
+    .range([10, 280])
+    .domain(d3.extent(data, xFn))
+
+  var y = d3.scaleLinear()
+    .range([180, 10])
+    .domain(d3.extent(data, yFn))
+
+  var svg = d3.select("#demo").append("svg:svg")
+  .attr("width", 300)
+  .attr("height", 200)
+
+	var refresh_graph = function(){
+		x.domain(d3.extent(data, xFn))
+	  y.domain(d3.extent(data, yFn))
+
+		circles=svg.selectAll("circle")
+			.data(data,xFn)
+
+		circles.transition()
+			.attr("cx", function(d) { return x(xFn(d)) })
+			.attr("cy", function(d) { return y(yFn(d)) })
+			.attr("class","old")
+
+		circles.enter()
+			.append("svg:circle")
+			.attr("class","new")
+			.attr("r", 6)
+			.attr("cx", function(d) { return x(xFn(d)) })
+			.attr("cy", function(d) { return y(yFn(d)) })
+
+		circles.exit()
+			.remove();
+	}
+	refresh_graph();
+
+	d3.selectAll(".add-data-button")
+	   .on("click", function() {
+	     var start = d3.min(data, xFn)
+	     var end = d3.max(data, xFn)
+
+	     obj = {
+	       'id': Math.floor(Math.random() * 70),
+	       'xval': Math.floor(-10000 + 20000*Math.random()),
+	       'yval': Math.floor(-150000 + 2*150000*Math.random())
+	     }
+	     data.push(obj)
+	     refresh_graph()
+	  })
+		d3.selectAll(".delete-data-button")
+		   .on("click", function() {
+		     data.shift()
+		     refresh_graph()
+		  })
+
+}
+
+</script>
+</head>
+<body onload="init();">
+
+<table align="center">
+<tr><td colspan="2" align="center">
+	<div id="demo"></div>
+</td></tr>
+<tr><td align="center">
+	<div class="button add-data-button">
+	<span>Add</span>
+	</div>
+</td><td align="center">
+	<div class="button delete-data-button">
+	<span>Remove</span>
+	</div>
+</td></tr>
+</table>
+
+</body>
+</html>

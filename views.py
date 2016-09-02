@@ -31,6 +31,22 @@ def get_client_ip(request):
         ip = request.META.get('REMOTE_ADDR')
     return ip
 
+def editor(request):
+	logging.debug("editor")
+	if len(request.META['QUERY_STRING'])>0:
+		logging.debug('query_string')
+	if request.method=="POST":
+		logging.debug(request.POST.get('mytextarea'))
+		logging.debug(request.POST)
+	return render(request, 'editest.html', 
+		context={'title': 'EdiTest',},
+		content_type='text/html'
+	)
+
+
+def lanwatch(request):
+	return render(request,'lanwatch.html',context={'title':'LAN-Watch'},content_type="text/html")
+
 def traffic(request):
 	#logging.debug(request.META)
 	try:
