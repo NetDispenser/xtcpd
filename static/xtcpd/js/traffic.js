@@ -12,7 +12,8 @@ var W;
 var H=300;
 var padd=50;
 var units="kB/s";
-var points=lines=true;
+var points=false;
+var lines=true;
 var show_data=false;
 var t_min,pyld,SF,maxdat,maxdatidx;
 var traffic_hostname="http://spytools.asymptopia.org";
@@ -88,7 +89,7 @@ me.render_data=function(pyld){
 		//***************************
 		var botScale=d3.scaleLinear()
 			.range([padd,width-padd])
-			.domain([100,0]);
+			.domain([pyld['data'].length,0]);
 //			.domain([t_min,pyld['data'][maxdatidx][0]]);
 		var topScale=d3.scaleLinear()
 			.range([padd,width-padd])
@@ -292,7 +293,7 @@ me.update=function(){
 					var W=parseInt(document.getElementById("mobile_header").getBoundingClientRect().width);
 					svg.attr("width",W);
 					width=W;
-					console.log("width="+width);
+//					console.log("width="+width);
 
 				}catch(e){
 					console.log(e)

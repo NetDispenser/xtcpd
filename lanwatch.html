@@ -6,7 +6,6 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 
-
 <link rel="stylesheet" type="text/css" href="/static/xtcpd/css/bootstrap.css">
 <link rel="stylesheet" type="text/css" href="/static/xtcpd/css/traffic.css">
 <link rel="stylesheet" type="text/css" href="/static/xtcpd/css/lanwatch.css">
@@ -111,20 +110,72 @@ var init=function(){
 
 <body onload="init()">
 
+	<nav id="le_nav" class="navbar navbar-default navbar-fixed-top">
+	  <div class="container-fluid">
+	    <div class="navbar-header">
+	      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse-1" aria-expanded="false">
+	        <span class="sr-only">Toggle navigation</span>
+	        <span class="icon-bar"></span>
+	        <span class="icon-bar"></span>
+	        <span class="icon-bar"></span>
+	      </button>
+	      <a class="navbar-brand" href="/lanwatch/">
+	        <img id="logo" alt="Brand" src="/static/xtcpd/img/asymptopia-logo.png">
+	      </a>
+	    </div>
+
+
+	    <div class="collapse navbar-collapse" id="navbar-collapse-1">
+	      <ul class="nav navbar-nav">
+
+	        <li><a href="/lanwatch/"><span class="glyphicon glyphicon-home" aria-hidden="true"></span> Run </a></li>
+
+	        <li class="dropdown">
+	          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><span class="glyphicon glyphicon-deciduous" aria-hidden="true"></span> WiFi <span class="caret"></span></a>
+	          <ul class="dropdown-menu">
+	            <li class="dropdown-header">WiFi</li>
+	            <li><a href="">wlan0</a></li>
+							<li><a href="">wlan1</a></li>
+	          </ul>
+	        </li>
+
+					<li class="dropdown">
+	          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><span class="glyphicon glyphicon-deciduous" aria-hidden="true"></span> Analysis <span class="caret"></span></a>
+	          <ul class="dropdown-menu">
+	            <li class="dropdown-header">WiFi</li>
+	            <li><a href="">wlan0</a></li>
+							<li><a href="">wlan1</a></li>
+	          </ul>
+	        </li>
+
+	      </ul>
+	    </div>
+	  </div>
+	</nav>
+
+
 <div id="layout" class="container">
 	<div class="row">
-
 	<div id="controls" class="controls">
 		<div id="mobile_header" class="mobile_header"></div>
 		<div id="tb" class="tb">
 			<img id="tb_arrow" src="/static/xtcpd/img/arrow-lt.png" class="tb_arrow"/>
 		</div>
-		<div id="traffic">
-		<div id="svg_background" class="svg_background" style="height:300px;"></div>
-		</div>
-		<div id="spectra"></div>
-	</div>
 
+		<div id="traffic">
+			<div id="svg_background" class="svg_background"></div>
+		</div>
+
+		<div id="spectra">
+			<div id="svg_background" class="svg_background"></div>
+		</div>
+
+		<div id="div_controls_top" >
+			<div id='title_controls_top'>LAN-Watch</div>
+			<img class="controls_logo" src="/static/xtcpd/img/asymptopia-logo.png"/>
+<!--			<img id='img_controls_top' src="/static/xtcpd/img/green-bar.png" class="img-responsive w100"/> -->
+		</div>
+	</div>
 	<div id="mapdiv" class="mapdiv"></div>
 	</div>
 </div>

@@ -24,7 +24,7 @@ class DaemonProcess(Daemon):
 		self.buffer=[]
 		self.t=None
 		self.t_last=time.perf_counter()
-		self.BUFFERLEN=100
+		self.BUFFERLEN=60
 
 	def remove_space(self,line):
 		line=line.rstrip().lstrip()
@@ -65,6 +65,7 @@ class DaemonProcess(Daemon):
 
 	def get_data(self,*args):
 		#logging.debug("get_data")
+		#{"geoip": {"keys": []},
 		t_now=time.perf_counter()
 		dt=t_now-self.t_last
 		self.t_last=t_now

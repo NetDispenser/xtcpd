@@ -1,10 +1,10 @@
 #status{width:100%;background-color:navy;color:white;overflow:auto;}
 .svg_background{background-color:#333333;}
 
-.d1pts{fill:#44FFAA;}
-.d2pts{fill:#44AAFF;}
-.d3pts{fill:#FF44AA;}
-.d4pts{fill:#AA44FF;}
+.d1pts{radius:1;stroke-width:0;stroke:#444444;fill:#FFCC00;}
+.d2pts{radius:1;stroke-width:0;stroke:#444444;fill:#00FF00;}
+.d3pts{radius:1;stroke-width:0;stroke:#444444;fill:#FFCC00;}
+.d4pts{radius:1;stroke-width:0;stroke:#444444;fill:#00FF00;}
 
 path {
 	stroke-width: 2;
