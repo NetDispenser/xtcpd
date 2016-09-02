@@ -66,9 +66,13 @@ window.onresize=function(e){
 
 }
 window.counter=0;
+var setup=function(){
+	var traffic_widget=new TrafficDaemonUI().setup();
+}
 var init=function(){
 	var map=new Map('mapdiv');
-	var traffic_widget=new TrafficDaemonUI().setup();
+
+	window.setTimeout("setup()",3000);
 
 	d3.selectAll("#tb")
 		.on("click", function() {
@@ -116,9 +120,9 @@ var init=function(){
 			<img id="tb_arrow" src="/static/xtcpd/img/arrow-lt.png" class="tb_arrow"/>
 		</div>
 		<div id="traffic">
-		<div id="svg_background" class="svg_background" style="width:100%;height:300px;"></div>
+		<div id="svg_background" class="svg_background" style="height:300px;"></div>
 		</div>
-<div id="spectra"></div>
+		<div id="spectra"></div>
 	</div>
 
 	<div id="mapdiv" class="mapdiv"></div>

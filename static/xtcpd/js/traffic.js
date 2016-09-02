@@ -289,6 +289,11 @@ me.update=function(){
 					if(me.RUNNING==true){
 						setTimeout("me.update()",me.TIMEOUT);
 					}
+					var W=parseInt(document.getElementById("mobile_header").getBoundingClientRect().width);
+					svg.attr("width",W);
+					width=W;
+					console.log("width="+width);
+
 				}catch(e){
 					console.log(e)
 					if(me.RUNNING==true){
@@ -303,8 +308,9 @@ me.update=function(){
 	xhr.send("");
 }
 me.setup=function(){
-	console.log('init');
-	var W=document.getElementById("svg_background").getBoundingClientRect().width;
+	var W=parseInt(document.getElementById("mobile_header").getBoundingClientRect().width);
+	console.log(W);
+//	if(true)W=380;
 	svg = d3.select(".svg_background").append("svg").attr("width",W).attr("height",H),
 			width = W,
 			height = H,
