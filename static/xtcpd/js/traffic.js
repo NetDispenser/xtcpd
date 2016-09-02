@@ -9,7 +9,7 @@ me.TIMEOUT=1000;
 me.RUNNING=true;
 var svg;
 var W;
-var H=300;
+var H=200;
 var padd=50;
 var units="kB/s";
 var points=false;

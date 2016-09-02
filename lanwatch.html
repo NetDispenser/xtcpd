@@ -20,7 +20,7 @@
 <script type="text/javascript">
 window.onresize=function(e){
 	console.log("onresize");
-	var h_nav=0;//document.getElementById("le_nav").getBoundingClientRect().height;
+	var h_nav=document.getElementById("le_nav").getBoundingClientRect().height;
 	//$("#gmap").css("top",h_nav);
 
 	var msg="";
@@ -128,7 +128,7 @@ var init=function(){
 	    <div class="collapse navbar-collapse" id="navbar-collapse-1">
 	      <ul class="nav navbar-nav">
 
-	        <li><a href="/lanwatch/"><span class="glyphicon glyphicon-home" aria-hidden="true"></span> Run </a></li>
+	        <li class="runB"><a href="/lanwatch/"><span class="glyphicon glyphicon-home" aria-hidden="true"></span> Run </a></li>
 
 	        <li class="dropdown">
 	          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><span class="glyphicon glyphicon-deciduous" aria-hidden="true"></span> WiFi <span class="caret"></span></a>
@@ -155,9 +155,13 @@ var init=function(){
 
 
 <div id="layout" class="container">
+
 	<div class="row">
+
 	<div id="controls" class="controls">
+
 		<div id="mobile_header" class="mobile_header"></div>
+
 		<div id="tb" class="tb">
 			<img id="tb_arrow" src="/static/xtcpd/img/arrow-lt.png" class="tb_arrow"/>
 		</div>
