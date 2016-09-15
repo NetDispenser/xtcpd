@@ -1,19 +1,16 @@
 #!/usr/bin/env python
 from daemon import Daemon
 #from service_utils import *
-#from country_codes import *
-#from ip_idns import *
 import logging,json,time,sys,os,re,copy,datetime
 from idns.country_codes import *
 
 line='>pcount\ttstamp\tsrc_dst_idn\tport_port_idn\tnetrange_idn\tcountry_idn\tsrc_idn\tdst_idn\tlat\tlon\n'
 ouf=None
+if not os.path.exists('./ntuple.dat'):
+	ouf=open('ntuple.dat','w')
+	ouf.write(line)
 
-#if not os.path.exists('./ntuple.dat'):
-#	ouf=open('ntuple.dat','w')
-#	ouf.write(line)
-
-FORMAT = '%(message)s'
+FORMAT = 'XTCPD: %(message)s'
 logging.basicConfig(filename='/var/log/xtcpd/xtcpd.log',level=logging.DEBUG,format=FORMAT)
 #logging.disable(logging.DEBUG)
 
@@ -37,7 +34,7 @@ XTCPD_LOCK = threading.Lock()
 UBUNTU=False
 if UBUNTU:
 	XTCPD_HOSTNAME='xtcpd.asymptopia.org'
-	XTCPD_CONFIG='/var/www/xtcpd/xapp/daemons/xtcpd.config'
+	XTCPD_CONFIG='/var/www/FIXME!???/xtcpd/xapp/daemons/xtcpd.config'
 	USE_PYGEOIP=True
 else:
 	XTCPD_HOSTNAME='spytools.asymptopia.org'
@@ -56,7 +53,7 @@ else:
 #import GeoIP
 #gip=GeoIP.open("/usr/share/GeoIP/GeoLiteCity.dat",GeoIP.GEOIP_STANDARD)
 rexp=re.compile('(\d+:\d+:\d+)(\.\d+) (IP) (.*)(\.\d+) > (\d+\.\d+\.\d+\.\d+)(\.\d+)(.*)')
-tcpdump_cmd="tcpdump -i wlan0 -l -s 0 -n"
+tcpdump_cmd="tcpdump -i wlan1 -l -s 0 -n"
 
 class DaemonProcess(Daemon):
 
@@ -86,8 +83,7 @@ class DaemonProcess(Daemon):
 			inf.close()
 			logging.debug(self.first_whois['NetRange'])
 
-		#self.ignore=['192.168.68.1','192.168.68.37',]
-		self.ignore=[]
+		self.ignore=['192.168.66.127','10.0.0.9']
 
 		#src_dst_idn,port_port_idn,netrange_idn,country_idn,src_idn,dst_idn
 		self.src_dst_idns={}
@@ -122,11 +118,11 @@ class DaemonProcess(Daemon):
 
 		self.first_whois=copy.copy(whois)
 		#logging.debug(self.first_whois)
-		"""
+
 		ouf=open('first_whois.dat','w')
 		ouf.write(json.dumps(self.first_whois))
 		ouf.close()
-		"""
+
 		return whois
 
 	def add2dB(self,a):
@@ -296,7 +292,7 @@ class DaemonProcess(Daemon):
 			self.DEBUG=False
 			logging.disable(logging.DEBUG)
 		rval={'keys':['debug'],'debug':self.DEBUG}
-		return json.dumps(rval)
+		return rval
 
 	def toggle_running(self,*args):
 		if not self.t:
@@ -310,7 +306,7 @@ class DaemonProcess(Daemon):
 			self.RUNNING=False
 
 		rval={'keys':['running'],'running':self.RUNNING}
-		return json.dumps(rval)
+		return rval
 
 	def get_data(self,*args):
 		logging.debug("get_data")
@@ -336,7 +332,7 @@ class DaemonProcess(Daemon):
 			'clients':json.dumps(self.clients),
 		}
 		self.clients[client]['buffer'].__init__()
-		return json.dumps(rval)
+		return rval
 
 	def reload_config(self,*args):
 		try:
@@ -379,7 +375,7 @@ if __name__=="__main__":
 			daemon.start()
 		elif 'stop'==sys.argv[1]:
 			daemon.stop()
-			ouf.close()
+			#ouf.close()
 		elif 'restart'==sys.argv[1]:
 			daemon.restart()
 		elif 'status'==sys.argv[1]:

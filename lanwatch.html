@@ -15,9 +15,17 @@
 <script type="text/javascript" src="/static/xtcpd/js/d3.v4.min.js"></script>
 <script type="text/javascript" src="/static/xtcpd/js/util.js"></script>
 <script type="text/javascript" src="/static/xtcpd/js/traffic.js"></script>
+<script type="text/javascript" src="/static/xtcpd/js/clients.js"></script>
+<script type="text/javascript" src="/static/xtcpd/js/spectra.js"></script>
 <script type="text/javascript" src="/static/xtcpd/js/map.js"></script>
 
 <script type="text/javascript">
+var RUNNING=true;
+var TIMEOUT=1000;
+window.traffic_widget=null;
+window.clients_widget=null;
+window.spectra_widget=null;
+
 window.onresize=function(e){
 	console.log("onresize");
 	var h_nav=document.getElementById("le_nav").getBoundingClientRect().height;
@@ -65,8 +73,20 @@ window.onresize=function(e){
 
 }
 window.counter=0;
+var toggleRunCB=function(e){
+	if(RUNNING==true){
+		RUNNING=false;
+	}
+	else{
+		RUNNING=true;
+		update();
+	}
+}
 var setup=function(){
-	var traffic_widget=new TrafficDaemonUI().setup();
+	window.traffic_widget=new TrafficDaemonUI().setup();
+	window.spectra_widget=new SpectraDaemonUI().setup();
+	window.clients_widget=new ClientsDaemonUI().setup();
+	update();
 }
 var init=function(){
 	var map=new Map('mapdiv');
@@ -128,7 +148,7 @@ var init=function(){
 	    <div class="collapse navbar-collapse" id="navbar-collapse-1">
 	      <ul class="nav navbar-nav">
 
-	        <li class="runB"><a href="/lanwatch/"><span class="glyphicon glyphicon-home" aria-hidden="true"></span> Run </a></li>
+	        <li class="runB"><a onclick="toggleRunCB()"><span class="glyphicon glyphicon-home" aria-hidden="true"></span> Run </a></li>
 
 	        <li class="dropdown">
 	          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><span class="glyphicon glyphicon-deciduous" aria-hidden="true"></span> WiFi <span class="caret"></span></a>
@@ -170,15 +190,22 @@ var init=function(){
 			<div id="svg_background" class="svg_background"></div>
 		</div>
 
-		<div id="spectra">
-			<div id="svg_background" class="svg_background"></div>
-		</div>
 
 		<div id="div_controls_top" >
+			<!--			<img id='img_controls_top' src="/static/xtcpd/img/green-bar.png" class="img-responsive w100"/> -->
 			<div id='title_controls_top'>LAN-Watch</div>
 			<img class="controls_logo" src="/static/xtcpd/img/asymptopia-logo.png"/>
-<!--			<img id='img_controls_top' src="/static/xtcpd/img/green-bar.png" class="img-responsive w100"/> -->
 		</div>
+
+		<div id="netrange">
+			<div id="netrange_background" class="svg_background"></div>
+			<span>Spectral Activity</span>
+			<span>Connected Devices</span>
+		</div>
+		<div id="spectra">
+<!--			<div id="spectra_background" class="svg_background"></div> -->
+		</div>
+
 	</div>
 	<div id="mapdiv" class="mapdiv"></div>
 	</div>

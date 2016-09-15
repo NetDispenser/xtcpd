@@ -1,0 +1,100 @@
+#!/usr/bin/python
+import os,sys,json,logging,re,copy
+from xmlrpc.server import SimpleXMLRPCServer
+import threading
+from queue import Queue
+
+from daemon import Daemon
+
+SPECTRAD_PID='/var/run/spectrad.pid'
+SPECTRAD_HOSTNAME="spytools.asymptopia.org"
+
+FORMAT = 'SPECTRA: %(message)s'
+logging.basicConfig(filename='/var/log/xtcpd/xtcpd.log',level=logging.DEBUG, format=FORMAT)
+
+rexp=re.compile('(\d+:\d+:\d+)(\.\d+) (IP) (.*)(\.\d+) > (\d+\.\d+\.\d+\.\d+)(\.\d+)(.*)')
+tcpdump_cmd="tcpdump -i wlan1 -l -s 0 -n"
+
+class SpectraDaemonProcess(Daemon):
+
+	def __init__(self,pidfile):
+		Daemon.__init__(self,pidfile)
+		logging.debug("spectra.init")
+		self.data={}
+		self.q = Queue()
+		self.t=None
+		self.RUNNING=False
+
+	def harvest(self):
+		p=os.popen(tcpdump_cmd)
+		while True:
+			if self.RUNNING:
+				self.q.put(p.readline())
+				for dummy in range(10-threading.active_count()):
+					logging.debug("creating thread")
+					t=threading.Thread(target=self.process)
+					t.daemon=True
+					t.start()
+			else:
+				p.flush()
+				time.sleep(.2)
+
+	def process(self):
+		while True:
+			try:
+				item=self.q.get()
+				a=rexp.match(item)
+				if not a:continue
+				dst=a.group(6)
+				netrange=self.getNetRange(dst)
+
+				try:
+					test=list(self.data.keys()).index(netrange)
+					if self.data[netrange]['ips'][dst]:
+						self.data[netrange]['ips'][dst]+=1
+					else:
+						self.data[netrange]['ips'][dst]=1
+				except:
+					self.data[netrange]={
+						'ips':{
+							str(dst):1
+						},
+					}
+			except:pass
+
+	def getNetRange(self,ip):
+		ip4=ip.split('.')
+		netrange="%s.%s.%s.%s - %s.%s.%s.%s"%(ip4[0],ip4[1],'0','0',ip4[0],ip4[1],'255','255')
+		return netrange
+
+	def get_data(self,client_ip):
+		rval={'keys':['data'],'data':copy.copy(self.data)}
+		self.data.__init__()
+		return rval
+
+	def toggle_running(self,*args):
+		if not self.t:
+			self.t = threading.Thread(target=self.harvest)
+			self.t.daemon = True
+			self.t.start()
+
+		if not self.RUNNING:self.RUNNING=True
+		else:self.RUNNING=False
+
+	def run(self):
+		logging.debug("run")
+		#self.RUNNING=False
+		self.server=SimpleXMLRPCServer((SPECTRAD_HOSTNAME,8009))
+		self.server.register_introspection_functions()
+		self.server.register_instance(self)
+
+		self.toggle_running()
+
+		self.server.serve_forever()
+
+
+if __name__=="__main__":
+	daemon=SpectraDaemonProcess(SPECTRAD_PID)
+	if len(sys.argv)==2:
+		if 'start'==sys.argv[1]:daemon.start()
+		elif 'stop'==sys.argv[1]:daemon.stop()

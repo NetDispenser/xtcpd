@@ -38,7 +38,7 @@ def editor(request):
 	if request.method=="POST":
 		logging.debug(request.POST.get('mytextarea'))
 		logging.debug(request.POST)
-	return render(request, 'editest.html', 
+	return render(request, 'editest.html',
 		context={'title': 'EdiTest',},
 		content_type='text/html'
 	)
@@ -48,6 +48,7 @@ def lanwatch(request):
 	return render(request,'lanwatch.html',context={'title':'LAN-Watch'},content_type="text/html")
 
 def traffic(request):
+	#traffic->getalldata?
 	#logging.debug(request.META)
 	try:
 		qs=request.META['QUERY_STRING']
@@ -58,13 +59,17 @@ def traffic(request):
 			'tstamp':str(datetime.datetime.now()),
 			'msg':'01 Next: rpc call to get ifstat from trafd',
 			}
-			s=xmlrpc.client.Server("http://spytools.asymptopia.org:8005")
-			client_ip=str(get_client_ip(request))
 			if qs=='get_data':
-				#logging.debug(client_ip)
-				rval=s.get_data((client_ip))
-				#logging.debug(rval)
-			return HttpResponse(rval);
+				client_ip=str(get_client_ip(request))
+				rval={}
+				s=xmlrpc.client.Server("http://spytools.asymptopia.org:8005")
+				rval['traffic']=s.get_data((client_ip))
+				s=xmlrpc.client.Server("http://spytools.asymptopia.org:8009")#8000=xtcpd;8009=spectra
+				rval['xtcpd']=s.get_data((client_ip))
+				s=xmlrpc.client.Server("http://spytools.asymptopia.org:8007")
+				rval['clients']=s.get_data((client_ip))
+				logging.debug(rval['xtcpd'])
+			return HttpResponse(json.dumps(rval));
 	except:
 		logging.exception("get_data failed")
 
@@ -99,7 +104,7 @@ def xtcpd(request):
 				rval=s.reload_config()
 			elif qs=='reset':
 				rval=s.reset((client_ip))
-			return HttpResponse( rval )
+			return HttpResponse( json.dumps(rval) )
 	except:
 		logging.exception(sys.exc_info())
 

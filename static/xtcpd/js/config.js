@@ -10,7 +10,7 @@
 //var xtcpd_hostname="http://xtcpd.asymptopia.org";
 //
 //for e- DNS registered w/ A record -> 192.168.68.1
-var xtcpd_hostname="http://hotspot.asymptopia.org";
+var xtcpd_hostname="http://spytools.asymptopia.org";
 //
 //for e- This works b/c only 1 server/vhost at this addr
 //var xtcpd_hostname="http://192.168.68.1";

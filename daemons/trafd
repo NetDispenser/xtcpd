@@ -79,7 +79,8 @@ class DaemonProcess(Daemon):
 		}
 		#self.buffer.__init__()
 		#logging.debug(json.dumps(rval))
-		return json.dumps(rval)
+		#return json.dumps(rval)
+		return rval
 
 	def toggle_running(self,*args):
 		logging.debug("toggle_running")
@@ -97,7 +98,8 @@ class DaemonProcess(Daemon):
 			logging.debug("RUNNING False")
 
 		rval={'keys':['running'],'running':self.RUNNING}
-		return json.dumps(rval)
+		#return json.dumps(rval)
+		return rval
 
 	def run(self):
 		logging.debug("run")

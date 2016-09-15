@@ -5,9 +5,7 @@ September 12, 2016
 */
 var TrafficDaemonUI=function(){
 me={};
-me.TIMEOUT=1000;
-me.RUNNING=true;
-var svg;
+me.svg=null;
 var W;
 var H=200;
 var padd=50;
@@ -16,21 +14,7 @@ var points=false;
 var lines=true;
 var show_data=false;
 var t_min,pyld,SF,maxdat,maxdatidx;
-var traffic_hostname="http://spytools.asymptopia.org";
 
-me.xajax=function(what){
-	var xhr=new_xhr();
-	xhr.onreadystatechange=function(){
-		if(xhr.readyState==4){
-			if(xhr.status==200){
-				//console.log(what+" returned "+xhr.responseText);
-			}
-		}
-	}
-	xhr.open('Get',traffic_hostname+"/traffic?"+what,true);
-	xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-	xhr.send("");
-}
 
 me.render_data=function(pyld){
 		console.log(pyld);
@@ -277,37 +261,6 @@ me.render_metadata=function(pyld){
 	}
 }
 
-me.update=function(){
-	var xhr=new_xhr();
-	xhr.onreadystatechange=function(){
-		if(xhr.readyState==4){
-			if(xhr.status==200){
-				try{
-					//console.log(xhr.responseText);
-					pyld=JSON.parse(decode(xhr.responseText));
-					if(show_data)me.render_metadata(pyld);
-					me.render_data(pyld);
-					if(me.RUNNING==true){
-						setTimeout("me.update()",me.TIMEOUT);
-					}
-					var W=parseInt(document.getElementById("mobile_header").getBoundingClientRect().width);
-					svg.attr("width",W);
-					width=W;
-//					console.log("width="+width);
-
-				}catch(e){
-					console.log(e)
-					if(me.RUNNING==true){
-						setTimeout("me.update()",me.TIMEOUT);
-					}
-				}
-			}
-		}
-	}
-	xhr.open('Get',traffic_hostname+"/traffic?get_data",true);
-	xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-	xhr.send("");
-}
 me.setup=function(){
 	var W=parseInt(document.getElementById("mobile_header").getBoundingClientRect().width);
 	console.log(W);
@@ -328,17 +281,17 @@ me.setup=function(){
 			g_y_axis_dn_l = svg.append("g").attr("transform", "translate("+(padd) + "," + (height-padd) + ")"),
 
 	me.svg=svg;
-	me.update();
+//	me.update();
 	return me;
 }
 
 me.toggle_updatesCB=function(e){
-	if(me.RUNNING){
-		me.RUNNING=false;
+	if(RUNNING){
+		RUNNING=false;
 	}
 	else{
-		me.RUNNING=true;
-		setTimeout("me.update()",me.TIMEOUT);
+		RUNNING=true;
+		setTimeout("me.update()",TIMEOUT);
 	}
 }
 me.toggle_pointsCB=function(e){

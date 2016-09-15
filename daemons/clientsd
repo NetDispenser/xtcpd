@@ -1,0 +1,42 @@
+#!/usr/bin/python
+import os,sys,json,logging
+from xmlrpc.server import SimpleXMLRPCServer
+
+from daemon import Daemon
+
+CLIENTSD_PID='/var/run/clientsd.pid'
+CLIENTSD_HOSTNAME="spytools.asymptopia.org"
+
+FORMAT = 'CLIENTS: %(message)s'
+logging.basicConfig(filename='/var/log/xtcpd/xtcpd.log',level=logging.DEBUG, format=FORMAT)
+
+class ClientsDaemonProcess(Daemon):
+
+	def __init__(self,pidfile):
+		Daemon.__init__(self,pidfile)
+		logging.debug("clients.init")
+
+	def get_data(self,client_ip):
+		logging.debug("clients.get_data")
+		cmd="cat /var/lib/misc/dnsmasq.leases"
+		p=os.popen(cmd)
+		lines=p.readlines()
+		p.close()
+		rval={'keys':['lines'],'lines':lines}
+		logging.debug(rval)
+		return rval
+
+	def run(self):
+		logging.debug("run")
+		#self.RUNNING=False
+		self.server=SimpleXMLRPCServer((CLIENTSD_HOSTNAME,8007))
+		self.server.register_introspection_functions()
+		self.server.register_instance(self)
+		self.server.serve_forever()
+
+
+if __name__=="__main__":
+	daemon=ClientsDaemonProcess(CLIENTSD_PID)
+	if len(sys.argv)==2:
+		if 'start'==sys.argv[1]:daemon.start()
+		elif 'stop'==sys.argv[1]:daemon.stop()

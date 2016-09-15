@@ -1,7 +1,7 @@
 import sys, os, time, atexit
 from signal import SIGTERM
 
-DAEMONIZE=False
+DAEMONIZE=True
 class Daemon:
 
 	def __init__(self, pidfile, stdin='/dev/null', stdout='/dev/null', stderr='/dev/null'):

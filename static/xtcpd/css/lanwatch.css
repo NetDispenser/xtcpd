@@ -148,7 +148,17 @@ body{
 	width:100%;
 	background-color:orange;
 }
-#spectra{}
+#spectra{
+	width:100%;
+	height:200px;
+	background-color:orange;
+	color:black;
+}
+#netrange{
+	width:100%;
+	height:200px;
+	background-color:blue;
+}
 #logo{
 	height:36px;
   border-radius:18px;
@@ -161,3 +171,8 @@ body{
   padding:9px 9px;
 }
 .runB{background-color:orange;border-radius:4px;border:1px solid #333;color:navy;}
+.marker{
+  width: 100px;
+  height: 100px;
+  background: url("/static/xtcpd/img/anim.png") no-repeat scroll 0% 0% transparent;
+}
