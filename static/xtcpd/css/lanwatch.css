@@ -151,13 +151,14 @@ body{
 #spectra{
 	width:100%;
 	height:200px;
-	background-color:orange;
-	color:black;
+	background-color:#333333;
+	color:#CCCCCC;
 }
 #netrange{
 	width:100%;
 	height:200px;
-	background-color:blue;
+	background-color:#CCCCCC;
+	color:#333333;
 }
 #logo{
 	height:36px;

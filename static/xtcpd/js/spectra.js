@@ -29,8 +29,8 @@ var SpectraDaemonUI=function(){
 						me.data[netrange]['ips']['keys'].push(ip);
 					}
 					else{
-						console.log("increment:"+data['data'][netrange]['ips'][ip]);
-						me.data[netrange]['ips'][ip]+=data['data'][netrange]['ips'][ip];
+						console.log("increment:"+data['data'][netrange]['ips'][ip]['count']);
+						me.data[netrange]['ips'][ip]['count']+=data['data'][netrange]['ips'][ip]['count'];
 					}
 				}
 			}
@@ -44,7 +44,7 @@ var SpectraDaemonUI=function(){
 			var ips=me.data[netrange]['ips']['keys'];
 			for(var i=0;i<ips.length;i++){
 				ip=ips[i];
-				html+="<div style='width:50px;'></div>"+ip+": "+me.data[netrange]['ips'][ip]+"<br/>";
+				html+="<div style='width:50px;'></div>"+ip+": "+me.data[netrange]['ips'][ip]['count']+" "+me.data[netrange]['ips'][ip]['country_code']+"<br/>";
 			}
 		}
 //		document.getElementById("spectra").innerHTML=JSON.stringify(data['data']);

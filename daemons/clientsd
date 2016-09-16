@@ -20,9 +20,12 @@ class ClientsDaemonProcess(Daemon):
 		logging.debug("clients.get_data")
 		cmd="cat /var/lib/misc/dnsmasq.leases"
 		p=os.popen(cmd)
-		lines=p.readlines()
+		lines=p.readline().split("\n")
+		slines=[]
+		for line in lines:
+			slines.append(line.split(" "))
 		p.close()
-		rval={'keys':['lines'],'lines':lines}
+		rval={'keys':['lines'],'lines':slines}
 		logging.debug(rval)
 		return rval
 
