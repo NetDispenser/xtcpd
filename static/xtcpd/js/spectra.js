@@ -40,11 +40,11 @@ var SpectraDaemonUI=function(){
 		var netranges=me.data['keys'];
 		for(var k=0;k<netranges.length;k++){
 			var netrange=netranges[k];
-			html+=netrange+"<span style='width:20px;'></span>";
+			html+=netrange+"<br/>";
 			var ips=me.data[netrange]['ips']['keys'];
 			for(var i=0;i<ips.length;i++){
 				ip=ips[i];
-				html+=ip+": "+me.data[netrange]['ips'][ip]+"<br>";
+				html+="<div style='width:50px;'></div>"+ip+": "+me.data[netrange]['ips'][ip]+"<br/>";
 			}
 		}
 //		document.getElementById("spectra").innerHTML=JSON.stringify(data['data']);
