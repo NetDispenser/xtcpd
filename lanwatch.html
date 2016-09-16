@@ -84,7 +84,8 @@ var toggleRunCB=function(e){
 }
 var setup=function(){
 	window.traffic_widget=new TrafficDaemonUI().setup();
-	window.spectra_widget=new SpectraDaemonUI().setup();
+	window.spectra_widget=new SpectraDaemonUI();
+	window.spectra_widget.setup();
 	window.clients_widget=new ClientsDaemonUI().setup();
 	update();
 }

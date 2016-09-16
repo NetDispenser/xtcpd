@@ -54,9 +54,11 @@ class SpectraDaemonProcess(Daemon):
 						self.data[netrange]['ips'][dst]+=1
 					else:
 						self.data[netrange]['ips'][dst]=1
+						self.data[netrange]['ips']['keys'].append(dst)
 				except:
 					self.data[netrange]={
 						'ips':{
+							'keys':[dst,],
 							str(dst):1
 						},
 					}
@@ -64,11 +66,14 @@ class SpectraDaemonProcess(Daemon):
 
 	def getNetRange(self,ip):
 		ip4=ip.split('.')
-		netrange="%s.%s.%s.%s - %s.%s.%s.%s"%(ip4[0],ip4[1],'0','0',ip4[0],ip4[1],'255','255')
+		netrange="%s.%s.%s.%s - %s.%s.%s.%s"%(ip4[0],'0','0','0',ip4[0],'255','255','255')
 		return netrange
 
 	def get_data(self,client_ip):
 		rval={'keys':['data'],'data':copy.copy(self.data)}
+		rval['data']['keys']=list(self.data.keys())
+		del self.data
+		self.data={}
 		self.data.__init__()
 		return rval
 

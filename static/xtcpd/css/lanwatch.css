@@ -124,7 +124,7 @@
 	background-color:green;
 }
 body{
-	overflow:hidden;
+	overflow:auto;
 	background-color:#333333;
 }
 .ol-attribution{
