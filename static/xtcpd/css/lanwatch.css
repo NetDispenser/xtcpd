@@ -150,13 +150,17 @@ body{
 }
 #spectra{
 	width:100%;
-	height:200px;
+	background-color:#333333;
+	color:#CCCCCC;
+}
+#myselectra{
+	width:100%;
+	height:300px;
 	background-color:#333333;
 	color:#CCCCCC;
 }
 #netrange{
 	width:100%;
-	height:200px;
 	background-color:#CCCCCC;
 	color:#333333;
 }

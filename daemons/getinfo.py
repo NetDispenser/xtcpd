@@ -16,3 +16,6 @@ for k in keys:
 	print(k)
 	for ip in rval['xtcpd']['data'][k]['ips']['keys']:
 		print("\t%s: %s"%(ip,rval['xtcpd']['data'][k]['ips'][ip]))
+
+print(rval['clients'])
+print (keys)

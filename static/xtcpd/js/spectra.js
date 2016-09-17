@@ -1,54 +1,111 @@
 var SpectraDaemonUI=function(){
 	var me={};
+	me.current_selection=0;
 	me.data={'keys':[],};
 	me.setup=function(){
 		console.log("SpectraDaemonUI.setup");
+	}
+	me.selclickCB=function(e){
+		var ms=document.getElementById("myselectra");
+		for(var oidx=0;oidx<ms.options.length;oidx++){
+			if(ms.options[oidx].selected==true)me.current_selection=oidx;
+		}
+		//ip=id of options
+		var ip=ms.options[me.current_selection].id;
+		me.hilite_src(ip);
+	}
+	me.selectCB=function(direction){
+		console.log("selectCB:"+direction);
+		//get selectedID and go up/down
+		var ms=document.getElementById("myselectra");
+		var delta=+1;
+		if(direction=='up')delta=-1;
+		else if(direction=='dn')delta=+1;
+		ms.options[me.current_selection].selected=false;
+		me.current_selection+=delta;
+		if(me.current_selection>=ms.options.length)
+			me.current_selection=0;
+		if(me.current_selection<0)
+			me.current_selection=ms.options.length-1;
+		ms.options[me.current_selection].selected=true;//CB: Here is where update others
+
+		var ip=ms.options[me.current_selection].id;
+		me.hilite_src(ip);
+	}
+	me.hilite_src=function(ip){
+		var src_id="src_192.168.66.127";//NEED: Fix this!!
+//problem is id is id_dst and need src ... but not in select, only me.data.
+		console.log(src_id);
+		var src_label=document.getElementById(src_id);
+		src_label.style.background="red";
 	}
 	me.render_data=function(data){
 		//console.log("SpectraDaemonUI.render_data");
 		//if(!me.data)me.data={};
 		//me.data=Object.assign({},me.last_data,data['data']);
+		var ms=document.getElementById("myselectra");
 		for(var kidx=0;kidx<data['data']['keys'].length;kidx++){
 			var netrange=data['data']['keys'][kidx];
 			var dummy=me.data['keys'].indexOf(netrange);
 			if(dummy<0){
-				console.log("adding netrange:"+netrange);
 				me.data['keys'].push(netrange);
-				me.data[netrange]=data['data'][netrange];
+				me.data[netrange]=data['data'][netrange];//copy entire sub-{}
+				//NEED: insert new netrange rollup
+				var o=document.createElement("option");
+				o.text=netrange;
+				o.id=netrange;
+				o.addEventListener("click",me.selclickCB,false);
+				ms.add(o,ms.options[0]);//NEED:add ips ... like code below
+				var ips=data['data'][netrange]['ips']['keys'];//incoming list
+				for(var idx=0;idx<ips.length;idx++){//cycle over incoming ips
+					var ip=ips[idx];
+					var o=document.createElement("option");
+					o.text=ip+" "+me.data[netrange]['ips'][ip]['count']+" "+me.data[netrange]['ips'][ip]['country_code'];
+					o.id=ip;
+					o.addEventListener("click",me.selclickCB,false);
+					ms.add(o,ms.options[idx+1]);//NEED:add at correct place in stack (append)
+				}
 			}
 			else{
-				var ips=data['data'][netrange]['ips']['keys'];
-				console.log("ips="+ips);
-				for(var idx=0;idx<ips.length;idx++){
+				var ips=data['data'][netrange]['ips']['keys'];//incoming list
+				for(var idx=0;idx<ips.length;idx++){//cycle over incoming ips
 					var ip=ips[idx];
-					console.log("considering:"+ip);
-					var dummy2=me.data[netrange]['ips']['keys'].indexOf(ip);
+					var dummy2=me.data[netrange]['ips']['keys'].indexOf(ip);//our list
 					if(dummy2<0){
-						console.log("adding ip:"+ip);
+						//NEED:insert new select option into corresponding netrange rollup
 						me.data[netrange]['ips'][ip]=data['data'][netrange]['ips'][ip];
 						me.data[netrange]['ips']['keys'].push(ip);
+
+						var o=document.createElement("option");
+						o.text=ip+" "+me.data[netrange]['ips'][ip]['count']+" "+me.data[netrange]['ips'][ip]['country_code'];
+						o.id=ip;
+						o.addEventListener("click",me.selclickCB,false);
+						//Now insert at right place:
+						var target_idx=0;
+						for(var tidx=0;tidx<ms.options.length;tidx++){
+							if(ms.options[tidx].text==netrange){
+								target_idx=tidx;
+								break;
+							}
+						}
+						ms.add(o,ms.options[target_idx+1]);//NEED:add at correct place in stack (append)
 					}
 					else{
-						console.log("increment:"+data['data'][netrange]['ips'][ip]['count']);
 						me.data[netrange]['ips'][ip]['count']+=data['data'][netrange]['ips'][ip]['count'];
+						var target_idx=0;
+						for(var tidx=0;tidx<ms.options.length;tidx++){
+							if(ms.options[tidx].id==ip){
+								target_idx=tidx;
+								break;
+							}
+						}
+						var o=ms.options[target_idx];
+						o.text=ip+" "+me.data[netrange]['ips'][ip]['count']+" "+me.data[netrange]['ips'][ip]['country_code'];
+						//if does have that ip then we need to update count of existing
 					}
 				}
 			}
 		}
-
-		var html="";
-		var netranges=me.data['keys'];
-		for(var k=0;k<netranges.length;k++){
-			var netrange=netranges[k];
-			html+=netrange+"<br/>";
-			var ips=me.data[netrange]['ips']['keys'];
-			for(var i=0;i<ips.length;i++){
-				ip=ips[i];
-				html+="<div style='width:50px;'></div>"+ip+": "+me.data[netrange]['ips'][ip]['count']+" "+me.data[netrange]['ips'][ip]['country_code']+"<br/>";
-			}
-		}
-//		document.getElementById("spectra").innerHTML=JSON.stringify(data['data']);
-		document.getElementById("spectra").innerHTML=html;
 	}
 	return me;
 }
