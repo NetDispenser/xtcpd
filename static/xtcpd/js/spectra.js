@@ -11,8 +11,8 @@ var SpectraDaemonUI=function(){
 			if(ms.options[oidx].selected==true)me.current_selection=oidx;
 		}
 		//ip=id of options
-		var ip=ms.options[me.current_selection].id;
-		me.hilite_src(ip);
+		var src_ip=ms.options[me.current_selection].value;
+		window.clients_widget.hilite_src(src_ip);
 	}
 	me.selectCB=function(direction){
 		console.log("selectCB:"+direction);
@@ -29,15 +29,8 @@ var SpectraDaemonUI=function(){
 			me.current_selection=ms.options.length-1;
 		ms.options[me.current_selection].selected=true;//CB: Here is where update others
 
-		var ip=ms.options[me.current_selection].id;
-		me.hilite_src(ip);
-	}
-	me.hilite_src=function(ip){
-		var src_id="src_192.168.66.127";//NEED: Fix this!!
-//problem is id is id_dst and need src ... but not in select, only me.data.
-		console.log(src_id);
-		var src_label=document.getElementById(src_id);
-		src_label.style.background="red";
+		var src_ip=ms.options[me.current_selection].value;
+		window.clients_widget.hilite_src(src_ip);
 	}
 	me.render_data=function(data){
 		//console.log("SpectraDaemonUI.render_data");
@@ -62,6 +55,8 @@ var SpectraDaemonUI=function(){
 					var o=document.createElement("option");
 					o.text=ip+" "+me.data[netrange]['ips'][ip]['count']+" "+me.data[netrange]['ips'][ip]['country_code'];
 					o.id=ip;
+					o.value=me.data[netrange]['ips'][ip]['src'];
+					console.log("assigning src_ip="+me.data[netrange]['ips'][ip]['src']);
 					o.addEventListener("click",me.selclickCB,false);
 					ms.add(o,ms.options[idx+1]);//NEED:add at correct place in stack (append)
 				}
@@ -79,6 +74,8 @@ var SpectraDaemonUI=function(){
 						var o=document.createElement("option");
 						o.text=ip+" "+me.data[netrange]['ips'][ip]['count']+" "+me.data[netrange]['ips'][ip]['country_code'];
 						o.id=ip;
+						o.value=me.data[netrange]['ips'][ip]['src'];
+						console.log("assigning src_ip="+me.data[netrange]['ips'][ip]['src']);
 						o.addEventListener("click",me.selclickCB,false);
 						//Now insert at right place:
 						var target_idx=0;
@@ -105,7 +102,8 @@ var SpectraDaemonUI=function(){
 					}
 				}
 			}
-		}
-	}
+		}//for netrange in keys
+	}//me.render_data
+
 	return me;
 }

@@ -48,9 +48,14 @@ class SpectraDaemonProcess(Daemon):
 				item=self.q.get()
 				a=rexp.match(item)
 				if not a:continue
+				src=a.group(4)
+				sport=a.group(5)
 				dst=a.group(6)
+				dport=a.group(7)
+
 				if dst[0:3]=="192":continue
 				if dst[0:3]=="255":continue
+				if dst[0:3]=="239":continue
 				netrange=self.getNetRange(dst)
 				country_code="NA"
 				longitude=latitude=0.0
@@ -66,6 +71,7 @@ class SpectraDaemonProcess(Daemon):
 						self.data[netrange]['ips'][dst]['count']+=1
 					else:
 						self.data[netrange]['ips'][dst]={
+							'src':src,
 							'count':1,
 							'country_code':country_code,
 							'latitude':latitude,
@@ -77,6 +83,7 @@ class SpectraDaemonProcess(Daemon):
 						'ips':{
 							'keys':[dst,],
 							str(dst):{
+								'src':src,
 								'count':1,
 								'country_code':country_code,
 								'latitude':latitude,
