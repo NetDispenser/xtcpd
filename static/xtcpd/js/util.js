@@ -1,5 +1,21 @@
 var traffic_hostname="http://spytools.asymptopia.org";
 
+var mkrandomcolor=function(){
+	var hexvals=['0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F'];
+	var rval="#";
+	for(var dummy=0;dummy<6;dummy++){
+		var idx=parseInt(Math.random()*hexvals.length);
+		rval+=hexvals[idx];
+	}
+	return rval;
+}
+var mkhidden=function(hval){
+	console.log("mkhidden:"+hval);
+	dummy=document.createElement("input");
+	dummy.type="hidden";
+	dummy.value=hval;
+	return dummy;
+}
 var new_xhr=function(){
 	var xhr=null;
 	try{xhr=new ActiveXObject('Msxml2.XMLHTTP');}
@@ -55,7 +71,7 @@ var update=function(){
 					if(RUNNING==true){
 						setTimeout("update()",TIMEOUT);
 					}
-					var W=parseInt(document.getElementById("mobile_header").getBoundingClientRect().width);
+					var W=parseInt(document.getElementById("mapdiv").getBoundingClientRect().width);
 					window.traffic_widget.svg.attr("width",W);
 					width=W;
 //					console.log("width="+width);

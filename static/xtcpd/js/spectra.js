@@ -10,9 +10,9 @@ var SpectraDaemonUI=function(){
 		for(var oidx=0;oidx<ms.options.length;oidx++){
 			if(ms.options[oidx].selected==true)me.current_selection=oidx;
 		}
-		//ip=id of options
-		var src_ip=ms.options[me.current_selection].value;
-		window.clients_widget.hilite_src(src_ip);
+		var pyld=JSON.parse(ms.options[me.current_selection].value);
+		window.clients_widget.hilite_src(pyld['src']);
+		window.map_widget.focus_point(pyld);
 	}
 	me.selectCB=function(direction){
 		console.log("selectCB:"+direction);
@@ -20,7 +20,6 @@ var SpectraDaemonUI=function(){
 		var ms=document.getElementById("myselectra");
 		var delta=+1;
 		if(direction=='up')delta=-1;
-		else if(direction=='dn')delta=+1;
 		ms.options[me.current_selection].selected=false;
 		me.current_selection+=delta;
 		if(me.current_selection>=ms.options.length)
@@ -29,8 +28,10 @@ var SpectraDaemonUI=function(){
 			me.current_selection=ms.options.length-1;
 		ms.options[me.current_selection].selected=true;//CB: Here is where update others
 
-		var src_ip=ms.options[me.current_selection].value;
-		window.clients_widget.hilite_src(src_ip);
+		//this throwing syntax error when netrange b/c only ips have pyld as o.value
+		var pyld=JSON.parse(ms.options[me.current_selection].value);
+		window.clients_widget.hilite_src(pyld['src']);
+		window.map_widget.focus_point(pyld);
 	}
 	me.render_data=function(data){
 		//console.log("SpectraDaemonUI.render_data");
@@ -49,16 +50,20 @@ var SpectraDaemonUI=function(){
 				o.id=netrange;
 				o.addEventListener("click",me.selclickCB,false);
 				ms.add(o,ms.options[0]);//NEED:add ips ... like code below
+
 				var ips=data['data'][netrange]['ips']['keys'];//incoming list
 				for(var idx=0;idx<ips.length;idx++){//cycle over incoming ips
 					var ip=ips[idx];
 					var o=document.createElement("option");
 					o.text=ip+" "+me.data[netrange]['ips'][ip]['count']+" "+me.data[netrange]['ips'][ip]['country_code'];
 					o.id=ip;
-					o.value=me.data[netrange]['ips'][ip]['src'];
-					console.log("assigning src_ip="+me.data[netrange]['ips'][ip]['src']);
+					console.log("setting o.value="+JSON.stringify(me.data[netrange]['ips'][ip]));
+					o.value=JSON.stringify(me.data[netrange]['ips'][ip]);//me.data[netrange]['ips'][ip]['src'];
+					console.log("assigning src_ip="+JSON.stringify(me.data[netrange]['ips'][ip]['src']));
 					o.addEventListener("click",me.selclickCB,false);
 					ms.add(o,ms.options[idx+1]);//NEED:add at correct place in stack (append)
+
+					window.map_widget.add_point(me.data[netrange]['ips'][ip]);
 				}
 			}
 			else{
@@ -74,8 +79,8 @@ var SpectraDaemonUI=function(){
 						var o=document.createElement("option");
 						o.text=ip+" "+me.data[netrange]['ips'][ip]['count']+" "+me.data[netrange]['ips'][ip]['country_code'];
 						o.id=ip;
-						o.value=me.data[netrange]['ips'][ip]['src'];
-						console.log("assigning src_ip="+me.data[netrange]['ips'][ip]['src']);
+						console.log("setting o.value2="+JSON.stringify(me.data[netrange]['ips'][ip]));
+						o.value=JSON.stringify(me.data[netrange]['ips'][ip]);//me.data[netrange]['ips'][ip]['src'];
 						o.addEventListener("click",me.selclickCB,false);
 						//Now insert at right place:
 						var target_idx=0;
@@ -86,6 +91,8 @@ var SpectraDaemonUI=function(){
 							}
 						}
 						ms.add(o,ms.options[target_idx+1]);//NEED:add at correct place in stack (append)
+
+						window.map_widget.add_point(me.data[netrange]['ips'][ip]);
 					}
 					else{
 						me.data[netrange]['ips'][ip]['count']+=data['data'][netrange]['ips'][ip]['count'];

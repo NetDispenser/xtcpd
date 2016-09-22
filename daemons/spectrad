@@ -72,6 +72,7 @@ class SpectraDaemonProcess(Daemon):
 					else:
 						self.data[netrange]['ips'][dst]={
 							'src':src,
+							'dst':dst,
 							'count':1,
 							'country_code':country_code,
 							'latitude':latitude,
@@ -84,6 +85,7 @@ class SpectraDaemonProcess(Daemon):
 							'keys':[dst,],
 							str(dst):{
 								'src':src,
+								'dst':dst,
 								'count':1,
 								'country_code':country_code,
 								'latitude':latitude,

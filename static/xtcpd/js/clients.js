@@ -12,6 +12,7 @@ var ClientsDaemonUI=function(){
 			var src_id="src_"+client_ip;
 			var src_label=document.getElementById(src_id);
 			src_label.style.background="#CCCCCC";
+			src_label.style.color="#000000";
 		}
 	}
 	me.hilite_src=function(src_ip){
@@ -21,6 +22,7 @@ var ClientsDaemonUI=function(){
 		try{
 			var src_label=document.getElementById(src_id);
 			src_label.style.background="#555555";
+			src_label.style.color="#FFFFFF";
 		}
 		catch(e){}
 	}
@@ -49,7 +51,7 @@ var ClientsDaemonUI=function(){
 		}
 		for(var idx=0;idx<me.data['keys'].length;idx++){
 			var key=me.data['keys'][idx];
-			if(current_keys.indexOf(key)<100 && !document.getElementById("delete "+key)){
+			if(current_keys.indexOf(key)<0 && !document.getElementById("delete "+key)){
 				console.log("NEED: Fade2Inactive and Red Remove Button to remove once seen.");
 				var src_ip="src_"+key;
 				var d=document.getElementById(src_ip);
