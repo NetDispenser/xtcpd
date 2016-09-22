@@ -1,6 +1,7 @@
 var Map=function(mapdiv){
 	var me={};
 	me.data={};
+	me.center=[-35,35.31];
 
 	me.xpopup = document.getElementById('xpopup');
 	console.log('xpopup found by map.js');
@@ -18,10 +19,13 @@ var Map=function(mapdiv){
 		me.popup_closer.blur();
 		return false;
 	};
-
+	me.set_center=function(){
+		me.map.getView().setCenter(ol.proj.transform(me.center,"EPSG:4326","EPSG:3857"));
+		me.map.getView().setZoom(1);
+	}
 	me.view = new ol.View({
 	  maxZoom: 21,
-		center:ol.proj.transform([-35,35.31],"EPSG:4326","EPSG:3857"),
+		center:ol.proj.transform(me.center,"EPSG:4326","EPSG:3857"),
 		zoom:1,
 	});
 	me.osm2_base=new ol.layer.Tile({

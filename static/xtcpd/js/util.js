@@ -59,15 +59,19 @@ var update=function(){
 				try{
 					//console.log(xhr.responseText);
 					pyld=JSON.parse(decode(xhr.responseText));
-					//if(show_data)me.render_metadata(pyld);
-					//console.log(pyld);
-					console.log("calling traffic.render");
-					window.traffic_widget.render_data(pyld['traffic']);
-					console.log("calling spectra.render");
-					window.spectra_widget.render_data(pyld['xtcpd']);
+
+					//clients first b/c spectra will check client color
+					//somehow need to apply so don't have to keep checking.
+					//it's actually a const, just under client obj, so ref it!
 					console.log("calling clients.render");
 					window.clients_widget.render_data(pyld['clients']);
-					console.log(pyld['xtcpd']);
+
+					console.log("calling spectra.render");
+					window.spectra_widget.render_data(pyld['spectra']);
+
+					console.log("calling traffic.render");
+					window.traffic_widget.render_data(pyld['traffic']);
+
 					if(RUNNING==true){
 						setTimeout("update()",TIMEOUT);
 					}

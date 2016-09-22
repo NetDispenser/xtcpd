@@ -159,11 +159,21 @@ var init=function(){
 				</tr>
 				<tr height="10%">
 					<td colspan="2">
-					<table><tr><td>
+					<table>
+					<tr><td>
 					<input id="runB" class="navbot led" type="button" value="Run" onclick="toggleRunCB()"></input>
 					</td><td>
 					<div id="runLED" class="led navbot"></div>
-					</td></tr>
+					</td><td>
+					<input id="centerB" class="navbot" type="button" value="Center" onclick="window.map_widget.set_center();"></input>
+					</td><td>
+					<input id="flyB" class="navbot" type="button" value="FlyIn" onclick=""></input>
+					</td><td>
+					<!--full info button: have it roll-down over map via navbot button.-->
+					<input id="fullinfoB" class="navbot" type="button" value="Info" onclick=""></input>
+					</td>
+
+					</tr>
 					</table>
 					</td>
 				</tr>
@@ -192,7 +202,7 @@ var init=function(){
 							<tr>
 								<td><div id="lat"></div></td>
 								<td><div id="lon"></div></td>
-							<tr>
+							</tr>
 						</table>
 					</div>
 			</div></div>

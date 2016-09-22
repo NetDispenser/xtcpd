@@ -57,6 +57,7 @@ var SpectraDaemonUI=function(){
 					var o=document.createElement("option");
 					o.text=ip+" "+me.data[netrange]['ips'][ip]['count']+" "+me.data[netrange]['ips'][ip]['country_code'];
 					o.id=ip;
+					o.style.color=window.clients_widget.get_color(me.data[netrange]['ips'][ip]['src']);//
 					console.log("setting o.value="+JSON.stringify(me.data[netrange]['ips'][ip]));
 					o.value=JSON.stringify(me.data[netrange]['ips'][ip]);//me.data[netrange]['ips'][ip]['src'];
 					console.log("assigning src_ip="+JSON.stringify(me.data[netrange]['ips'][ip]['src']));

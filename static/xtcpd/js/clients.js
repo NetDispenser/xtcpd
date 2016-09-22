@@ -26,18 +26,24 @@ var ClientsDaemonUI=function(){
 		}
 		catch(e){}
 	}
+	me.mkswatchcode=function(c){
+		var rval="<div style='width:20px;height:20px;background-color:"+c+";'>";
+		rval+="</div>";
+		return rval;
+	}
+	me.get_color=function(client_ip){
+		if(me.data['keys'].indexOf(client_ip)<0)return "#FF0000";
+		return me.data[client_ip]['color'];
+	}
 	me.render_data=function(data){
-		//NEED:check 1:1 keys for no-longer-present clients
-		//also, last activity indicator/info
-		var remake=false;
 		var current_keys=[];
 		for(var idx=0;idx<data['lines'].length;idx++){
 			if(data['lines'][idx].length<3){continue};
 			var client_ip=data['lines'][idx][2];
 			current_keys.push(client_ip);
-			if(me.data['keys'].indexOf(client_ip)<0){
+			if(me.data['keys'].indexOf(client_ip)<0){//add new clients
 				me.data['keys'].push(client_ip);
-				me.data[client_ip]=data['lines'][idx];
+				me.data[client_ip]={'raw':data['lines'][idx],'color':mkrandomcolor(),};
 				console.log('NEED ADD THIS CLIENT '+client_ip);
 				var r=me.table.insertRow(-1);
 				r.id="row_"+client_ip;
@@ -45,7 +51,9 @@ var ClientsDaemonUI=function(){
 				var d=document.createElement("div");
 				var src_id='src_'+client_ip;
 				d.id=src_id;
-				d.innerHTML=client_ip+" "+me.data[client_ip][3].slice(0,12);
+				d.innerHTML=client_ip+" "+me.data[client_ip]['raw'][3].slice(0,12);
+				var swatch_code=me.mkswatchcode(me.data[client_ip]['color']);
+				d.innerHTML+=swatch_code;
 				c.appendChild(d);
 			}
 		}
