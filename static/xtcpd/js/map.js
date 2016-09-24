@@ -19,10 +19,6 @@ var Map=function(mapdiv){
 		me.popup_closer.blur();
 		return false;
 	};
-	me.set_center=function(){
-		me.map.getView().setCenter(ol.proj.transform(me.center,"EPSG:4326","EPSG:3857"));
-		me.map.getView().setZoom(1);
-	}
 	me.view = new ol.View({
 	  maxZoom: 21,
 		center:ol.proj.transform(me.center,"EPSG:4326","EPSG:3857"),
@@ -33,8 +29,27 @@ var Map=function(mapdiv){
 		title:'OpenStreetMap2',
 		source:new ol.source.OSM()
 	});
+
+	var src_url="/static/xtcpd/data/world_borders.geojson";
+	var polygon_source=new ol.source.Vector({
+		url: src_url,
+		format: new ol.format.GeoJSON()
+	});
+	var polygon_layer= new ol.layer.Vector({
+		source: polygon_source,
+		style:new ol.style.Style({
+			stroke: new ol.style.Stroke({
+				color: "rgba(0,0,100,1.0)",
+				width: "1"
+			}),
+			fill: new ol.style.Fill({
+				color: "rgba(0,0,200,0.5)",
+			})
+		}),
+	});
+
 	me.map = new ol.Map({
-		layers: [me.osm2_base,],//osm,sat
+		layers: [polygon_layer,],//osm,sat,me.osm2_base,
 //		interactions:[],
 //		controls:[],
 		target: mapdiv,
@@ -70,6 +85,15 @@ var Map=function(mapdiv){
 		me.map.addOverlay(marker);
 	}
 */
+	me.flyin=function(){
+		var ms=document.getElementById("myselectra");//reaching into spectra
+		var pyld=JSON.parse(ms.options[window.spectra_widget.current_selection].value);
+		var target_center=[pyld['longitude'],pyld['latitude']];
+		flyin(target_center,4);
+	}
+	me.set_center=function(){
+		flyin(me.center,1);
+	}
 	me.add_point=function(pyld){
 		console.log("add_point");
 		var x=document.createElement("div");
@@ -84,6 +108,17 @@ var Map=function(mapdiv){
 		});
 		me.map.addOverlay(oly);
 	}
+	me.full_info=function(){
+		var ms=document.getElementById("myselectra");//reaching into spectra
+		var pyld=JSON.parse(ms.options[window.spectra_widget.current_selection].value);
+		var src=pyld['src'];
+		var src_color=window.clients_widget.data[src]['color'];
+		var swatch_code=mkswatchcode(src_color);
+		me.xpopup.innerHTML+="<br>"+swatch_code;
+		var client_device=window.clients_widget.device_by_ip(pyld['src']);
+		me.xpopup.innerHTML+=client_device;
+	}
+
 	me.focus_point=function(pyld){
 		lonlat=[parseFloat(pyld['longitude']),parseFloat(pyld['latitude'])];
 		me.marker1.setPosition(ol.proj.transform(lonlat, 'EPSG:4326', 'EPSG:3857'));
@@ -121,7 +156,7 @@ var Map=function(mapdiv){
 
 	me.xpopup.innerHTML="WHERE IS THIS POPUP?"
 	me.overlay.setMap(me.map);
-
+/*
 	me.map.on('pointermove',function(evt){
 		var latpanel=document.getElementById("lat");
 		var lonpanel=document.getElementById("lon");
@@ -130,16 +165,10 @@ var Map=function(mapdiv){
 		var lat=parseFloat(parseInt(lonlat[1]*1E4)/1E4);
 		latpanel.innerHTML=lat;
 		lonpanel.innerHTML=lon;
-
 		if(evt.dragging){return;}
 		var found=false;
-
-		//NEED: when mouseover mdiv/overlay/something!!
-
-//		me.xpopup.innerHTML=lon+", "+lat;
-//		me.overlay.setPosition(ol.proj.transform([lon,lat], 'EPSG:4326', 'EPSG:3857'));
-
 	});
+*/
 	me.overlay.on('change:element',function(e){console.log("YOO");});
 
 	return me;

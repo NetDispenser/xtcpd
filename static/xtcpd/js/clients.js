@@ -4,6 +4,7 @@ var ClientsDaemonUI=function(){
 	me.table=document.getElementById("clients_table");//pass-in as arg
 	me.setup=function(){
 		console.log("ClientsDaemonUI.setup");
+		document.getElementById("clients_status").innerHTML="DHCP Clients Status";
 		return me;
 	}
 	me.unhilite=function(){
@@ -14,6 +15,10 @@ var ClientsDaemonUI=function(){
 			src_label.style.background="#CCCCCC";
 			src_label.style.color="#000000";
 		}
+	}
+	me.device_by_ip=function(client_ip){
+		if(me.data['keys'].indexOf(client_ip)<0)return "unknown device";
+		return me.data[client_ip]['raw'][3];
 	}
 	me.hilite_src=function(src_ip){
 		me.unhilite();
@@ -26,11 +31,6 @@ var ClientsDaemonUI=function(){
 		}
 		catch(e){}
 	}
-	me.mkswatchcode=function(c){
-		var rval="<div style='width:20px;height:20px;background-color:"+c+";'>";
-		rval+="</div>";
-		return rval;
-	}
 	me.get_color=function(client_ip){
 		if(me.data['keys'].indexOf(client_ip)<0)return "#FF0000";
 		return me.data[client_ip]['color'];
@@ -41,9 +41,16 @@ var ClientsDaemonUI=function(){
 			if(data['lines'][idx].length<3){continue};
 			var client_ip=data['lines'][idx][2];
 			current_keys.push(client_ip);
-			if(me.data['keys'].indexOf(client_ip)<0){//add new clients
+			if(me.data['keys'].indexOf(client_ip)<0){//This section adds
 				me.data['keys'].push(client_ip);
 				me.data[client_ip]={'raw':data['lines'][idx],'color':mkrandomcolor(),};
+				var tstamp=data['lines'][idx][0];
+				var mac_addr=data['lines'][idx][1];
+				var ip_num=data['lines'][idx][2];
+				var device_name=data['lines'][idx][3];
+
+				me.data[client_ip]['device']=me.data[client_ip]['raw'][3];
+
 				console.log('NEED ADD THIS CLIENT '+client_ip);
 				var r=me.table.insertRow(-1);
 				r.id="row_"+client_ip;
@@ -52,12 +59,12 @@ var ClientsDaemonUI=function(){
 				var src_id='src_'+client_ip;
 				d.id=src_id;
 				d.innerHTML=client_ip+" "+me.data[client_ip]['raw'][3].slice(0,12);
-				var swatch_code=me.mkswatchcode(me.data[client_ip]['color']);
+				var swatch_code=mkswatchcode(me.data[client_ip]['color']);
 				d.innerHTML+=swatch_code;
 				c.appendChild(d);
 			}
 		}
-		for(var idx=0;idx<me.data['keys'].length;idx++){
+		for(var idx=0;idx<me.data['keys'].length;idx++){//This section preps4 delete
 			var key=me.data['keys'][idx];
 			if(current_keys.indexOf(key)<0 && !document.getElementById("delete "+key)){
 				console.log("NEED: Fade2Inactive and Red Remove Button to remove once seen.");

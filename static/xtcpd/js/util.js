@@ -1,5 +1,9 @@
 var traffic_hostname="http://spytools.asymptopia.org";
-
+var mkswatchcode=function(c){
+	var rval="<div style='width:20px;height:20px;background-color:"+c+";'>";
+	rval+="</div>";
+	return rval;
+}
 var mkrandomcolor=function(){
 	var hexvals=['0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F'];
 	var rval="#";
