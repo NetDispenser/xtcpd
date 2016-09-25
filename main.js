@@ -14,7 +14,7 @@ function createWindow() {
 
   // and load the index.html of the app.
   //win.loadURL(`file://${__dirname}/index.html`);
-  win.loadURL(`file://${__dirname}/xtcpd.html`);
+  win.loadURL(`file://${__dirname}/lanwatch.html`);
 
   // Open the DevTools.
   win.webContents.openDevTools();
