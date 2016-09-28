@@ -5,6 +5,12 @@ var SpectraDaemonUI=function(){
 	me.setup=function(){
 		console.log("SpectraDaemonUI.setup");
 	}
+	me.netrangeCB=function(e){//replace with toggleClass (via d3 toggleClass?)
+		try{
+			console.log("netrangeCB: ");
+		}
+		catch(e){console.log(e);}
+	}
 	me.selclickCB=function(e){
 		console.log('id='+e.target.id);
 		var ms=document.getElementById("myselectra");
@@ -62,6 +68,7 @@ var SpectraDaemonUI=function(){
 				o.id=netrange;
 				o.selected=false;
 				o.addEventListener("click",me.selclickCB,false);
+				o.addEventListener("mouseover",me.netrangeCB,false);
 				ms.add(o,ms.options[0]);//NEED:add ips ... like code below
 				document.getElementById("spectra_status").innerHTML="NetRange "+netrange;
 
@@ -150,8 +157,19 @@ var SpectraDaemonUI=function(){
 		document.getElementById("spectra_status").innerHTML=status;
 		console.log(status);
 
+		d3.selectAll(".marker_default")
+			.on("mouseover",me.markermouseover)
+			.on("mouseout",me.markermouseout);
+
 
 	}//me.render_data
-
+	me.markermouseout=function(){
+		d3.select(this)
+			.style("background-color","#FFFF00");
+	}
+	me.markermouseover=function(){
+		d3.select(this)
+		.style("background-color","#FFFFFF");
+	}
 	return me;
 }

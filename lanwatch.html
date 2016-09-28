@@ -8,6 +8,7 @@
 
 <link rel="stylesheet" type="text/css" href="/static/xtcpd/css/bootstrap.css">
 <link rel="stylesheet" type="text/css" href="/static/xtcpd/css/traffic.css">
+<link rel="stylesheet" type="text/css" href="/static/xtcpd/css/wonder_button.css">
 <link rel="stylesheet" type="text/css" href="/static/xtcpd/css/lanwatch.css">
 
 <link rel="stylesheet" type="text/css" href="/static/xtcpd/css/ol.css">
@@ -23,7 +24,7 @@
 <script type="text/javascript" src="/static/xtcpd/js/spectra.js"></script>
 <script type="text/javascript" src="/static/xtcpd/js/zoom.js"></script>
 <script type="text/javascript" src="/static/xtcpd/js/map.js"></script>
-
+<script type="text/javascript" src="/static/xtcpd/js/wonderbutton.js"></script>
 <script type="text/javascript">
 var RUNNING=true;
 var TIMEOUT=5000;
@@ -121,7 +122,20 @@ var setup=function(){
 	d3.selectAll("#clients_div")
 		.style("height",parseInt(bcr.height*0.60))
 
-
+	//selectra2
+	var s2t=document.getElementById("selectra2_table");
+	for(var sidx=0;sidx<10;sidx++){
+		var s2tr=s2t.insertRow(-1);
+		var s2td=s2tr.insertCell(-1);
+		s2td.appendChild(new WonderButton().get());
+		var s2trx=s2t.insertRow(-1);
+		var s2tdx=s2trx.insertCell(-1);
+		var hrule=document.createElement("hr");
+		hrule.className="hr";
+		s2tdx.appendChild(hrule);
+	}
+	d3.selectAll("#selectra2")
+		.style("height",parseInt(bcr.height))
 
 	update();
 
@@ -208,26 +222,35 @@ var init=function(){
 			</div>
 		</div></div>
 
-		<div class="item"><div class="slide3">
+		<div class="item">
+		<div class="slide3">
+			<div id="selectra2">
+				<table id="selectra2_table" width="100%">
+				</table>
+			</div>
+		</div>
+		</div>
+
+		<div class="item"><div class="slide4">
 		SLIDE 4: Data Record & Playback
 		<div class="example1">
 			<h3>32 NetRanges | 257 IPs | 572 Clients | 449 Messages | Beaverton, OR | Comcast | United States |</h3>
 		</div>
 		</div></div>
 
-		<div class="item"><div class="slide3">
+		<div class="item"><div class="slide5">
 		SLIDE 5: Daemon Status & Control
 		<marquee bgcolor="#000000"><font color="#00FF00">
 			32 Clients | 12 Active | Average Load: 87%
 		</font></marquee>
 		</div></div>
 
-		<div class="item"><div class="slide3">
+		<div class="item"><div class="slide6">
 		SLIDE 6:
 		</div></div>
 
 
-			<div class="item"><div class="slide4">
+			<div class="item"><div class="slide7">
 				<div id="netrange">
 					<table width="100%">
 

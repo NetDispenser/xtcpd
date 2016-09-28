@@ -1,7 +1,7 @@
 var Map=function(mapdiv){
 	var me={};
 	me.data={};
-	me.center=[-35,35.31];
+	me.center=[0.0,35.31];
 
 	me.xpopup = document.getElementById('xpopup');
 	console.log('xpopup found by map.js');
@@ -22,7 +22,7 @@ var Map=function(mapdiv){
 	me.view = new ol.View({
 	  maxZoom: 21,
 		center:ol.proj.transform(me.center,"EPSG:4326","EPSG:3857"),
-		zoom:1,
+		zoom:0.5,
 	});
 	me.osm2_base=new ol.layer.Tile({
 		preload:14,
@@ -50,8 +50,8 @@ var Map=function(mapdiv){
 
 	me.map = new ol.Map({
 		layers: [polygon_layer,],//osm,sat,me.osm2_base,
-//		interactions:[],
-//		controls:[],
+		interactions:[],
+		controls:[],
 		target: mapdiv,
 		view:me.view,
 	});
@@ -97,7 +97,8 @@ var Map=function(mapdiv){
 	me.add_point=function(pyld){
 		console.log("add_point");
 		var x=document.createElement("div");
-		x.className="marker_default";
+		x.className="marker_default "+pyld['country_code']+" "+pyld['src']+" "+pyld['netrange'];
+
 		document.getElementById("mapdiv").appendChild(x);
 		lonlat=[parseFloat(pyld['longitude']),parseFloat(pyld['latitude'])];
 		var oly = new ol.Overlay({
