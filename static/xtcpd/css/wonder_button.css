@@ -1,0 +1,71 @@
+.hr{
+	margin-top:0px;
+	margin-bottom:0px;
+}
+.wbdt0{
+	width:100%;
+	background-color:#333333;
+	color:white;
+}
+.netrange_label{
+	color:#00FF00;
+}
+.roll_up_checkbox{
+	width:20px;
+}
+.roll_up_icon{
+	height:20px;
+	transition: transform 0.3s ease;
+}
+.roll_up_icon.up{
+	transform:rotate(180deg);
+}
+.rollup{
+	position:relative;
+	text-align:center;
+	overflow:hidden;
+	background-color:orange;
+}
+.scrolling_button_text {
+ height: 20px;
+ overflow-x: hidden;
+ overflow-y: hidden;
+ position: relative;
+ color:white;
+}
+.scrolling_button_text h5 {
+ position: absolute;
+ white-space:nowrap;
+ width: 100%;
+ margin: 0;
+ text-align: center;
+ /* Starting position */
+ -moz-transform:translateX(100%);
+ -webkit-transform:translateX(100%);
+ transform:translateX(100%);
+ /* Apply animation to this element */
+ -moz-animation: scrolling_button_text 15s linear infinite;
+ -webkit-animation: scrolling_button_text 15s linear infinite;
+ animation: scrolling_button_text 15s linear infinite;
+}
+/* Move it (define the animation) */
+@-moz-keyframes scrolling_button_text {
+ 0%   { -moz-transform: translateX(100%); }
+ 100% { -moz-transform: translateX(-100%); }
+}
+@-webkit-keyframes scrolling_button_text {
+ 0%   { -webkit-transform: translateX(100%); }
+ 100% { -webkit-transform: translateX(-100%); }
+}
+@keyframes scrolling_button_text {
+ 0%   {
+ -moz-transform: translateX(100%); /* Firefox bug fix */
+ -webkit-transform: translateX(100%); /* Firefox bug fix */
+ transform: translateX(100%);
+ }
+ 100% {
+ -moz-transform: translateX(-100%); /* Firefox bug fix */
+ -webkit-transform: translateX(-100%); /* Firefox bug fix */
+ transform: translateX(-100%);
+ }
+}
