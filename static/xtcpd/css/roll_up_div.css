@@ -1,0 +1,46 @@
+.roll_up_div{
+	text-align:center;
+	font-weight:bold;
+	padding-left:10px;
+	padding-right:10px;
+	padding-top:10px;
+	padding-bottom:10px;
+}
+.swatch_table_div{
+	#width:75px;
+	overflow:auto;
+}
+.roll_up_icon_cell{
+	width:40px;
+	text-align:center;
+}
+.roll_up_icon{
+	height:20px;
+	transition: transform 0.3s ease;
+}
+.roll_up_icon.up{
+	transform:rotate(180deg);
+}
+.roll_up_label{
+	color:#00FF00;
+	font-size:8pt;
+}
+.rollup{
+	position:relative;
+	text-align:center;
+	overflow:hidden;
+}
+.layer_table{
+	width:100%;
+	text-align:center;
+}
+.ip_label{
+	color:#fff;
+	font-size:12pt;
+	#display: table-cell;
+	#vertical-align:middle;
+}
+.hr{
+	margin-top:5px;
+	margin-bottom:5px;
+}

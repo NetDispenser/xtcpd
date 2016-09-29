@@ -1,3 +1,18 @@
+var DEBUG=true;
+var checkboxCB=function(e){
+	console.log(e.target.id);
+
+	var cb=document.getElementById(e.target.id);
+	console.log(cb.src);
+	if(cb.src.indexOf('checkbox-0')>-1){
+		cb.src='/static/xtcpd/img/checkbox-1.png';
+		console.log("checked");
+	}
+	else {
+		cb.src='/static/xtcpd/img/checkbox-0.png';
+		console.log("unchecked");
+	}
+}
 var SpectraDaemonUI=function(){
 	var me={};
 	me.current_selection=0;
@@ -72,6 +87,38 @@ var SpectraDaemonUI=function(){
 				ms.add(o,ms.options[0]);//NEED:add ips ... like code below
 				document.getElementById("spectra_status").innerHTML="NetRange "+netrange;
 
+				//SELECTRA2
+				var sanitized=netrange;
+				for(var dummy=0;dummy<8;dummy++)
+					sanitized=sanitized.replace(".","ZZZ");
+
+				var ip_key=me.data[netrange]['ips']['keys'][0];
+//				var roll_up_name=netrange;
+
+				var roll_up_name=netrange+"<br>"+me.data[netrange]['ips'][ip_key]['city']+", ";
+				roll_up_name+=me.data[netrange]['ips'][ip_key]['region_name']+", ";
+				roll_up_name+=me.data[netrange]['ips'][ip_key]['country_name'];
+
+				var opts={
+					'category':sanitized,
+					'parent_id':'selectra2',
+					'id':netrange,
+					'className':'roll_up_div',
+					'roll_up_class':'rollup',
+					'roll_up_name':roll_up_name,
+					'arrow_img':'/static/xtcpd/img/arrow-dn.png',
+					'roll_up_icon_src':'/static/xtcpd/img/arrow-dn.png',
+					'checkboxCB':checkboxCB,
+					'checkboxSRC':'/static/xtcpd/img/checkbox-1.png',
+				};
+				var rollup=new RollUpDiv(opts);
+
+
+
+				var lt=document.createElement("table");//lt=LayersTable
+				lt.className="layer_table";
+				lt.id=netrange+"_layer_table";
+
 				var ips=data['data'][netrange]['ips']['keys'];//incoming list
 				for(var idx=0;idx<ips.length;idx++){//cycle over incoming ips
 					var ip=ips[idx];
@@ -86,8 +133,20 @@ var SpectraDaemonUI=function(){
 					o.addEventListener("click",me.selclickCB,false);
 					ms.add(o,ms.options[idx+1]);//NEED:add at correct place in stack (append)
 
+					var layer_name=ip;
+					var r=lt.insertRow(-1);
+					var c=r.insertCell(-1);
+					var ip_label=document.createElement("div");
+					ip_label.id=ip+"ip_label";
+					ip_label.innerHTML="<a>"+ip+"</a>&nbsp;";
+					ip_label.innerHTML+="<a>"+me.data[netrange]['ips'][ip]['count']+"</a>&nbsp;";
+					ip_label.innerHTML+="<a>"+me.data[netrange]['ips'][ip]['country_code']+"</a>&nbsp;";
+					ip_label.className="ip_label";
+					c.appendChild(ip_label);
+
 					window.map_widget.add_point(me.data[netrange]['ips'][ip]);
 				}
+				rollup.rollup.appendChild(lt);
 			}
 			else{
 				var ips=data['data'][netrange]['ips']['keys'];//incoming list
@@ -120,6 +179,19 @@ var SpectraDaemonUI=function(){
 						}
 						ms.add(o,ms.options[target_idx+1]);//NEED:add at correct place in stack (append)
 
+						var lt=document.getElementById(netrange+"_layer_table");
+						var layer_name=ip;
+						var r=lt.insertRow(-1);
+						var c=r.insertCell(-1);
+						var ip_label=document.createElement("div");
+						ip_label.id=ip+"ip_label";
+						ip_label.innerHTML="<a>"+ip+"</a>&nbsp;";
+						ip_label.innerHTML+="<a>"+me.data[netrange]['ips'][ip]['count']+"</a>&nbsp;";
+						ip_label.innerHTML+="<a>"+me.data[netrange]['ips'][ip]['country_code']+"</a>&nbsp;";
+						ip_label.className="ip_label";
+						c.appendChild(ip_label);
+
+
 						window.map_widget.add_point(me.data[netrange]['ips'][ip]);
 					}
 					else{
@@ -134,6 +206,12 @@ var SpectraDaemonUI=function(){
 						var o=ms.options[target_idx];
 						o.text=ip+" "+me.data[netrange]['ips'][ip]['count']+" "+me.data[netrange]['ips'][ip]['country_code'];
 						//if does have that ip then we need to update count of existing
+
+						ip_label=document.getElementById(ip+"ip_label");
+						ip_label.innerHTML="<a>"+ip+"</a>&nbsp;";
+						ip_label.innerHTML+="<a>"+me.data[netrange]['ips'][ip]['count']+"</a>&nbsp;";
+						ip_label.innerHTML+="<a>"+me.data[netrange]['ips'][ip]['country_code']+"</a>&nbsp;";
+						ip_label.className="ip_label";
 					}
 				}
 			}

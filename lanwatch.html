@@ -9,6 +9,7 @@
 <link rel="stylesheet" type="text/css" href="/static/xtcpd/css/bootstrap.css">
 <link rel="stylesheet" type="text/css" href="/static/xtcpd/css/traffic.css">
 <link rel="stylesheet" type="text/css" href="/static/xtcpd/css/wonder_button.css">
+<link rel="stylesheet" type="text/css" href="/static/xtcpd/css/roll_up_div.css">
 <link rel="stylesheet" type="text/css" href="/static/xtcpd/css/lanwatch.css">
 
 <link rel="stylesheet" type="text/css" href="/static/xtcpd/css/ol.css">
@@ -24,6 +25,7 @@
 <script type="text/javascript" src="/static/xtcpd/js/spectra.js"></script>
 <script type="text/javascript" src="/static/xtcpd/js/zoom.js"></script>
 <script type="text/javascript" src="/static/xtcpd/js/map.js"></script>
+<script type="text/javascript" src="/static/xtcpd/js/roll_up_div.js"></script>
 <script type="text/javascript" src="/static/xtcpd/js/wonderbutton.js"></script>
 <script type="text/javascript">
 var RUNNING=true;
@@ -122,18 +124,32 @@ var setup=function(){
 	d3.selectAll("#clients_div")
 		.style("height",parseInt(bcr.height*0.60))
 
+/*
 	//selectra2
 	var s2t=document.getElementById("selectra2_table");
 	for(var sidx=0;sidx<2;sidx++){
 		var s2tr=s2t.insertRow(-1);
 		var s2td=s2tr.insertCell(-1);
-		s2td.appendChild(new WonderButton().get());
+		var opts={
+//			'category':category,
+//			'parent_id':'control_panel',
+			'id':'wbd0'+(Math.random()*1E9).toString().slice(0,4),
+			'className':'roll_up_div',
+			'roll_up_class':'rollup',
+//			'roll_up_name':category.replace("_"," "),
+			'arrow_img':'/static/xtcpd/img/arrow-dn.png',
+			'roll_up_icon_src':'/static/xtcpd/img/arrow-dn.png',
+		};
+		var wb=new WonderButton(opts);
+		s2td.appendChild(wb.get());
+
 		var s2trx=s2t.insertRow(-1);
 		var s2tdx=s2trx.insertCell(-1);
 		var hrule=document.createElement("hr");
 		hrule.className="hr";
 		s2tdx.appendChild(hrule);
 	}
+*/
 	d3.selectAll("#selectra2")
 		.style("height",parseInt(bcr.height))
 
@@ -154,11 +170,11 @@ var init=function(){
 	var carhammer = new Hammer(document.getElementById("theCarousel"));
 	carhammer.on('swipeleft', function(ev){
 		$("#theCarousel").carousel("next");
-		d3.selectAll("#theCarousel").style('background-color',mkrandomcolor());
+		d3.selectAll("#theCarousel").style('background-color',"#333333");
 	});
 	carhammer.on('swiperight', function(ev){
 		$("#theCarousel").carousel("prev");
-		d3.selectAll("#theCarousel").style('background-color',mkrandomcolor());
+		d3.selectAll("#theCarousel").style('background-color',"#333333");
 	});
 
 	window.onresize();

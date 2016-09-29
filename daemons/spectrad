@@ -62,12 +62,20 @@ class SpectraDaemonProcess(Daemon):
 				country_code="US"
 				longitude=-122.8037
 				latitude=45.4871
+				city="Beaverton"
+				region_name="OR"
+				country_code3="USA"
+				country_name="United States"
+
 				g=gip.record_by_addr(dst)
 				if g:
 					country_code=g['country_code']
 					longitude=g['longitude']
 					latitude=g['latitude']
-
+					city=g['city']
+					country_code3=g['country_code3']
+					country_name=g['country_name']
+					region_name=g['region_name']
 				#logging.debug("looping over client_ips")
 				logging.debug(src+"->"+dst)
 
@@ -90,6 +98,10 @@ class SpectraDaemonProcess(Daemon):
 								'dst':dst,
 								'count':1,
 								'country_code':country_code,
+								'country_code3':country_code3,
+								'country_name':country_name,
+								'region_name':region_name,
+								'city':city,
 								'latitude':latitude,
 								'longitude':longitude,
 								'netrange':netrange,
@@ -106,6 +118,10 @@ class SpectraDaemonProcess(Daemon):
 									'dst':dst,
 									'count':1,
 									'country_code':country_code,
+									'country_code3':country_code3,
+									'country_name':country_name,
+									'region_name':region_name,
+									'city':city,
 									'latitude':latitude,
 									'longitude':longitude,
 									'netrange':netrange,#for d3 by classname
@@ -117,7 +133,7 @@ class SpectraDaemonProcess(Daemon):
 
 	def getNetRange(self,ip):
 		ip4=ip.split('.')
-		netrange="%s.%s.%s.%s - %s.%s.%s.%s"%(ip4[0],'0','0','0',ip4[0],'255','255','255')
+		netrange="%s.%s.%s.%s-%s.%s.%s.%s"%(ip4[0],'0','0','0',ip4[0],'255','255','255')
 		return netrange
 
 	def get_data(self,client_ip):

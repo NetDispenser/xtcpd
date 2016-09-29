@@ -1,6 +1,6 @@
 var traffic_hostname="http://spytools.asymptopia.org";
 var mkswatchcode=function(c){
-	var rval="<div style='width:20px;height:20px;background-color:"+c+";'>";
+	var rval="<div style='width:10px;height:10px;background-color:"+c+";'>";
 	rval+="</div>";
 	return rval;
 }
