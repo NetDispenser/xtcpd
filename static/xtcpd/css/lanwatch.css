@@ -3,7 +3,10 @@
 	padding-right:0px;
 	margin-left:0px;
 	margin-right:0px;
-	width:100%;
+	#width:100%;
+	width:360px;
+	height:640px;
+	background-color:#888888;
 }
 .row{
 	margin-right:0px;
@@ -49,8 +52,16 @@
 a{
 	text-decoration:none;
 	font-weight:normal;
-	color:cyan;
+	color:#FFF;
 	font-size:10pt;
+	cursor:pointer;
+}
+a:hover{
+	text-decoration:none;
+	font-weight:bold;
+	color:#FE0;
+	font-size:11pt;
+	cursor:pointer;
 }
 .mybutton{
 	width:100%;

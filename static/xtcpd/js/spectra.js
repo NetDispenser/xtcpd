@@ -13,12 +13,30 @@ var checkboxCB=function(e){
 		console.log("unchecked");
 	}
 }
+var select_rollupCB=function(e,obj){
+	console.log('select_rollupCB');
+	window.spectra_widget.deselect_all_rollups();
+
+	var netrange=obj['opts']['id'];
+	while(netrange.indexOf(".")>-1)
+		netrange=netrange.replace(".","ZZZ");
+	console.log(netrange);
+	//use netrange to hilite all with className==netrange
+	d3.selectAll("."+netrange.replace(".","ZZZ")).style("border","4px solid red");
+}
 var SpectraDaemonUI=function(){
 	var me={};
 	me.current_selection=0;
 	me.data={'keys':[],};
+	me.rollups={'keys':[],};
 	me.setup=function(){
 		console.log("SpectraDaemonUI.setup");
+	}
+	me.deselect_all_rollups=function(){
+		for(var kidx=0;kidx<me.rollups['keys'].length;kidx++){
+			var key=me.rollups['keys'][kidx];
+			me.rollups[key].deselect();
+		}
 	}
 	me.netrangeCB=function(e){//replace with toggleClass (via d3 toggleClass?)
 		try{
@@ -96,24 +114,25 @@ var SpectraDaemonUI=function(){
 //				var roll_up_name=netrange;
 
 				var roll_up_name=netrange+"<br>"+me.data[netrange]['ips'][ip_key]['city']+", ";
-				roll_up_name+=me.data[netrange]['ips'][ip_key]['region_name']+", ";
+				//roll_up_name+=me.data[netrange]['ips'][ip_key]['region_name']+", ";
 				roll_up_name+=me.data[netrange]['ips'][ip_key]['country_name'];
 
 				var opts={
 					'category':sanitized,
 					'parent_id':'selectra2',
-					'id':netrange,
+					'id':"nr-"+netrange,
 					'className':'roll_up_div',
 					'roll_up_class':'rollup',
 					'roll_up_name':roll_up_name,
 					'arrow_img':'/static/xtcpd/img/arrow-dn.png',
 					'roll_up_icon_src':'/static/xtcpd/img/arrow-dn.png',
-					'checkboxCB':checkboxCB,
+					'checkboxCB':checkboxCB,//note:external to $this
+					'select_rollupCB':select_rollupCB,//note:external to $this
 					'checkboxSRC':'/static/xtcpd/img/checkbox-1.png',
 				};
 				var rollup=new RollUpDiv(opts);
-
-
+				me.rollups["nr-"+netrange]=rollup;
+				me.rollups["keys"].push("nr-"+netrange);
 
 				var lt=document.createElement("table");//lt=LayersTable
 				lt.className="layer_table";
@@ -136,6 +155,23 @@ var SpectraDaemonUI=function(){
 					var layer_name=ip;
 					var r=lt.insertRow(-1);
 					var c=r.insertCell(-1);
+					c.className='roll_up_icon';//25px indent
+					c=r.insertCell(-1);
+					c.className='layer_table_indent';
+					var swatch_table_div=document.createElement("div");
+					var swatch_table=document.createElement("table");
+					var sr=swatch_table.insertRow(-1);
+					for(var dummy=0;dummy<1;dummy++){
+						var sc=sr.insertCell(-1);
+						var swatch_div=document.createElement("div");
+						swatch_div.innerHTML="";
+						swatch_div.innerHTML+=mkswatchcode("#00FFFF");
+						sc.appendChild(swatch_div);
+					}
+					swatch_table_div.appendChild(swatch_table);
+					c.appendChild(swatch_table_div);
+					//
+					c=r.insertCell(-1);
 					var ip_label=document.createElement("div");
 					ip_label.id=ip+"ip_label";
 					ip_label.innerHTML="<a>"+ip+"</a>&nbsp;";
@@ -183,6 +219,25 @@ var SpectraDaemonUI=function(){
 						var layer_name=ip;
 						var r=lt.insertRow(-1);
 						var c=r.insertCell(-1);
+						c.className="roll_up_icon";
+						c=r.insertCell(-1);
+						c.className='layer_table_indent';//swatches should go here
+						var swatch_table_div=document.createElement("div");
+						var swatch_table=document.createElement("table");
+						var sr=swatch_table.insertRow(-1);
+						for(var dummy=0;dummy<1;dummy++){
+							var sc=sr.insertCell(-1);
+							var swatch_div=document.createElement("div");
+							swatch_div.innerHTML="";
+							swatch_div.innerHTML+=mkswatchcode("#00FFFF");
+							sc.appendChild(swatch_div);
+						}
+						swatch_table_div.appendChild(swatch_table);
+						c.appendChild(swatch_table_div);
+
+
+						//
+						c=r.insertCell(-1);
 						var ip_label=document.createElement("div");
 						ip_label.id=ip+"ip_label";
 						ip_label.innerHTML="<a>"+ip+"</a>&nbsp;";
@@ -207,7 +262,7 @@ var SpectraDaemonUI=function(){
 						o.text=ip+" "+me.data[netrange]['ips'][ip]['count']+" "+me.data[netrange]['ips'][ip]['country_code'];
 						//if does have that ip then we need to update count of existing
 
-						ip_label=document.getElementById(ip+"ip_label");
+						var ip_label=document.getElementById(ip+"ip_label");
 						ip_label.innerHTML="<a>"+ip+"</a>&nbsp;";
 						ip_label.innerHTML+="<a>"+me.data[netrange]['ips'][ip]['count']+"</a>&nbsp;";
 						ip_label.innerHTML+="<a>"+me.data[netrange]['ips'][ip]['country_code']+"</a>&nbsp;";

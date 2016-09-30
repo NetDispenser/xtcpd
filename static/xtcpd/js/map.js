@@ -97,7 +97,17 @@ var Map=function(mapdiv){
 	me.add_point=function(pyld){
 		console.log("add_point");
 		var x=document.createElement("div");
-		x.className="marker_default "+pyld['country_code']+" "+pyld['src']+" "+pyld['netrange'];
+
+		var netrange="nr-"+pyld['netrange'];
+		while(netrange.indexOf(".")>-1)
+			netrange=netrange.replace(".","ZZZ");
+
+		var src="src-"+pyld['src'];
+		while(src.indexOf(".")>-1)
+			src=src.replace(".","ZZZ");
+
+		x.className="marker_default "+pyld['country_code']+" "+src+" "+netrange;
+		console.log("map.add_point: "+pyld['netrange']);
 
 		document.getElementById("mapdiv").appendChild(x);
 		lonlat=[parseFloat(pyld['longitude']),parseFloat(pyld['latitude'])];

@@ -16,26 +16,30 @@
 }
 .roll_up_icon{
 	height:20px;
+	width:20px;
 	transition: transform 0.3s ease;
 }
 .roll_up_icon.up{
 	transform:rotate(180deg);
 }
 .roll_up_label{
-	color:#00FF00;
-	font-size:8pt;
+	color:#ADF;
+	font-size:10pt;
 }
 .rollup{
 	position:relative;
 	text-align:center;
 	overflow:hidden;
 }
+.layer_table_indent{
+	width:40px;
+}
 .layer_table{
 	width:100%;
-	text-align:center;
+	text-align:left;
 }
 .ip_label{
-	color:#fff;
+	#color:#fff;
 	font-size:12pt;
 	#display: table-cell;
 	#vertical-align:middle;
