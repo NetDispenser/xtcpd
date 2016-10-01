@@ -34,6 +34,10 @@ var select_rollupCB=function(e,obj){
 	var ip_keys=window.spectra_widget.data[netrange]['ips']['keys'];
 	console.log(ip_keys.length+" ips in this netrange");
 
+	var ip_key=ip_keys[0];
+	var pyld=window.spectra_widget.data[netrange]['ips'][ip_key];
+	window.map_widget.focus_point(pyld);
+	window.spectra_widget.current_pyld=window.spectra_widget.data[netrange]['ips'][ip_key];
 }
 var SpectraDaemonUI=function(){
 	var me={};

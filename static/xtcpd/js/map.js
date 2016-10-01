@@ -57,42 +57,26 @@ var Map=function(mapdiv){
 	});
 	var bcr=document.getElementById(mapdiv).getBoundingClientRect();
 	me.map.setSize([bcr.width,bcr.height]);
-/*
-	//091416: this section just pasted-in to get animated marker on map @HOME
-	locations=[[-122.8037,45.4871],[-57.7215, 6.7938]];
-	for(var dummy=0;dummy<locations.length;dummy++){
-		var d=document.createElement("div");
-		d.style="display:none;";
-
-		var m=document.createElement("div");
-		m.id='marker'+dummy
-		m.className="marker";
-
-		d.appendChild(m);
-		document.body.appendChild(d);
-
-		var lon=-180+parseInt(360.*Math.random());
-		var lat=-60+parseInt(120.*Math.random());
-		console.log(lon+", "+lat);
-		var pos = ol.proj.fromLonLat(locations[dummy]);//
-
-		var marker = new ol.Overlay({
-		  position: pos,
-		  positioning: 'center-center',
-		  element: document.getElementById('marker'+dummy),
-		  stopEvent: false
-		});
-		me.map.addOverlay(marker);
-	}
-*/
-	me.flyin=function(){
-		var ms=document.getElementById("myselectra");//reaching into spectra
-		var pyld=JSON.parse(ms.options[window.spectra_widget.current_selection].value);
+	me.flyin3=function(){
+		var pyld=window.spectra_widget.current_pyld;
 		var target_center=[pyld['longitude'],pyld['latitude']];
 		flyin(target_center,4);
 	}
+	me.flyin2=function(){
+		try{
+			console.log("map.flyin");
+			var ms=document.getElementById("myselectra");//reaching into spectra
+			var pyld=JSON.parse(ms.options[window.spectra_widget.current_selection].value);
+			var target_center=[pyld['longitude'],pyld['latitude']];
+			flyin(target_center,4);
+		}
+		catch(e){console.log(e);}
+	}
 	me.set_center=function(){
-		flyin(me.center,1);
+		try{
+			flyin(me.center,1);
+		}
+		catch(e){console.log(e);}
 	}
 	me.add_point=function(pyld){
 		console.log("add_point");
@@ -120,8 +104,15 @@ var Map=function(mapdiv){
 		me.map.addOverlay(oly);
 	}
 	me.full_info=function(){
+		if(me.xpopup.innerHTML!=""){
+			me.xpopup.innerHTML="";
+			var lonlat=[-160.0,-70.0];
+			me.overlay.setPosition(ol.proj.transform(lonlat, 'EPSG:4326', 'EPSG:3857'));
+			return;
+		}
+
 		var ms=document.getElementById("myselectra");//reaching into spectra
-		var pyld=JSON.parse(ms.options[window.spectra_widget.current_selection].value);
+		var pyld=window.spectra_widget.current_pyld;
 		var src=pyld['src'];
 		var src_color=window.clients_widget.data[src]['color'];
 		var swatch_code=mkswatchcode(src_color);
@@ -129,10 +120,14 @@ var Map=function(mapdiv){
 		me.xpopup.innerHTML+="<br>"+swatch_code;
 		var client_device=window.clients_widget.device_by_ip(pyld['src']);
 		me.xpopup.innerHTML+=client_device;
-
+		var bcr=me.xpopup.getBoundingClientRect();
+		console.log(bcr.width+"x"+bcr.height);
 		var lonlat=[parseFloat(pyld['longitude']),parseFloat(pyld['latitude'])];
 		me.overlay.setPosition(ol.proj.transform(lonlat, 'EPSG:4326', 'EPSG:3857'));
-	}
+
+		//NEED: -w/2 * dpx2dlon
+
+}
 
 	me.focus_point=function(pyld){
 		var lonlat=[parseFloat(pyld['longitude']),parseFloat(pyld['latitude'])];
@@ -140,7 +135,6 @@ var Map=function(mapdiv){
 		me.marker2.setPosition(ol.proj.transform(lonlat, 'EPSG:4326', 'EPSG:3857'));
 
 		me.xpopup.innerHTML="";
-
 		var lonlat=[-160.0,-70.0];
 		me.overlay.setPosition(ol.proj.transform(lonlat, 'EPSG:4326', 'EPSG:3857'));
 
