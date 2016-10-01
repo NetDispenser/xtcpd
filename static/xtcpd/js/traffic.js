@@ -15,6 +15,9 @@ var lines=true;
 var show_data=false;
 var t_min,pyld,SF,maxdat,maxdatidx;
 
+me.clear=function(){
+	console.log("traffic.clear() nothing to do");
+}
 
 me.render_data=function(pyld){
 		console.log(pyld);

@@ -2,6 +2,10 @@ var ClientsDaemonUI=function(){
 	me={};
 	me.data={'keys':[],};
 	me.table=document.getElementById("clients_table");//pass-in as arg
+	me.clear=function(){
+		console.log("clients.clear()");
+		me.data={'keys':[],};
+	}
 	me.setup=function(){
 		console.log("ClientsDaemonUI.setup");
 		document.getElementById("clients_status").innerHTML="DHCP Clients Status";
@@ -45,9 +49,10 @@ var ClientsDaemonUI=function(){
 				me.data['keys'].push(client_ip);
 				me.data[client_ip]={'raw':data['lines'][idx],'color':mkrandomcolor(),};
 				var tstamp=data['lines'][idx][0];
-				var mac_addr=data['lines'][idx][1];
+				var _mac_addr=data['lines'][idx][1];
 				var ip_num=data['lines'][idx][2];
 				var device_name=data['lines'][idx][3];
+				var mac_addr=data['lines'][idx][4];
 
 				me.data[client_ip]['device']=me.data[client_ip]['raw'][3];
 

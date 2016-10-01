@@ -1,5 +1,4 @@
 <html>
-
 <head>
 <title>LAN-Watch</title>
 <meta charset="UTF-8">
@@ -94,12 +93,17 @@ var toggleRunCB=function(e){
 		update();
 	}
 }
+var clearCB=function(e){
+		window.traffic_widget.clear();
+		window.spectra_widget.clear();
+		window.clients_widget.clear();
+		window.map_widget.clear();
+}
 var setup=function(){
 	window.traffic_widget=new TrafficDaemonUI().setup();
 	window.spectra_widget=new SpectraDaemonUI();
 	window.spectra_widget.setup();
 	window.clients_widget=new ClientsDaemonUI().setup();
-
 
 //	d3.selectAll("#theCarousel").style('background-color',mkrandomcolor());
 	var bcr=document.getElementById("theCarousel").getBoundingClientRect();
@@ -111,29 +115,9 @@ var setup=function(){
 	d3.selectAll("#top_menu")
 		.style("width",parseInt(bcr.width));
 
-
 	d3.selectAll(".menuB")
 		.style("width","50px")
 		.style("height","50px");
-/*
-	d3.selectAll("#flyB")
-		.on("click",window.map_widget.flyin());
-	d3.selectAll("#ctrB")
-		.on("click",window.map_widget.set_center());
-*/
-	d3.selectAll(".navbot")
-		.style("height",parseInt(bcr.height*0.30))
-		.style("width",parseInt(bcr.width*0.2));
-
-	d3.selectAll(".mybutton")
-		.style("height",parseInt(bcr.height*0.30))
-		.style("width",parseInt(bcr.width*0.2));
-
-	d3.selectAll("#spectra_status")
-		.style("height",parseInt(bcr.height*0.10))
-
-	d3.selectAll("#myselectra")
-		.style("height",parseInt(bcr.height*0.60))
 
 	d3.selectAll("#clients_status")
 		.style("height",parseInt(bcr.height*0.10))
@@ -145,7 +129,6 @@ var setup=function(){
 		.style("height",parseInt(bcr.height))
 
 	update();
-
 }
 var init=function(){
 	window.map_widget=new Map('mapdiv');
@@ -181,7 +164,7 @@ var init=function(){
 	<div class="row">
 
 	<div id="top_menu" class="top_menu">
-		<input id="clearB" class="menuB" type="button" value="Clear" onclick="toggleClearCB()"></input>
+		<input id="clearB" class="menuB" type="button" value="Clear" onclick="clearCB()"></input>
 		<input id="ctrB" class="menuB" type="button" value="Cntr" onclick="window.map_widget.set_center()"></input>
 		<input id="flyB" class="menuB" type="button" value="FlyIn" onclick="window.map_widget.flyin3()"></input>
 		<input id="runB" class="menuB led" type="button" value="Run" onclick="toggleRunCB()"></input>
@@ -193,47 +176,12 @@ var init=function(){
 
 	<div id="theCarousel" class="carousel page-header slide col-lg-12 col-md-12 col-sm-12 col-xs-12" data-ride="carousel" data-interval=false>
 	<div class="carousel-inner">
-
-		<div class="item active"><div class="slide1">
-			<div id="selectra">
-				<table width="100%" height="100%">
-				<tr>
-					<td colspan="10"><div id="spectra_status"></div></td>
-				</tr>
-				<tr>
-				<td rowspan="2" width="80%">
-				<select id="myselectra" multiple="";></select>
-				</td>
-
-				<td><input class="mybutton" type="button" value="Up" onclick="spectra_widget.selectCB('up')"></input></td>
-				</tr>
-				<tr>
-				<td><input class="mybutton" type="button" value="Dn" onclick="spectra_widget.selectCB('dn')"></input></td>
-				</tr>
-				<tr>
-					<td colspan="2">
-					<table>
-					<tr><td>
-					<input id="clearB" class="navbot" type="button" value="Clear" onclick="toggleClearCB()"></input>
-					</td><td>
-					<input id="runB" class="navbot led" type="button" value="Run" onclick="toggleRunCB()"></input>
-					</td><td>
-					<input id="centerB" class="navbot" type="button" value="Center" onclick="window.map_widget.set_center();"></input>
-					</td><td>
-					<input id="flyB" class="navbot" type="button" value="FlyIn" onclick="window.map_widget.flyin2()"></input>
-					</td><td>
-					<!--full info button: have it roll-down over map via navbot button.-->
-					<input id="fullinfoB" class="navbot" type="button" value="Info" onclick="window.map_widget.full_info();"></input>
-					</td>
-
-					</tr>
-					</table>
-					</td>
-				</tr>
-
-				</table>
+		<div class="item active">
+		<div class="slide1">
+			<div id="selectra2">
 			</div>
-		</div></div>
+		</div>
+		</div>
 
 		<div class="item "><div class="slide2">
 			<div id="traffic">
@@ -241,14 +189,6 @@ var init=function(){
 			</div>
 		</div></div>
 
-		<div class="item">
-		<div class="slide3">
-			<div id="selectra2">
-				<table id="selectra2_table" width="100%">
-				</table>
-			</div>
-		</div>
-		</div>
 
 		<div class="item"><div class="slide4">
 		SLIDE 4: Data Record & Playback
@@ -259,17 +199,12 @@ var init=function(){
 
 		<div class="item"><div class="slide5">
 		SLIDE 5: Daemon Status & Control
-		<marquee bgcolor="#000000"><font color="#00FF00">
-			32 Clients | 12 Active | Average Load: 87%
-		</font></marquee>
+		<div class="example1">
+			<h3>32 Clients | 12 Active | Average Load: 87%</h3>
+		</div>
 		</div></div>
 
-		<div class="item"><div class="slide6">
-		SLIDE 6:
-		</div></div>
-
-
-			<div class="item"><div class="slide7">
+		<div class="item"><div class="slide7">
 				<div id="netrange">
 					<table width="100%">
 
@@ -293,16 +228,16 @@ var init=function(){
 							<td colspan="2">
 							<table>
 							<tr><td>
-							<input id="clearB" class="navbot" type="button" value="Clear" onclick="toggleClearCB()"></input>
+							<input id="clearB2" class="navbot" type="button" value="Clear" onclick=""></input>
 							</td><td>
-							<input id="runB" class="navbot led" type="button" value="Run" onclick="toggleRunCB()"></input>
+							<input id="runB2" class="navbot led" type="button" value="Run" onclick="toggleRunCB()"></input>
 							</td><td>
-							<input id="centerB" class="navbot" type="button" value="Center" onclick="window.map_widget.set_center();"></input>
+							<input id="centerB2" class="navbot" type="button" value="Center" onclick="window.map_widget.set_center();"></input>
 							</td><td>
-							<input id="flyB" class="navbot" type="button" value="FlyIn" onclick="window.map_widget.flyin2()"></input>
+							<input id="flyB2" class="navbot" type="button" value="FlyIn" onclick="window.map_widget.flyin2()"></input>
 							</td><td>
 							<!--full info button: have it roll-down over map via navbot button.-->
-							<input id="fullinfoB" class="navbot" type="button" value="Info" onclick="window.map_widget.full_info();"></input>
+							<input id="fullinfoB2" class="navbot" type="button" value="Info" onclick="window.map_widget.full_info();"></input>
 							</td>
 
 							</tr>
@@ -313,7 +248,7 @@ var init=function(){
 
 					</table>
 				</div>
-			</div></div>
+		</div></div>
 
 
 

@@ -41,11 +41,23 @@ var select_rollupCB=function(e,obj){
 }
 var SpectraDaemonUI=function(){
 	var me={};
-	me.current_selection=0;
 	me.data={'keys':[],};
 	me.rollups={'keys':[],};
+	me.current_pyld=null;
+
+	me.clear=function(){
+		me.data={'keys':[],};
+		me.rollups={'keys':[],};
+		me.current_pyld=null;
+		document.getElementById("selectra2").innerHTML="";
+		var s2=document.getElementById("selectra2");
+		var s2t=document.createElement("table");
+		s2t.width="100%";
+		s2.appendChild(s2t);
+	}
 	me.setup=function(){
 		console.log("SpectraDaemonUI.setup");
+		me.clear();
 	}
 	me.deselect_all_rollups=function(){
 		console.log("spectra_widget.deselect_all_rollups");
@@ -63,83 +75,19 @@ var SpectraDaemonUI=function(){
 //			d3.selectAll("."+netrange).style("border","3px solid #00FF00");
 		}
 	}
-	me.netrangeCB=function(e){//replace with toggleClass (via d3 toggleClass?)
-		try{
-			console.log("netrangeCB: ");
-		}
-		catch(e){console.log(e);}
-	}
-	me.selclickCB=function(e){
-		console.log('id='+e.target.id);
-		var ms=document.getElementById("myselectra");
-		for(var oidx=0;oidx<ms.options.length;oidx++){
-			if(ms.options[oidx].id==e.target.id){
-				me.current_selection=oidx;
-				ms.options[oidx].selected=true;
-			}
-			else ms.options[oidx].selected=false;//explicit to prevent mult select
-		}
-		var pyld=JSON.parse(ms.options[me.current_selection].value);
-		window.clients_widget.hilite_src(pyld['src']);
-		window.map_widget.focus_point(pyld);
-	}
-	me.selectCB=function(direction){
-		console.log("selectCB:"+direction);
-		//get selectedID and go up/down
-		var ms=document.getElementById("myselectra");
-		var delta=+1;
-		if(direction=='up')delta=-1;
-		ms.options[me.current_selection].selected=false;
-		me.current_selection+=delta;
-		if(me.current_selection>=ms.options.length)
-			me.current_selection=0;
-		if(me.current_selection<0)
-			me.current_selection=ms.options.length-1;
-		ms.options[me.current_selection].selected=true;//CB: Here is where update others
-		try{
-			var c=JSON.parse(ms.options[me.current_selection].value)['color'];
-			console.log(c);
-			ms.options[me.current_selection].style.color=c;
-			console.log('color='+c);
-		}
-		catch(e){console.log(e);}
-
-		//this throwing syntax error when netrange b/c only ips have pyld as o.value
-		var pyld=JSON.parse(ms.options[me.current_selection].value);
-		window.clients_widget.hilite_src(pyld['src']);
-		window.map_widget.focus_point(pyld);
-	}
 	me.render_data=function(data){
-		//console.log("SpectraDaemonUI.render_data");
-		//if(!me.data)me.data={};
-		//me.data=Object.assign({},me.last_data,data['data']);
-		var ms=document.getElementById("myselectra");
 		for(var kidx=0;kidx<data['data']['keys'].length;kidx++){
 			var netrange=data['data']['keys'][kidx];
 			var dummy=me.data['keys'].indexOf(netrange);
 			if(dummy<0){
 				me.data['keys'].push(netrange);
 				me.data[netrange]=data['data'][netrange];//copy entire sub-{}
-				//NEED: insert new netrange rollup
-				var o=document.createElement("option");
-				o.text=netrange;
-				o.id=netrange;
-				o.selected=false;
-				o.addEventListener("click",me.selclickCB,false);
-				o.addEventListener("mouseover",me.netrangeCB,false);
-				ms.add(o,ms.options[0]);//NEED:add ips ... like code below
-				document.getElementById("spectra_status").innerHTML="NetRange "+netrange;
-
-				//SELECTRA2
 				var sanitized=netrange;
 				for(var dummy=0;dummy<8;dummy++)
 					sanitized=sanitized.replace(".","ZZZ");
 
 				var ip_key=me.data[netrange]['ips']['keys'][0];
-//				var roll_up_name=netrange;
-
 				var roll_up_name=netrange+"<br>"+me.data[netrange]['ips'][ip_key]['city']+", ";
-				//roll_up_name+=me.data[netrange]['ips'][ip_key]['region_name']+", ";
 				roll_up_name+=me.data[netrange]['ips'][ip_key]['country_name'];
 
 				var opts={
@@ -167,17 +115,6 @@ var SpectraDaemonUI=function(){
 				var ips=data['data'][netrange]['ips']['keys'];//incoming list
 				for(var idx=0;idx<ips.length;idx++){//cycle over incoming ips
 					var ip=ips[idx];
-					var o=document.createElement("option");
-					o.text=ip+" "+me.data[netrange]['ips'][ip]['count']+" "+me.data[netrange]['ips'][ip]['country_code'];
-					o.id=ip;
-					o.selected=false;
-					o.style.color=window.clients_widget.get_color(me.data[netrange]['ips'][ip]['src']);//
-					console.log("setting o.value="+JSON.stringify(me.data[netrange]['ips'][ip]));
-					o.value=JSON.stringify(me.data[netrange]['ips'][ip]);//me.data[netrange]['ips'][ip]['src'];
-					console.log("assigning src_ip="+JSON.stringify(me.data[netrange]['ips'][ip]['src']));
-					o.addEventListener("click",me.selclickCB,false);
-					ms.add(o,ms.options[idx+1]);//NEED:add at correct place in stack (append)
-
 					var layer_name=ip;
 					var r=lt.insertRow(-1);
 					var c=r.insertCell(-1);
@@ -216,31 +153,9 @@ var SpectraDaemonUI=function(){
 					var ip=ips[idx];
 					var dummy2=me.data[netrange]['ips']['keys'].indexOf(ip);//our list
 					if(dummy2<0){
-
-						document.getElementById("spectra_status").innerHTML="IP "+ip;
-
 						//NEED:insert new select option into corresponding netrange rollup
 						me.data[netrange]['ips'][ip]=data['data'][netrange]['ips'][ip];
 						me.data[netrange]['ips']['keys'].push(ip);
-
-						var o=document.createElement("option");
-						o.text=ip+" "+me.data[netrange]['ips'][ip]['count']+" "+me.data[netrange]['ips'][ip]['country_code'];
-						o.id=ip;
-						o.selected=false;
-						o.style.color=window.clients_widget.get_color(me.data[netrange]['ips'][ip]['src']);//
-						console.log("setting o.value2="+JSON.stringify(me.data[netrange]['ips'][ip]));
-						o.value=JSON.stringify(me.data[netrange]['ips'][ip]);//me.data[netrange]['ips'][ip]['src'];
-						o.addEventListener("click",me.selclickCB,false);
-						//Now insert at right place:
-						var target_idx=0;
-						for(var tidx=0;tidx<ms.options.length;tidx++){
-							if(ms.options[tidx].text==netrange){
-								target_idx=tidx;
-								break;
-							}
-						}
-						ms.add(o,ms.options[target_idx+1]);//NEED:add at correct place in stack (append)
-
 						var lt=document.getElementById(netrange+"_layer_table");
 						var layer_name=ip;
 						var r=lt.insertRow(-1);
@@ -260,8 +175,6 @@ var SpectraDaemonUI=function(){
 						}
 						swatch_table_div.appendChild(swatch_table);
 						c.appendChild(swatch_table_div);
-
-
 						//
 						c=r.insertCell(-1);
 						var ip_label=document.createElement("div");
@@ -271,23 +184,11 @@ var SpectraDaemonUI=function(){
 						ip_label.innerHTML+="<a>"+me.data[netrange]['ips'][ip]['country_code']+"</a>&nbsp;";
 						ip_label.className="ip_label";
 						c.appendChild(ip_label);
-
-
 						window.map_widget.add_point(me.data[netrange]['ips'][ip]);
 					}
 					else{
 						me.data[netrange]['ips'][ip]['count']+=data['data'][netrange]['ips'][ip]['count'];
 						var target_idx=0;
-						for(var tidx=0;tidx<ms.options.length;tidx++){
-							if(ms.options[tidx].id==ip){
-								target_idx=tidx;
-								break;
-							}
-						}
-						var o=ms.options[target_idx];
-						o.text=ip+" "+me.data[netrange]['ips'][ip]['count']+" "+me.data[netrange]['ips'][ip]['country_code'];
-						//if does have that ip then we need to update count of existing
-
 						var ip_label=document.getElementById(ip+"ip_label");
 						ip_label.innerHTML="<a>"+ip+"</a>&nbsp;";
 						ip_label.innerHTML+="<a>"+me.data[netrange]['ips'][ip]['count']+"</a>&nbsp;";
@@ -313,7 +214,7 @@ var SpectraDaemonUI=function(){
 		status+="IPs: "+ip_count+"&nbsp;&nbsp;";
 		status+="Pkt: "+pkt_count+"&nbsp;&nbsp;";
 
-		document.getElementById("spectra_status").innerHTML=status;
+//		document.getElementById("spectra_status").innerHTML=status;
 		console.log(status);
 
 		d3.selectAll(".marker_default")

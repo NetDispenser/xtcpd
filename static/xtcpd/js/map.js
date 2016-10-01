@@ -2,7 +2,9 @@ var Map=function(mapdiv){
 	var me={};
 	me.data={};
 	me.center=[0.0,35.31];
-
+	me.clear=function(){
+		me.data={};
+	}
 	me.xpopup = document.getElementById('xpopup');
 	console.log('xpopup found by map.js');
 	me.popup_closer = document.getElementById('popup-closer');
@@ -114,7 +116,7 @@ var Map=function(mapdiv){
 		var ms=document.getElementById("myselectra");//reaching into spectra
 		var pyld=window.spectra_widget.current_pyld;
 		var src=pyld['src'];
-		var src_color=window.clients_widget.data[src]['color'];
+		var src_color=window.clients_widget.get_color(src);//.data[src]['color'];
 		var swatch_code=mkswatchcode(src_color);
 		me.xpopup.innerHTML=pyld['src']+"->"+pyld['dst'];
 		me.xpopup.innerHTML+="<br>"+swatch_code;
