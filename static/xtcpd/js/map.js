@@ -125,18 +125,25 @@ var Map=function(mapdiv){
 		var src=pyld['src'];
 		var src_color=window.clients_widget.data[src]['color'];
 		var swatch_code=mkswatchcode(src_color);
+		me.xpopup.innerHTML=pyld['src']+"->"+pyld['dst'];
 		me.xpopup.innerHTML+="<br>"+swatch_code;
 		var client_device=window.clients_widget.device_by_ip(pyld['src']);
 		me.xpopup.innerHTML+=client_device;
+
+		var lonlat=[parseFloat(pyld['longitude']),parseFloat(pyld['latitude'])];
+		me.overlay.setPosition(ol.proj.transform(lonlat, 'EPSG:4326', 'EPSG:3857'));
 	}
 
 	me.focus_point=function(pyld){
-		lonlat=[parseFloat(pyld['longitude']),parseFloat(pyld['latitude'])];
+		var lonlat=[parseFloat(pyld['longitude']),parseFloat(pyld['latitude'])];
 		me.marker1.setPosition(ol.proj.transform(lonlat, 'EPSG:4326', 'EPSG:3857'));
 		me.marker2.setPosition(ol.proj.transform(lonlat, 'EPSG:4326', 'EPSG:3857'));
 
+		me.xpopup.innerHTML="";
+
+		var lonlat=[-160.0,-70.0];
 		me.overlay.setPosition(ol.proj.transform(lonlat, 'EPSG:4326', 'EPSG:3857'));
-		me.xpopup.innerHTML=pyld['src']+"->"+pyld['dst'];
+
 		return null;
 	}
 

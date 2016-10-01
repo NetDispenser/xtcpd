@@ -38,6 +38,9 @@
 	border: 3px solid #00FF00;
 	background-color: #FFFF00;
 }
+.marker_default_hilite{
+	border:5px solid #FF0000;
+}
 .led{
 	background-color:green;
 	height:100%;
@@ -92,6 +95,15 @@ a:hover{
 	background-color:CCDDAA;
 	color:navy;
 	font-weight:bold;
+}
+#xpopup{
+  font-family:Pacifico;
+  font-size:12pt;
+  padding:10px;
+  color:#f5f5f5;
+  background-color:#333333;
+  text-align:center;
+  border-radius:2px;
 }
 .example1 {
  height: 50px;

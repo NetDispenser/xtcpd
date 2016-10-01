@@ -20,9 +20,20 @@ var select_rollupCB=function(e,obj){
 	var netrange=obj['opts']['id'];
 	while(netrange.indexOf(".")>-1)
 		netrange=netrange.replace(".","ZZZ");
-	console.log(netrange);
+	console.log(netrange+" setting to red");
 	//use netrange to hilite all with className==netrange
-	d3.selectAll("."+netrange.replace(".","ZZZ")).style("border","4px solid red");
+	//d3.selectAll("."+netrange).style("border","4px solid red");
+	$("."+netrange).toggleClass("marker_default_hilite");
+
+	netrange=obj['opts']['netrange'];
+	console.log("netrange="+netrange);
+	for(var kidx=0;kidx<window.spectra_widget.data['keys'].length;kidx++){
+		var key=window.spectra_widget.data['keys'][kidx];
+		console.log("key="+key);
+	}
+	var ip_keys=window.spectra_widget.data[netrange]['ips']['keys'];
+	console.log(ip_keys.length+" ips in this netrange");
+
 }
 var SpectraDaemonUI=function(){
 	var me={};
@@ -33,9 +44,19 @@ var SpectraDaemonUI=function(){
 		console.log("SpectraDaemonUI.setup");
 	}
 	me.deselect_all_rollups=function(){
+		console.log("spectra_widget.deselect_all_rollups");
 		for(var kidx=0;kidx<me.rollups['keys'].length;kidx++){
 			var key=me.rollups['keys'][kidx];
+			console.log(key);
 			me.rollups[key].deselect();
+
+			var netrange=me.rollups[key]['opts']['id'];
+			while(netrange.indexOf(".")>-1)
+				netrange=netrange.replace(".","ZZZ");
+			console.log(netrange+" setting to green");
+			if($("."+netrange).hasClass("marker_default_hilite"))
+				$("."+netrange).removeClass("marker_default_hilite");
+//			d3.selectAll("."+netrange).style("border","3px solid #00FF00");
 		}
 	}
 	me.netrangeCB=function(e){//replace with toggleClass (via d3 toggleClass?)
@@ -119,6 +140,7 @@ var SpectraDaemonUI=function(){
 
 				var opts={
 					'category':sanitized,
+					'netrange':netrange,
 					'parent_id':'selectra2',
 					'id':"nr-"+netrange,
 					'className':'roll_up_div',
