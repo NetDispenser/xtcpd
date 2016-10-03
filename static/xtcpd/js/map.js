@@ -144,7 +144,7 @@ var Map=function(mapdiv){
 	}
 
 	me.mdiv1=document.createElement("div");
-	me.mdiv1.className="marker";
+	me.mdiv1.className="marker focus_marker hide";
 	me.mdiv1.id="marker";
 	document.getElementById("mapdiv").appendChild(me.mdiv1);
 	me.marker1 = new ol.Overlay({
@@ -156,13 +156,13 @@ var Map=function(mapdiv){
 	me.map.addOverlay(me.marker1);
 
 	me.mdiv2=document.createElement("div");
-	me.mdiv2.className="marker80";
+	me.mdiv2.className="marker80 focus_marker hide";
 	me.mdiv2.id="marker80";
 	document.getElementById("mapdiv").appendChild(me.mdiv2);
 	me.marker2 = new ol.Overlay({
 		position: ol.proj.transform([0,0], 'EPSG:4326', 'EPSG:3857'),
 		positioning: 'center-center',
-		element: me.mdiv2,//********
+		element: me.mdiv2,
 		stopEvent: false
 	});
 	me.map.addOverlay(me.marker2);

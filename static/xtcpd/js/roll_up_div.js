@@ -5,11 +5,11 @@ var RollUpDiv=function(opts){
 	me.className="rollup";
 
 	var CB=opts['checkboxCB'];
-	var callCB=function(e){
+	var callCB=function(e,obj){
 		try{
 			if(DEBUG)console.log("callCB");
 			if(DEBUG)console.log(opts['checkboxCB']);
-			CB(e);
+			CB(e,obj);
 		}
 		catch(e){
 			if(DEBUG)console.log("Failed to call checkboxCB");
@@ -64,15 +64,15 @@ var RollUpDiv=function(opts){
 	me.label.className="roll_up_label";
 	td.appendChild(me.label);
 
-	if(opts['checkboxCB']){//BASE_LAYERS are laid out differently
+	if(opts['checkboxCB']){
 		td=me.tr.insertCell(-1);
 		td.className="roll_up_icon_cell";
-		var roll_up_icon=new Image();
-		roll_up_icon.id=me.head.id+"_checkbox";
-		roll_up_icon.className="roll_up_icon";
-		roll_up_icon.src=opts['checkboxSRC'];
-		roll_up_icon.addEventListener("click",callCB,false);
-		td.appendChild(roll_up_icon);
+		var checkbox_icon=new Image();
+		checkbox_icon.id=me.head.id+"_checkbox";
+		checkbox_icon.className="roll_up_icon";
+		checkbox_icon.src=opts['checkboxSRC'];
+		checkbox_icon.addEventListener("click",callCB,false);
+		td.appendChild(checkbox_icon);
 	}
 	else{if(DEBUG)console.log("no checkboxCB");}
 
@@ -95,15 +95,26 @@ var RollUpDiv=function(opts){
 	//me.rollup.className=opts['roll_up_class'];
 	//$("#"+opts['parent_id']).append(me.rollup);
 	me.head.appendChild(me.rollup);
+
+	if(opts['checkboxCB']){
+		$("#"+checkbox_icon.id).click(function(e){
+			callCB(e,me);
+		});
+	}
 	$("#"+me.label.id).click(function(e){
 		var final_selected_state=true;
 		if(me.selected)final_selected_state=false;
 		callCB2(e,me);//deselect all from list @spectrad
 		if(final_selected_state){
 			me.select(e);
+			if($(".focus_marker").hasClass("hide")){
+				$(".focus_marker").removeClass("hide");
+				window.map_widget.map.render();
+			}
 		}
 		else{
 			me.deselect(e);
+			$(".focus_marker").addClass("hide");
 		}
 	});
 	me.select=function(e){

@@ -3,15 +3,16 @@
 	padding-right:0px;
 	margin-left:0px;
 	margin-right:0px;
-	#width:100%;
-	width:360px;
-	height:640px;
+	width:100%;
+	#width:360px;
+	#height:640px;
 	background-color:#888888;
 }
 .row{
 	margin-right:0px;
 	margin-left:0px;
 }
+.hide{opacity:0;}
 .mapcover{
 	height:50%;
 	width:100%;
@@ -55,13 +56,17 @@
 	border: 5px solid #0000AA;
 	background-color: #00EEFF;
 }
+.marker_default.hide{
+	opacity:0.0;
+}
 .marker_default {
 	width: 8px;height: 8px;border-radius: 4px;opacity:1.0;
 	border: 3px solid #00FF00;
 	background-color: #FFFF00;
+	opacity:1.0;
 }
 .marker_default_hilite{
-	border:5px solid #FF0000;
+	border 3px solid #FF0000;
 }
 .led{
 	background-color:green;

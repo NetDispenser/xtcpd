@@ -1,16 +1,23 @@
 var DEBUG=true;
-var checkboxCB=function(e){
+var checkboxCB=function(e,obj){
 	console.log(e.target.id);
+	if(!obj)return;
+	var netrange=obj['opts']['id'];
+	while(netrange.indexOf(".")>-1)
+		netrange=netrange.replace(".","ZZZ");
+	console.log(netrange+" setting to red");
 
 	var cb=document.getElementById(e.target.id);
 	console.log(cb.src);
 	if(cb.src.indexOf('checkbox-0')>-1){
 		cb.src='/static/xtcpd/img/checkbox-1.png';
 		console.log("checked");
+		$("."+netrange).toggleClass("hide");
 	}
 	else {
 		cb.src='/static/xtcpd/img/checkbox-0.png';
 		console.log("unchecked");
+		$("."+netrange).toggleClass("hide");
 	}
 }
 var select_rollupCB=function(e,obj){
@@ -23,13 +30,13 @@ var select_rollupCB=function(e,obj){
 	console.log(netrange+" setting to red");
 	//use netrange to hilite all with className==netrange
 	//d3.selectAll("."+netrange).style("border","4px solid red");
-	$("."+netrange).toggleClass("marker_default_hilite");
+	$("."+netrange).toggleClass("marker_default_hilite");//NEED:iff hilited row
 
 	netrange=obj['opts']['netrange'];
 	console.log("netrange="+netrange);
 	for(var kidx=0;kidx<window.spectra_widget.data['keys'].length;kidx++){
 		var key=window.spectra_widget.data['keys'][kidx];
-		console.log("key="+key);
+		//console.log("key="+key);
 	}
 	var ip_keys=window.spectra_widget.data[netrange]['ips']['keys'];
 	console.log(ip_keys.length+" ips in this netrange");
@@ -74,6 +81,7 @@ var SpectraDaemonUI=function(){
 				$("."+netrange).removeClass("marker_default_hilite");
 //			d3.selectAll("."+netrange).style("border","3px solid #00FF00");
 		}
+		$(".focus_marker").addClass("hide");
 	}
 	me.render_data=function(data){
 		for(var kidx=0;kidx<data['data']['keys'].length;kidx++){

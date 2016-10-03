@@ -25,6 +25,7 @@
 .roll_up_label{
 	color:#ADF;
 	font-size:10pt;
+	cursor:pointer;
 }
 .rollup{
 	position:relative;
