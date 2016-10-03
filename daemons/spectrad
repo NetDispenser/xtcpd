@@ -7,16 +7,18 @@ from queue import Queue
 from daemon import Daemon
 
 SPECTRAD_PID='/var/run/spectrad.pid'
-SPECTRAD_HOSTNAME="spytools.asymptopia.org"
+SPECTRAD_HOSTNAME="spytools.asymptopia.org"#spytools
 
 FORMAT = 'SPECTRA: %(message)s'
-logging.basicConfig(filename='/var/log/xtcpd/xtcpd.log',level=logging.DEBUG, format=FORMAT)
+logging.basicConfig(filename='/var/log/xtcpd/xtcpd.log',level=logging.WARN, format=FORMAT)
 
 import GeoIP
 gip=GeoIP.open("/usr/share/GeoIP/GeoLiteCity.dat",GeoIP.GEOIP_STANDARD)
+#import pygeoip
+#gip=pygeoip.GeoIP("/usr/share/GeoIP/GeoLiteCity.dat")
 
 rexp=re.compile('(\d+:\d+:\d+)(\.\d+) (IP) (.*)(\.\d+) > (\d+\.\d+\.\d+\.\d+)(\.\d+)(.*)')
-tcpdump_cmd="tcpdump -i wlan1 -l -s 0 -n"
+tcpdump_cmd="tcpdump -i wlan1 -l -s 0 -n|grep -v ARP"#wlan1
 
 class SpectraDaemonProcess(Daemon):
 
@@ -70,12 +72,16 @@ class SpectraDaemonProcess(Daemon):
 				g=gip.record_by_addr(dst)
 				if g:
 					country_code=g['country_code']
+					if not country_code:country_code="UNK"
 					longitude=g['longitude']
 					latitude=g['latitude']
 					city=g['city']
+					if not city:city="UNK"
 					country_code3=g['country_code3']
+					if not country_code3:coutry_code3="UNK"
 					country_name=g['country_name']
-					region_name=g['region_name']
+					if not country_name:country_name="UNK"
+					#region_name=g['region_name']
 				#logging.debug("looping over client_ips")
 				logging.debug(src+"->"+dst)
 
@@ -100,7 +106,7 @@ class SpectraDaemonProcess(Daemon):
 								'country_code':country_code,
 								'country_code3':country_code3,
 								'country_name':country_name,
-								'region_name':region_name,
+								#'region_name':region_name,
 								'city':city,
 								'latitude':latitude,
 								'longitude':longitude,
@@ -120,7 +126,7 @@ class SpectraDaemonProcess(Daemon):
 									'country_code':country_code,
 									'country_code3':country_code3,
 									'country_name':country_name,
-									'region_name':region_name,
+									#'region_name':region_name,
 									'city':city,
 									'latitude':latitude,
 									'longitude':longitude,
@@ -137,19 +143,25 @@ class SpectraDaemonProcess(Daemon):
 		return netrange
 
 	def get_data(self,client_ip):
-		logging.debug("get_data: "+client_ip)
-		rval={'keys':['data'],'data':{'keys':[]}}
-		if list(self.data.keys()).count(client_ip) > 0:
-			rval={'keys':['data'],'data':copy.copy(self.data[client_ip])}
-			rval['data']['keys']=list(self.data[client_ip].keys())
-			del self.data[client_ip]
-		else:
-			logging.debug("client_ip not found: "+client_ip)
+		try:
+			logging.debug("get_data: "+client_ip)
+			rval={'keys':['data'],'data':{'keys':[]}}
+			if list(self.data.keys()).count(client_ip) > 0:
+				rval={'keys':['data'],'data':copy.copy(self.data[client_ip])}
+				rval['data']['keys']=list(self.data[client_ip].keys())
+				del self.data[client_ip]
+			else:
+				logging.debug("client_ip not found: "+client_ip)
 
-		self.data[client_ip]={}
-		self.data[client_ip].__init__()
-		self.ttl[client_ip]=time.perf_counter()+10
-		return rval
+			self.data[client_ip]={}
+			self.data[client_ip].__init__()
+			self.ttl[client_ip]=time.perf_counter()+10
+			logging.debug("get_data returning normally")
+			if not rval:logging.debug("rval is None btw!")
+			logging.debug(rval)
+			return rval
+		except(e):
+			logging.exception(sys.exc_info())
 
 	def toggle_running(self,*args):
 		if not self.t:

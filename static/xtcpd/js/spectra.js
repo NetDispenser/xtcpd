@@ -146,8 +146,9 @@ var SpectraDaemonUI=function(){
 					var ip_label=document.createElement("div");
 					ip_label.id=ip+"ip_label";
 					ip_label.innerHTML="<a>"+ip+"</a>&nbsp;";
-					ip_label.innerHTML+="<a>"+me.data[netrange]['ips'][ip]['count']+"</a>&nbsp;";
-					ip_label.innerHTML+="<a>"+me.data[netrange]['ips'][ip]['country_code']+"</a>&nbsp;";
+					ip_label.innerHTML+="<a>"+me.data[netrange]['ips'][ip]['count']+"</a> &nbsp;";
+					ip_label.innerHTML+="<a>"+me.data[netrange]['ips'][ip]['city']+"</a> &nbsp;";
+					ip_label.innerHTML+="<a>"+me.data[netrange]['ips'][ip]['country_code']+"</a> &nbsp;";
 					ip_label.className="ip_label";
 					c.appendChild(ip_label);
 
@@ -188,8 +189,9 @@ var SpectraDaemonUI=function(){
 						var ip_label=document.createElement("div");
 						ip_label.id=ip+"ip_label";
 						ip_label.innerHTML="<a>"+ip+"</a>&nbsp;";
-						ip_label.innerHTML+="<a>"+me.data[netrange]['ips'][ip]['count']+"</a>&nbsp;";
-						ip_label.innerHTML+="<a>"+me.data[netrange]['ips'][ip]['country_code']+"</a>&nbsp;";
+						ip_label.innerHTML+="<a>"+me.data[netrange]['ips'][ip]['count']+"</a> &nbsp;";
+						ip_label.innerHTML+="<a>"+me.data[netrange]['ips'][ip]['city']+"</a> &nbsp;";
+						ip_label.innerHTML+="<a>"+me.data[netrange]['ips'][ip]['country_code']+"</a> &nbsp;";
 						ip_label.className="ip_label";
 						c.appendChild(ip_label);
 						window.map_widget.add_point(me.data[netrange]['ips'][ip]);
@@ -199,8 +201,9 @@ var SpectraDaemonUI=function(){
 						var target_idx=0;
 						var ip_label=document.getElementById(ip+"ip_label");
 						ip_label.innerHTML="<a>"+ip+"</a>&nbsp;";
-						ip_label.innerHTML+="<a>"+me.data[netrange]['ips'][ip]['count']+"</a>&nbsp;";
-						ip_label.innerHTML+="<a>"+me.data[netrange]['ips'][ip]['country_code']+"</a>&nbsp;";
+						ip_label.innerHTML+="<a>"+me.data[netrange]['ips'][ip]['count']+"</a> &nbsp;";
+						ip_label.innerHTML+="<a>"+me.data[netrange]['ips'][ip]['city']+"</a> &nbsp;";
+						ip_label.innerHTML+="<a>"+me.data[netrange]['ips'][ip]['country_code']+"</a> &nbsp;";
 						ip_label.className="ip_label";
 					}
 				}
