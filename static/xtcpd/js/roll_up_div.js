@@ -72,6 +72,7 @@ var RollUpDiv=function(opts){
 		me.checkbox_icon.id=me.head.id+"_checkbox";
 		me.checkbox_icon.className="roll_up_icon";
 		me.checkbox_icon.src=opts['checkboxSRC'];
+		console.log(opts['checkboxSRC']);
 		me.checkbox_icon.addEventListener("click",callCB,false);
 		td.appendChild(me.checkbox_icon);
 	}
@@ -121,6 +122,7 @@ var RollUpDiv=function(opts){
 	me.select=function(e){
 		me.tr.style.backgroundColor="#666666";
 		me.selected=true;
+		window.map_widget.set_center(e);
 	}
 	me.deselect=function(e){
 		me.tr.style.backgroundColor="#333333";

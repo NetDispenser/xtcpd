@@ -1,16 +1,13 @@
 var DEBUG=true;
-var allnone_checkboxCB=function(e,obj){
-	console.log(e.target.id);
-}
 var checkboxCB=function(e,obj){
-	console.log(e.target.id);
+	console.log(obj.checkbox_icon.id);
 	if(!obj)return;
 	var netrange=obj['opts']['id'];
 	while(netrange.indexOf(".")>-1)
 		netrange=netrange.replace(".","ZZZ");
 	console.log(netrange+" setting to red");
 
-	var cb=document.getElementById(e.target.id);
+	var cb=document.getElementById(obj.checkbox_icon.id);
 	console.log(cb.src);
 	if(cb.src.indexOf('checkbox-0')>-1){
 		cb.src='/static/xtcpd/img/checkbox-1.png';
@@ -21,6 +18,43 @@ var checkboxCB=function(e,obj){
 		cb.src='/static/xtcpd/img/checkbox-0.png';
 		console.log("unchecked");
 		$("."+netrange).toggleClass("hide");
+	}
+}
+var allnone_checkboxCB=function(e,obj){
+	if(!obj)return;
+	var cb=document.getElementById(e.target.id);
+	var checked=null;
+	if(cb.src.indexOf('checkbox-0')>-1){
+		cb.src='/static/xtcpd/img/checkbox-1.png';
+		console.log("checked");
+		checked=true;
+	}
+	else {
+		cb.src='/static/xtcpd/img/checkbox-0.png';
+		console.log("unchecked");
+		checked=false;
+	}
+	for(var kidx=0;kidx<window.spectra_widget.rollups['keys'].length;kidx++){
+		var key=window.spectra_widget.rollups['keys'][kidx];
+		var rollup=window.spectra_widget.rollups[key];
+		var netrange=rollup.opts['id'];
+		while(netrange.indexOf(".")>-1)
+			netrange=netrange.replace(".","ZZZ");
+		console.log(netrange);
+		if(rollup.checkbox_icon.src.indexOf('checkbox-0')>-1){
+			if(checked==false)continue;
+			else{
+				console.log("need2show: "+netrange);
+				checkboxCB(e,rollup);
+			}
+		}
+		else{
+			if(checked==false){
+				console.log("need2hide: "+netrange);
+				checkboxCB(e,rollup);
+			}
+			else continue;
+		}
 	}
 }
 var allnone_select_rollupCB=function(e,obj){

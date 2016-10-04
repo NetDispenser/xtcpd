@@ -104,7 +104,7 @@ var setup=function(){
 	window.spectra_widget=new SpectraDaemonUI();
 	window.spectra_widget.setup();
 	window.clients_widget=new ClientsDaemonUI().setup();
-
+	window.map_widget.map.render();
 //	d3.selectAll("#theCarousel").style('background-color',mkrandomcolor());
 	var bcr=document.getElementById("theCarousel").getBoundingClientRect();
 

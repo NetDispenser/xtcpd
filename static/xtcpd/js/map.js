@@ -1,7 +1,7 @@
 var Map=function(mapdiv){
 	var me={};
 	me.data={};
-	me.zoom_levels=[0.5,1.0,2.0,3.0,4.0];
+	me.zoom_levels=[1.0,4.0,6.0,12.0];
 	me.current_zoom_idx=0;
 
 	me.center=[0.0,35.31];
@@ -29,7 +29,7 @@ var Map=function(mapdiv){
 	me.view = new ol.View({
 	  maxZoom: 21,
 		center:ol.proj.transform(me.center,"EPSG:4326","EPSG:3857"),
-		zoom:0.5,
+		zoom:me.zoom_levels[me.current_zoom_idx],
 	});
 	me.osm2_base=new ol.layer.Tile({
 		preload:14,
@@ -75,7 +75,7 @@ var Map=function(mapdiv){
 		me.current_zoom_idx+=1;
 		if(me.current_zoom_idx>me.zoom_levels.length-1)
 			me.current_zoom_idx=0;
-		flyin(me.current_center,me.current_zoom_idx);
+		flyin(me.current_center,me.zoom_levels[me.current_zoom_idx]);
 	}
 	me.set_center=function(){
 		try{
