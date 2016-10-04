@@ -20,6 +20,7 @@
 	top:0px;
 	left:0px;
 	background-color:transparent;
+	z-index:998;
 }
 .top_menu{
 	height:50px;
@@ -39,8 +40,14 @@
 	height:50%;
 	width:100%;
 }
+.statusbar{
+	height:5%;
+	width:100%;
+	background-color:#555555;
+	color:black;
+}
 .carousel{
-	height:50%;
+	height:45%;
 	width:100%;
 	margin:0px 0 0px;
 	padding-left:0px;

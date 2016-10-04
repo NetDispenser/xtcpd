@@ -3,6 +3,7 @@ var RollUpDiv=function(opts){
 	me.selected=false;
 	me.opts=opts;
 	me.className="rollup";
+	me.expanded=false;
 
 	var CB=opts['checkboxCB'];
 	var callCB=function(e,obj){
@@ -67,23 +68,23 @@ var RollUpDiv=function(opts){
 	if(opts['checkboxCB']){
 		td=me.tr.insertCell(-1);
 		td.className="roll_up_icon_cell";
-		var checkbox_icon=new Image();
-		checkbox_icon.id=me.head.id+"_checkbox";
-		checkbox_icon.className="roll_up_icon";
-		checkbox_icon.src=opts['checkboxSRC'];
-		checkbox_icon.addEventListener("click",callCB,false);
-		td.appendChild(checkbox_icon);
+		me.checkbox_icon=new Image();
+		me.checkbox_icon.id=me.head.id+"_checkbox";
+		me.checkbox_icon.className="roll_up_icon";
+		me.checkbox_icon.src=opts['checkboxSRC'];
+		me.checkbox_icon.addEventListener("click",callCB,false);
+		td.appendChild(me.checkbox_icon);
 	}
 	else{if(DEBUG)console.log("no checkboxCB");}
 
 	td=me.tr.insertCell(-1);
 	td.className="roll_up_icon_cell";
-	var roll_up_icon=new Image();
-	roll_up_icon.id=me.head.id+"_icon";
-	roll_up_icon.className="roll_up_icon up";
+	me.roll_up_icon=new Image();
+	me.roll_up_icon.id=me.head.id+"_icon";
+	me.roll_up_icon.className="roll_up_icon up";
 	if(opts["roll_up_icon_src"]!=null){
-		roll_up_icon.src=opts["roll_up_icon_src"];
-		td.appendChild(roll_up_icon);
+		me.roll_up_icon.src=opts["roll_up_icon_src"];
+		td.appendChild(me.roll_up_icon);
 	}
 
 	me.head.appendChild(t);
@@ -97,7 +98,7 @@ var RollUpDiv=function(opts){
 	me.head.appendChild(me.rollup);
 
 	if(opts['checkboxCB']){
-		$("#"+checkbox_icon.id).click(function(e){
+		$("#"+me.checkbox_icon.id).click(function(e){
 			callCB(e,me);
 		});
 	}
@@ -125,9 +126,11 @@ var RollUpDiv=function(opts){
 		me.tr.style.backgroundColor="#333333";
 		me.selected=false;
 	}
-	$("#"+roll_up_icon.id).click(function(e){
+	$("#"+me.roll_up_icon.id).click(function(e){
 		$(e.target).toggleClass("up");
 		$("#"+e.target.id.split("_")[0]+"_rollup").animate({height:'toggle'},300,function(){});
+		if(!me.expanded)me.expanded=true;
+		else me.expanded=false;
 	});
 
 	me.set_name=function(val){

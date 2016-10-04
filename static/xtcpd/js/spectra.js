@@ -1,4 +1,7 @@
 var DEBUG=true;
+var allnone_checkboxCB=function(e,obj){
+	console.log(e.target.id);
+}
 var checkboxCB=function(e,obj){
 	console.log(e.target.id);
 	if(!obj)return;
@@ -19,6 +22,9 @@ var checkboxCB=function(e,obj){
 		console.log("unchecked");
 		$("."+netrange).toggleClass("hide");
 	}
+}
+var allnone_select_rollupCB=function(e,obj){
+	console.log(e.target.id);
 }
 var select_rollupCB=function(e,obj){
 	console.log('select_rollupCB');
@@ -50,6 +56,7 @@ var SpectraDaemonUI=function(){
 	var me={};
 	me.data={'keys':[],};
 	me.rollups={'keys':[],};
+	me.allnone_rollup=null;
 	me.current_pyld=null;
 
 	me.clear=function(){
@@ -64,7 +71,56 @@ var SpectraDaemonUI=function(){
 	}
 	me.setup=function(){
 		console.log("SpectraDaemonUI.setup");
-		me.clear();
+		var opts={
+			'category':'allnone',
+			'netrange':'',
+			'parent_id':'statusbar',
+			'id':'status_rollup',
+			'className':'roll_up_div',
+			'roll_up_class':'rollup',
+			'roll_up_name':'status_rollup',
+			'arrow_img':'/static/xtcpd/img/arrow-dn.png',
+			'roll_up_icon_src':'/static/xtcpd/img/arrow-dn.png',
+			'checkboxCB':allnone_checkboxCB,//note:external to $this
+			'select_rollupCB':allnone_select_rollupCB,//note:external to $this
+			'checkboxSRC':'/static/xtcpd/img/checkbox-1.png',
+		};
+		me.allnone_rollup=new RollUpDiv(opts);
+		$("#allnone_icon").click(function(e){
+			//COLLAPSE
+			if(!me.allnone_rollup.expanded){
+				console.log("collapsing");
+				for(var kidx=0;kidx<me.rollups['keys'].length;kidx++){
+					var key=me.rollups['keys'][kidx];
+					if(me.rollups[key].expanded){
+						console.log("collapsing: "+me.rollups[key].rollup.id);
+						$("#"+me.rollups[key].rollup.id).animate({height:'toggle'},300,function(){});
+						$("#"+me.rollups[key].roll_up_icon.id).toggleClass("up");
+						me.rollups[key].expanded=false;
+					}
+					else{
+						console.log("already collapsed: "+me.rollups[key].rollup.id)
+					}
+				}
+			}
+			//EXPAND
+			else{
+			console.log("expanding");
+			console.log(e.target.id+", "+me.rollups['keys'].length);
+			for(var kidx=0;kidx<me.rollups['keys'].length;kidx++){
+				var key=me.rollups['keys'][kidx];
+				if(!me.rollups[key].expanded){
+					console.log("expanding: "+me.rollups[key].rollup.id);
+					$("#"+me.rollups[key].rollup.id).animate({height:'toggle'},300,function(){});
+					$("#"+me.rollups[key].roll_up_icon.id).toggleClass("up");
+					me.rollups[key].expanded=true;
+				}
+				else{
+					console.log("already expanded: "+me.rollups[key].rollup.ip)
+				}
+			}//for
+			}//else expand
+		});
 	}
 	me.deselect_all_rollups=function(){
 		console.log("spectra_widget.deselect_all_rollups");

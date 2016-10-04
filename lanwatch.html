@@ -109,7 +109,6 @@ var setup=function(){
 	var bcr=document.getElementById("theCarousel").getBoundingClientRect();
 
 	d3.selectAll("#mapcover")
-		.style("height",parseInt(bcr.height))
 		.style("width",parseInt(bcr.width));
 
 	d3.selectAll("#top_menu")
@@ -119,8 +118,8 @@ var setup=function(){
 		.style("width","50px")
 		.style("height","50px");
 
-	d3.selectAll("#clients_status")
-		.style("height",parseInt(bcr.height*0.10))
+//	d3.selectAll("#clients_status")
+//		.style("height",parseInt(bcr.height*0.10))
 
 	d3.selectAll("#clients_div")
 		.style("height",parseInt(bcr.height*0.60))
@@ -134,7 +133,7 @@ var init=function(){
 	window.map_widget=new Map('mapdiv');
 	window.setTimeout("setup()",3000);
 
-	var hammertime = new Hammer(document.getElementById("layout"));
+	var hammertime = new Hammer(document.getElementById("mapcover"));
 	hammertime.get('swipe').set({ direction: Hammer.DIRECTION_ALL });
 	hammertime.on('swipedown', function(ev) {
 		$("#top_menu").toggleClass("show");}
@@ -174,6 +173,7 @@ var init=function(){
 	<div id="mapcover" class="mapcover"></div>
 	<div id="mapdiv" class="mapdiv"></div>
 
+	<div id="statusbar" class="statusbar"></div>
 	<div id="theCarousel" class="carousel page-header slide col-lg-12 col-md-12 col-sm-12 col-xs-12" data-ride="carousel" data-interval=false>
 	<div class="carousel-inner">
 		<div class="item active">

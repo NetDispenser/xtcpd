@@ -1,7 +1,12 @@
 var Map=function(mapdiv){
 	var me={};
 	me.data={};
+	me.zoom_levels=[0.5,1.0,2.0,3.0,4.0];
+	me.current_zoom_idx=0;
+
 	me.center=[0.0,35.31];
+	me.current_center=me.center;
+
 	me.clear=function(){
 		me.data={};
 	}
@@ -60,23 +65,34 @@ var Map=function(mapdiv){
 	var bcr=document.getElementById(mapdiv).getBoundingClientRect();
 	me.map.setSize([bcr.width,bcr.height]);
 	me.flyin3=function(){
-		var pyld=window.spectra_widget.current_pyld;
-		var target_center=[pyld['longitude'],pyld['latitude']];
-		flyin(target_center,4);
-	}
-	me.flyin2=function(){
-		try{
-			console.log("map.flyin");
-			var ms=document.getElementById("myselectra");//reaching into spectra
-			var pyld=JSON.parse(ms.options[window.spectra_widget.current_selection].value);
-			var target_center=[pyld['longitude'],pyld['latitude']];
-			flyin(target_center,4);
+		if(window.spectra_widget.current_pyld){
+			var pyld=window.spectra_widget.current_pyld;
+			me.current_center=[pyld['longitude'],pyld['latitude']];
 		}
-		catch(e){console.log(e);}
+		else{
+			me.current_center=me.center;
+		}
+		me.current_zoom_idx+=1;
+		if(me.current_zoom_idx>me.zoom_levels.length-1)
+			me.current_zoom_idx=0;
+		flyin(me.current_center,me.current_zoom_idx);
 	}
 	me.set_center=function(){
 		try{
-			flyin(me.center,1);
+			if(window.spectra_widget.current_pyld){
+				var lat=window.spectra_widget.current_pyld['latitude'];
+				var lon=window.spectra_widget.current_pyld['longitude'];
+				me.current_center=[lon,lat];
+				if(me.current_center==me.view.getCenter()){
+					console.log("already there ... going to global center");
+					me.current_center=me.center;
+				}
+			}
+			else{
+				me.current_center=me.center;
+			}
+			me.current_zoom_idx=0;
+			flyin(me.current_center,me.zoom_levels[me.current_zoom_idx]);
 		}
 		catch(e){console.log(e);}
 	}
