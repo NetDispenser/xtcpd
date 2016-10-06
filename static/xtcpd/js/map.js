@@ -77,6 +77,9 @@ var Map=function(mapdiv){
 			me.current_zoom_idx=0;
 		flyin(me.current_center,me.zoom_levels[me.current_zoom_idx]);
 	}
+	me.flyhome=function(){
+		flyin(me.center,me.zoom_levels[0]);
+	}
 	me.set_center=function(){
 		try{
 			if(window.spectra_widget.current_pyld){
@@ -123,6 +126,7 @@ var Map=function(mapdiv){
 		me.map.addOverlay(oly);
 	}
 	me.full_info=function(){
+		console.log("current resolution: "+window.map_widget.view.getResolution());
 		if(me.xpopup.innerHTML!=""){
 			me.xpopup.innerHTML="";
 			var lonlat=[-160.0,-70.0];
@@ -141,8 +145,17 @@ var Map=function(mapdiv){
 		me.xpopup.innerHTML+=client_device;
 		var bcr=me.xpopup.getBoundingClientRect();
 		console.log(bcr.width+"x"+bcr.height);
+
+		var dlon=(-1)*(bcr.width/2.)*window.map_widget.view.getResolution();
+		//console.log("dlon[m]="+dlon);
+		//var dlonlat=ol.proj.transform([dlon,parseFloat(pyld['latitude'])], 'EPSG:4326', 'EPSG:3857');
+		//console.log(dlonlat);
 		var lonlat=[parseFloat(pyld['longitude']),parseFloat(pyld['latitude'])];
-		me.overlay.setPosition(ol.proj.transform(lonlat, 'EPSG:4326', 'EPSG:3857'));
+
+		var xlonlat=ol.proj.transform(lonlat, 'EPSG:4326', 'EPSG:3857');
+		xlonlat[0]+=dlon;
+		console.log(xlonlat);
+		me.overlay.setPosition(xlonlat);
 
 		//NEED: -w/2 * dpx2dlon
 
