@@ -25,7 +25,7 @@
 <script type="text/javascript" src="/static/xtcpd/js/map.js"></script>
 <script type="text/javascript" src="/static/xtcpd/js/roll_up_div.js"></script>
 <script type="text/javascript">
-var RUNNING=true;
+var RUNNING=false;
 var TIMEOUT=5000;
 window.traffic_widget=null;
 window.clients_widget=null;
@@ -83,13 +83,11 @@ window.counter=0;
 var toggleRunCB=function(e){
 	if(RUNNING==true){
 		RUNNING=false;
-		$("#runLED").toggleClass("off");
-		$("#runB").toggleClass("off");
+		$(".runBG").toggleClass('running');
 	}
 	else{
 		RUNNING=true;
-		$("#runLED").toggleClass("off");
-		$("#runB").toggleClass("off");
+		$(".runBG").toggleClass('running');
 		update();
 	}
 }
@@ -100,6 +98,7 @@ var clearCB=function(e){
 		window.map_widget.clear();
 }
 var setup=function(){
+	console.log('setup');
 	window.traffic_widget=new TrafficDaemonUI().setup();
 	window.spectra_widget=new SpectraDaemonUI();
 	window.spectra_widget.setup();
@@ -107,27 +106,30 @@ var setup=function(){
 	window.map_widget.map.render();
 //	d3.selectAll("#theCarousel").style('background-color',mkrandomcolor());
 	var bcr=document.getElementById("theCarousel").getBoundingClientRect();
-
+	console.log(bcr);
 	d3.selectAll("#mapcover")
 		.style("width",parseInt(bcr.width));
 
+	console.log("top_menu");
 	d3.selectAll("#top_menu")
 		.style("width",parseInt(bcr.width));
 
+	console.log("menuB");
 	d3.selectAll(".menuB")
 		.style("width","50px")
 		.style("height","50px");
 
 //	d3.selectAll("#clients_status")
 //		.style("height",parseInt(bcr.height*0.10))
-
+	console.log("clients_div");
 	d3.selectAll("#clients_div")
 		.style("height",parseInt(bcr.height*0.60))
 
+	console.log("selectra2");
 	d3.selectAll("#selectra2")
 		.style("height",parseInt(bcr.height))
 
-	update();
+//	update();
 }
 var init=function(){
 	window.map_widget=new Map('mapdiv');
@@ -162,13 +164,38 @@ var init=function(){
 <div id="layout" class="container">
 	<div class="row">
 
-	<div id="top_menu" class="top_menu">
-		<input id="clearB" class="menuB" type="button" value="Clear" onclick="clearCB()"></input>
-		<input id="ctrB" class="menuB" type="button" value="Cntr" onclick="window.map_widget.set_center()"></input>
-		<input id="flyB" class="menuB" type="button" value="FlyIn" onclick="window.map_widget.flyin3()"></input>
-		<input id="runB" class="menuB led" type="button" value="Run" onclick="toggleRunCB()"></input>
-		<input id="infoB" class="menuB" type="button" value="Info" onclick="window.map_widget.full_info()"></input>
-	</div>
+<div id="top_menu" class="top_menu show">
+<table><tr><td>
+<div class="menuBG">
+<img id="clearB" class="menuB" type="button" src="/static/xtcpd/img/clear.png" onclick="window.map_widget.clearCB()"></img>
+</div>
+</td><td>
+<div class="menuBG">
+<img id="ctrB" class="menuB" type="button" src="/static/xtcpd/img/center.png" onclick="window.map_widget.set_center()"></img>
+</div>
+</td><td>
+<div class="menuBG">
+<img id="flyB" class="menuB" type="button" src="/static/xtcpd/img/airplane.png" onclick="window.map_widget.flyin3()"></img>
+</div>
+</td><td>
+<div class="menuBG">
+<img id="runB" class="menuB" type="button" src="/static/xtcpd/img/running.png" onclick="toggleRunCB()"></img>
+</div>
+</td><td>
+<div class="menuBG">
+<img id="infoB" class="menuB" type="button" src="/static/xtcpd/img/info.png" onclick="window.map_widget.full_info()"></img>
+</div>
+</td><td>
+<div class="menuBG">
+<img id="dummyB" class="menuB" type="button" src="/static/xtcpd/img/info.png" onclick=""></img>
+</div>
+</td><td>
+<div class="menuBG">
+<img id="dummyB2" class="menuB" type="button" src="/static/xtcpd/img/info.png" onclick=""></img>
+</div>
+</td></tr>
+</table>
+</div>
 
 	<div id="mapcover" class="mapcover"></div>
 	<div id="mapdiv" class="mapdiv"></div>
@@ -189,68 +216,11 @@ var init=function(){
 			</div>
 		</div></div>
 
-
-		<div class="item"><div class="slide4">
-		SLIDE 4: Data Record & Playback
-		<div class="example1">
-			<h3>32 NetRanges | 257 IPs | 572 Clients | 449 Messages | Beaverton, OR | Comcast | United States |</h3>
-		</div>
-		</div></div>
-
-		<div class="item"><div class="slide5">
-		SLIDE 5: Daemon Status & Control
-		<div class="example1">
-			<h3>32 Clients | 12 Active | Average Load: 87%</h3>
-		</div>
-		</div></div>
-
-		<div class="item"><div class="slide7">
-				<div id="netrange">
-					<table width="100%">
-
-						<tr>
-							<td colspan="10"><div id="clients_status"></div></td>
-						</tr>
-
-						<tr>
-						<td rowspan="2" width="80%" style="background-color:teal;">
-							<div id="clients_div" style="overflow:auto;">
-							<table id="clients_table" width="100%" style="background-color:yellow;"></table>
-							</div>
-						</td>
-
-						<td><input class="mybutton" type="button" value="Up" onclick="spectra_widget.selectCB('up')"></input></td>
-						</tr>
-						<tr>
-						<td><input class="mybutton" type="button" value="Dn" onclick="spectra_widget.selectCB('dn')"></input></td>
-						</tr>
-						<tr>
-							<td colspan="2">
-							<table>
-							<tr><td>
-							<input id="clearB2" class="navbot" type="button" value="Clear" onclick=""></input>
-							</td><td>
-							<input id="runB2" class="navbot led" type="button" value="Run" onclick="toggleRunCB()"></input>
-							</td><td>
-							<input id="centerB2" class="navbot" type="button" value="Center" onclick="window.map_widget.set_center();"></input>
-							</td><td>
-							<input id="flyB2" class="navbot" type="button" value="FlyIn" onclick="window.map_widget.flyin2()"></input>
-							</td><td>
-							<!--full info button: have it roll-down over map via navbot button.-->
-							<input id="fullinfoB2" class="navbot" type="button" value="Info" onclick="window.map_widget.full_info();"></input>
-							</td>
-
-							</tr>
-							</table>
-							</td>
-						</tr>
-
-
-					</table>
+		<div class="item"><div class="slide3">
+				<div id="clients">
+					<table id="clients_table" width="100%"></table>
 				</div>
 		</div></div>
-
-
 
 	</div><!--carousel-inner-->
 	</div><!--theCarousel-->

@@ -10,7 +10,7 @@ SPECTRAD_PID='/var/run/spectrad.pid'
 SPECTRAD_HOSTNAME="spytools.asymptopia.org"#spytools
 
 FORMAT = 'SPECTRA: %(message)s'
-logging.basicConfig(filename='/var/log/xtcpd/xtcpd.log',level=logging.WARN, format=FORMAT)
+logging.basicConfig(filename='/var/log/xtcpd/xtcpd.log',level=logging.DEBUG, format=FORMAT)
 
 import GeoIP
 gip=GeoIP.open("/usr/share/GeoIP/GeoLiteCity.dat",GeoIP.GEOIP_STANDARD)

@@ -314,7 +314,7 @@ var SpectraDaemonUI=function(){
 		}
 		status+="IPs: "+ip_count+"&nbsp;&nbsp;";
 		status+="Pkt: "+pkt_count+"&nbsp;&nbsp;";
-
+		me.allnone_rollup.label.innerHTML=status;
 //		document.getElementById("spectra_status").innerHTML=status;
 		console.log(status);
 

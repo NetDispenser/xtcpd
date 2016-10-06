@@ -1,3 +1,6 @@
+body{
+	color:white;
+}
 .container{
 	padding-left:0px;
 	padding-right:0px;
@@ -13,6 +16,31 @@
 	margin-left:0px;
 }
 .hide{opacity:0;}
+.menuB{
+	width:50px;
+	height:50px;
+	vertical-align:top;
+}
+.menuBG{
+	background-color:#AAAAAA;
+}
+.menuBG:hover{
+	background-color:#00FF00;
+}
+.runB{
+	width:50px;
+	height:50px;
+	vertical-align:top;
+}
+.runBG{
+	background-color:#AAAAAA;
+}
+.runBG:hover{
+	background-color:#00FF00;
+}
+.runBG.running{
+	background-color:#00FF00;
+}
 .mapcover{
 	height:50%;
 	width:100%;
@@ -28,6 +56,7 @@
 	position:absolute;
 	top:-50px;
 	left:0px;
+	text-align:center;
 	background-color:rgba(51,51,51,0.8);
 	-webkit-transition: top 0.75s ease;
 	transition: top 0.75s ease;
@@ -35,6 +64,9 @@
 }
 .top_menu.show{
 	top:0px;
+}
+.top_menu td{
+	padding: 0px 1.5px 0px 0px;
 }
 .mapdiv{
 	height:50%;
@@ -44,7 +76,7 @@
 	opacity:0.75;
 	position:absolute;
 	z-index:999;
-	height:5%;
+	height:6%;
 	width:100%;
 	bottom:50%;
 	background-color:#555555;
@@ -80,9 +112,7 @@
 	border 3px solid #FF0000;
 }
 .led{
-	background-color:green;
-	height:100%;
-	border:solid 1px black;
+	background-color:#00FF00;
 }
 .off{
 	background-color:gray;
@@ -129,11 +159,8 @@ a:hover{
 	color:navy;
 	font-weight:bold;
 }
-#clients_status{
-	width:100%;
-	background-color:CCDDAA;
-	color:navy;
-	font-weight:bold;
+#clients{
+	color:white;
 }
 #xpopup{
   font-family:Pacifico;

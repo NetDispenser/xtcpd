@@ -91,8 +91,9 @@ var Map=function(mapdiv){
 			else{
 				me.current_center=me.center;
 			}
-			me.current_zoom_idx=0;
-			flyin(me.current_center,me.zoom_levels[me.current_zoom_idx]);
+//			me.current_zoom_idx=0;
+//			flyin(me.current_center,me.zoom_levels[me.current_zoom_idx]);
+			bounceto(me.current_center);
 		}
 		catch(e){console.log(e);}
 	}

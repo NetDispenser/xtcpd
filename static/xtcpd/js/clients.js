@@ -8,7 +8,6 @@ var ClientsDaemonUI=function(){
 	}
 	me.setup=function(){
 		console.log("ClientsDaemonUI.setup");
-		document.getElementById("clients_status").innerHTML="DHCP Clients Status";
 		return me;
 	}
 	me.unhilite=function(){
@@ -40,33 +39,49 @@ var ClientsDaemonUI=function(){
 		return me.data[client_ip]['color'];
 	}
 	me.render_data=function(data){
+		console.log("clients.render_data()");
 		var current_keys=[];
-		for(var idx=0;idx<data['lines'].length;idx++){
-			if(data['lines'][idx].length<3){continue};
-			var client_ip=data['lines'][idx][2];
+		//for(var idx=0;idx<data['lines'].length;idx++){
+		for(var idx=0;idx<data.length;idx++){
+			if(data[idx].length<3){continue};
+			var client_ip=data[idx];
 			current_keys.push(client_ip);
 			if(me.data['keys'].indexOf(client_ip)<0){//This section adds
 				me.data['keys'].push(client_ip);
-				me.data[client_ip]={'raw':data['lines'][idx],'color':mkrandomcolor(),};
-				var tstamp=data['lines'][idx][0];
-				var _mac_addr=data['lines'][idx][1];
-				var ip_num=data['lines'][idx][2];
-				var device_name=data['lines'][idx][3];
-				var mac_addr=data['lines'][idx][4];
+				console.log("added "+client_ip);
+				var color;
+				var client_colors=["#0F0","#F00","#00F","#FF0","#0FF","#F0F",];
+				if(client_ip=="192.168.66.127")color=client_colors[0];
+				else if(client_ip=="192.168.66.114")color=client_colors[1];
+				else if(me.data['keys'].length<client_colors.length)color=client_colors[me.data['keys'].length-1];
+				else color=mkrandomcolor();
+				me.data[client_ip]={'raw':data[idx],'color':color,};
+				//var tstamp=data['lines'][idx][0];
+				//var _mac_addr=data['lines'][idx][1];
+				//var ip_num=data['lines'][idx][2];
+				//var device_name=data['lines'][idx][3];
+				//var mac_addr=data['lines'][idx][4];
 
-				me.data[client_ip]['device']=me.data[client_ip]['raw'][3];
+				me.data[client_ip]['device']="unk device";//me.data[client_ip]['raw'][3];
 
-				console.log('NEED ADD THIS CLIENT '+client_ip);
 				var r=me.table.insertRow(-1);
 				r.id="row_"+client_ip;
 				var c=r.insertCell(-1);
-				var d=document.createElement("div");
-				var src_id='src_'+client_ip;
-				d.id=src_id;
-				d.innerHTML=client_ip+" "+me.data[client_ip]['raw'][3].slice(0,12);
 				var swatch_code=mkswatchcode(me.data[client_ip]['color']);
-				d.innerHTML+=swatch_code;
+				var d=document.createElement("div");
+				d.innerHTML=swatch_code;
 				c.appendChild(d);
+
+				c=r.insertCell(-1);
+				d=document.createElement("div");
+				d.innerHTML=client_ip;
+				c.appendChild(d);
+
+				c=r.insertCell(-1);
+				d=document.createElement("div");
+				d.innerHTML=me.data[client_ip]['device'].slice(0,12);
+				c.appendChild(d);
+
 			}
 		}
 		for(var idx=0;idx<me.data['keys'].length;idx++){//This section preps4 delete
