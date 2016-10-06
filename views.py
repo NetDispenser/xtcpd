@@ -62,16 +62,13 @@ def traffic(request):
 			if qs=='get_data':
 				client_ip=str(get_client_ip(request))
 				rval={}
-				logging.debug("calling traffic")
 				s=xmlrpc.client.Server("http://spytools.asymptopia.org:8005")
 				rval['traffic']=s.get_data((client_ip))
-				logging.debug("calling spectra")
 				s=xmlrpc.client.Server("http://spytools.asymptopia.org:8009")#8000=xtcpd;8009=spectra
 				rval['spectra']=s.get_data((client_ip))
-				logging.debug("calling clients")
 				s=xmlrpc.client.Server("http://spytools.asymptopia.org:8007")
 				rval['clients']=s.get_data((client_ip))
-				logging.debug(rval['spectra'])
+				#logging.debug("rval-spectra: "+str(rval['spectra']))
 			return HttpResponse(json.dumps(rval));
 	except:
 		logging.exception("get_data failed")

@@ -6,6 +6,7 @@ from queue import Queue
 
 from daemon import Daemon
 
+SPECTRAD_LOCK = threading.Lock()
 SPECTRAD_PID='/var/run/spectrad.pid'
 SPECTRAD_HOSTNAME="spytools.asymptopia.org"#spytools
 
@@ -25,7 +26,7 @@ class SpectraDaemonProcess(Daemon):
 	def __init__(self,pidfile):
 		Daemon.__init__(self,pidfile)
 		logging.debug("spectra.init")
-		self.data={}#no keys:[] array since re-create regardless
+		self.data={'keys':[],}#no keys:[] array since re-create regardless
 		self.ttl={}
 		self.q = Queue()
 		self.t=None
@@ -36,7 +37,7 @@ class SpectraDaemonProcess(Daemon):
 		while True:
 			if self.RUNNING:
 				self.q.put(p.readline())
-				for dummy in range(10-threading.active_count()):
+				for dummy in range(3-threading.active_count()):
 					logging.debug("creating thread")
 					t=threading.Thread(target=self.process)
 					t.daemon=True
@@ -46,122 +47,144 @@ class SpectraDaemonProcess(Daemon):
 				time.sleep(1)
 
 	def process(self):
+		logging.debug("starting: "+threading.current_thread().name)
 		while True:
-			try:
-				item=self.q.get()
-				logging.debug(item)
-				a=rexp.match(item)
-				if not a:continue
-				src=a.group(4)
-				sport=a.group(5)
-				dst=a.group(6)
-				dport=a.group(7)
+				#with XTCPD_LOCK:
+				try:
+					item=self.q.get()
+					#logging.debug(item)
+					a=rexp.match(item)
+					if not a:continue
+					dst=a.group(6)
+					#if dst[0:3]=="192":continue
+					if dst=="192.168.66.127":continue
+					if dst[0:3]=="255":continue
+					dport=a.group(7)
+					src=a.group(4)
+					sport=a.group(5)
 
-				#if dst[0:3]=="192":continue
-				if dst[0:3]=="255":continue
-				#if dst[0:3]=="239":continue
-				netrange=self.getNetRange(dst)
-				country_code="US"
-				longitude=-122.8037
-				latitude=45.4871
-				city="Beaverton"
-				region_name="OR"
-				country_code3="USA"
-				country_name="United States"
+					#if dst[0:3]=="239":continue
+					netrange=self.getNetRange(dst)
+					country_code="US"
+					longitude=-122.8037
+					latitude=45.4871
+					city="Beaverton"
+					region_name="OR"
+					country_code3="USA"
+					country_name="United States"
 
-				g=gip.record_by_addr(dst)
-				if g:
-					country_code=g['country_code']
-					if not country_code:country_code="UNK"
-					longitude=g['longitude']
-					latitude=g['latitude']
-					city=g['city']
-					if not city:city="UNK"
-					country_code3=g['country_code3']
-					if not country_code3:coutry_code3="UNK"
-					country_name=g['country_name']
-					if not country_name:country_name="UNK"
-					#region_name=g['region_name']
-				#logging.debug("looping over client_ips")
-				logging.debug(src+"->"+dst)
+					g=gip.record_by_addr(dst)
+					if g:
+						country_code=g['country_code']
+						if not country_code:country_code="UNK"
+						longitude=g['longitude']
+						latitude=g['latitude']
+						city=g['city']
+						if not city:city="UNK"
+						country_code3=g['country_code3']
+						if not country_code3:coutry_code3="UNK"
+						country_name=g['country_name']
+						if not country_name:country_name="UNK"
+						#region_name=g['region_name']
+					#logging.debug("looping over client_ips")
+					#logging.debug(src+"->"+dst)
 
-				for client_ip in list(self.data.keys()):
-					if time.perf_counter()>self.ttl[client_ip]:
-						logging.debug("deleting: "+client_ip)
-						del self.data[client_ip]
-						del self.ttl[client_ip]
-						logging.debug('done.')
-						continue
-					#logging.debug(client_ip)
-					try:
-						test=list(self.data[client_ip].keys()).index(netrange)
+					for client_ip in self.data['keys']:
 
-						if self.data[client_ip][netrange]['ips'][dst]:
-							self.data[client_ip][netrange]['ips'][dst]['count']+=1
-						else:
-							self.data[client_ip][netrange]['ips'][dst]={
-								'src':src,
-								'dst':dst,
-								'count':1,
-								'country_code':country_code,
-								'country_code3':country_code3,
-								'country_name':country_name,
-								#'region_name':region_name,
-								'city':city,
-								'latitude':latitude,
-								'longitude':longitude,
-								'netrange':netrange,
-							}
-							self.data[client_ip][netrange]['ips']['keys'].append(dst)
-						logging.debug("entry complete")
-					except:
-						logging.debug("creating manually: "+src+" "+dst+" "+netrange)
-						self.data[client_ip][netrange]={
-							'ips':{
-								'keys':[dst,],
-								str(dst):{
-									'src':src,
-									'dst':dst,
-									'count':1,
-									'country_code':country_code,
-									'country_code3':country_code3,
-									'country_name':country_name,
-									#'region_name':region_name,
-									'city':city,
-									'latitude':latitude,
-									'longitude':longitude,
-									'netrange':netrange,#for d3 by classname
-								},
-							},
-						}
-			except:
-				logging.exception(sys.exc_info())
+						if time.perf_counter()>self.ttl[client_ip]:
+							logging.debug(threading.current_thread().name+" deleting: "+client_ip)
+							del self.data[client_ip]
+							del self.ttl[client_ip]
+							logging.debug(threading.current_thread().name+' done.')
+							continue
+
+						#logging.debug(client_ip)
+						try:
+							if self.data[client_ip]['keys'].count(netrange)>0:
+								#logging.debug(threading.current_thread().name+" found netrange: "+netrange+", ("+client_ip+")")
+								if self.data[client_ip][netrange]['ips']['keys'].count(dst)>0:
+									self.data[client_ip][netrange]['ips'][dst]['count']+=1
+									#logging.debug(threading.current_thread().name+" incremented count for "+dst)
+								else:
+									#logging.debug(threading.current_thread().name+" dst is new: "+dst)
+									self.data[client_ip][netrange]['ips'][dst]={
+										'src':src,
+										'dst':dst,
+										'count':1,
+										'country_code':country_code,
+										'country_code3':country_code3,
+										'country_name':country_name,
+										#'region_name':region_name,
+										'city':city,
+										'latitude':latitude,
+										'longitude':longitude,
+										'netrange':netrange,
+									}
+									self.data[client_ip][netrange]['ips']['keys'].append(dst)
+								#logging.debug(threading.current_thread().name+" entry complete")
+							else:
+								#logging.debug(threading.get_ident()+" keys we have are: ")
+								#for key in self.data['keys']:
+								#	logging.debug(threading.get_ident()+" "+key)
+								#logging.debug(threading.get_ident()+" creating manually: "+src+" "+dst+" "+netrange)
+								self.data[client_ip]['keys'].append(netrange)
+								self.data[client_ip][netrange]={
+									'ips':{
+										'keys':[dst,],
+										str(dst):{
+											'src':src,
+											'dst':dst,
+											'count':1,
+											'country_code':country_code,
+											'country_code3':country_code3,
+											'country_name':country_name,
+											#'region_name':region_name,
+											'city':city,
+											'latitude':latitude,
+											'longitude':longitude,
+											'netrange':netrange,#for d3 by classname
+										},
+									},
+								}
+						except:
+							logging.exception(threading.current_thread().name+" WTF? "+client_ip)
+				except:
+					logging.debug(threading.current_thread().name+" !OUTER-EXCEPTION!")
+					logging.exception(sys.exc_info())
+		logging.debug(threading.current_thread().name+" THREAD EXITING")
 
 	def getNetRange(self,ip):
 		ip4=ip.split('.')
-		netrange="%s.%s.%s.%s-%s.%s.%s.%s"%(ip4[0],'0','0','0',ip4[0],'255','255','255')
+		netrange="%s.%s.%s.%s-%s.%s.%s.%s"%(ip4[0],ip4[1],'0','0',ip4[0],ip4[1],'255','255')
 		return netrange
 
 	def get_data(self,client_ip):
 		try:
-			logging.debug("get_data: "+client_ip)
+			logging.debug(threading.current_thread().name+" get_data: "+client_ip)
 			rval={'keys':['data'],'data':{'keys':[]}}
-			if list(self.data.keys()).count(client_ip) > 0:
-				rval={'keys':['data'],'data':copy.copy(self.data[client_ip])}
-				rval['data']['keys']=list(self.data[client_ip].keys())
-				del self.data[client_ip]
+			if self.data['keys'].count(client_ip) > 0:
+				rval={'keys':['data','clients'],'data':copy.copy(self.data[client_ip])}
+				rval['clients']=self.data['keys']
 			else:
-				logging.debug("client_ip not found: "+client_ip)
+				logging.debug(threading.current_thread().name+" client_ip not found: "+client_ip)
+				msg=''
+				for k in self.data['keys']:msg+=k+' '
+				logging.debug(threading.current_thread().name+" "+msg)
 
-			self.data[client_ip]={}
+			self.data[client_ip]={'keys':[],}
+			if self.data['keys'].count(client_ip)==0:
+				self.data['keys'].append(client_ip)
 			self.data[client_ip].__init__()
 			self.ttl[client_ip]=time.perf_counter()+10
-			logging.debug("get_data returning normally")
-			if not rval:logging.debug("rval is None btw!")
-			logging.debug(rval)
+			logging.debug(threading.current_thread().name+" get_data returning normally")
+			logging.debug(threading.current_thread().name+" returning: "+str(rval))
 			return rval
-		except(e):
+		except:
 			logging.exception(sys.exc_info())
+			self.data[client_ip]={'keys':[],}
+			self.data[client_ip].__init__()
+			self.ttl[client_ip]=time.perf_counter()+10
+
 
 	def toggle_running(self,*args):
 		if not self.t:

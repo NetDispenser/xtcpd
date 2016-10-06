@@ -1,4 +1,3 @@
-var traffic_hostname="http://spytools.asymptopia.org";
 var mkswatchcode=function(c){
 	var rval="<div style='width:10px;height:10px;background-color:"+c+";'>";
 	rval+="</div>";
@@ -51,7 +50,7 @@ var xajax=function(what){
 			}
 		}
 	}
-	xhr.open('Get',traffic_hostname+"/traffic?"+what,true);
+	xhr.open('Get',server_hostname+"/traffic?"+what,true);
 	xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
 	xhr.send("");
 }
@@ -68,7 +67,7 @@ var update=function(){
 					//somehow need to apply so don't have to keep checking.
 					//it's actually a const, just under client obj, so ref it!
 					console.log("calling clients.render");
-					window.clients_widget.render_data(pyld['clients']);
+					window.clients_widget.render_data(pyld['spectra']['clients']);
 
 					console.log("calling spectra.render");
 					window.spectra_widget.render_data(pyld['spectra']);
@@ -93,7 +92,7 @@ var update=function(){
 			}
 		}
 	}
-	xhr.open('Get',traffic_hostname+"/traffic?get_data",true);
+	xhr.open('Get',server_hostname+"/traffic?get_data",true);
 	xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
 	xhr.send("");
 }
