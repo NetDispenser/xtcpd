@@ -214,6 +214,17 @@ var Map=function(mapdiv){
 	});
 */
 	me.overlay.on('change:element',function(e){console.log("YOO");});
-
+	me.osm=new ol.layer.Tile({preload:14,opacity:1.0,title:'OpenStreetMap2',source:new ol.source.OSM()});
+	me.osm_showing=false;
+	me.layersCB=function(){
+		if(me.osm_showing){
+			me.map.removeLayer(me.osm);
+			me.osm_showing=false;
+		}
+		else{
+			me.map.getLayers().insertAt(1,me.osm);
+			me.osm_showing=true;
+		}
+	}
 	return me;
 }

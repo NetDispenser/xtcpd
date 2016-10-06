@@ -95,6 +95,7 @@ class SpectraDaemonProcess(Daemon):
 							logging.debug(threading.current_thread().name+" deleting: "+client_ip)
 							del self.data[client_ip]
 							del self.ttl[client_ip]
+							self.data['keys'].remove(client_ip)
 							logging.debug(threading.current_thread().name+' done.')
 							continue
 
