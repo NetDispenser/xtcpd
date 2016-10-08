@@ -220,10 +220,12 @@ var Map=function(mapdiv){
 		if(me.osm_showing){
 			me.map.removeLayer(me.osm);
 			me.osm_showing=false;
+			$(".layersBG").toggleClass('showing');
 		}
 		else{
 			me.map.getLayers().insertAt(1,me.osm);
 			me.osm_showing=true;
+			$(".layersBG").toggleClass('showing');
 		}
 	}
 	return me;

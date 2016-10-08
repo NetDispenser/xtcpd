@@ -1,6 +1,8 @@
+var client_colors=["#FF0","#0F0","#F00","#00F","#0FF","#F0F",];
 var ClientsDaemonUI=function(){
-	me={};
+	var me={};
 	me.data={'keys':[],};
+	me.current_keys=[];
 	me.table=document.getElementById("clients_table");//pass-in as arg
 	me.clear=function(){
 		console.log("clients.clear()");
@@ -34,28 +36,88 @@ var ClientsDaemonUI=function(){
 		}
 		catch(e){}
 	}
+	me.get_clients=function(){
+		try{return me.data['keys'];}
+		catch(e){return [];}
+	}
 	me.get_color=function(client_ip){
-		if(me.data['keys'].indexOf(client_ip)<0)return "#FF0000";
+		console.log()
+		if(me.data['keys'].indexOf(client_ip)<0){
+			if(client_ip=="192.168.66.1"){return client_colors[0];}
+			console.log("returning null for "+client_ip)
+			return null;
+		}
 		return me.data[client_ip]['color'];
 	}
-	me.render_data=function(data){
+	me.add_row=function(client_ip){
+		var r=me.table.insertRow(-1);
+		r.id="row_"+client_ip;
+		var c=r.insertCell(-1);
+		var swatch_code=mkswatchcode(me.data[client_ip]['color']);
+		var d=document.createElement("div");
+		d.innerHTML=swatch_code;
+		c.appendChild(d);
+
+		c=r.insertCell(-1);
+		d=document.createElement("div");
+		d.innerHTML=client_ip;
+		c.appendChild(d);
+
+		c=r.insertCell(-1);
+		d=document.createElement("div");
+		d.innerHTML=me.data[client_ip]['device'].slice(0,12);
+		c.appendChild(d);
+	}
+	me.render_data=function(spectra_data,dnsmasq_data){
 		console.log("clients.render_data()");
-		var current_keys=[];
-		//for(var idx=0;idx<data['lines'].length;idx++){
-		for(var idx=0;idx<data.length;idx++){
-			if(data[idx].length<3){continue};
-			var client_ip=data[idx];
-			current_keys.push(client_ip);
+		var color;
+
+		if(!me.data){
+			console.log("remaking data!");
+			me.clear();
+			console.log(me.data);
+		}
+		me.current_keys=[];
+		console.log(dnsmasq_data);
+		for(var idx=0;idx<dnsmasq_data['lines'].length;idx++){
+			var tstamp=dnsmasq_data['lines'][idx][0];
+			var _mac_addr=dnsmasq_data['lines'][idx][1];
+			var ip_num=dnsmasq_data['lines'][idx][2];
+			var device_name=dnsmasq_data['lines'][idx][3];
+			var mac_addr=dnsmasq_data['lines'][idx][4];
+			if(me.data['keys'].indexOf(ip_num)<0){
+				me.data['keys'].push(ip_num);
+				if(ip_num=="192.168.66.127")color=client_colors[1];
+				else if(ip_num=="192.168.66.114")color=client_colors[2];
+				else if(ip_num=="192.168.66.1")color=client_colors[0];
+				else if(me.data['keys'].length<client_colors.length)color=client_colors[me.data['keys'].length-1];
+				else color=mkrandomcolor();
+				me.data[ip_num]={
+					'raw':dnsmasq_data['lines'][idx],
+					'color':color,
+					'tstamp':tstamp,
+					'_mac_addr':_mac_addr,
+					'ip_num':ip_num,
+					'device':device_name,
+					'mac_addr':mac_addr,
+				};
+				me.add_row(ip_num);
+			}
+		}
+		for(var idx=0;idx<spectra_data.length;idx++){
+			if(spectra_data[idx].length<3){continue};
+			var client_ip=spectra_data[idx];
+			console.log("clients.render_data client_ip "+client_ip);
+			me.current_keys.push(client_ip);
 			if(me.data['keys'].indexOf(client_ip)<0){//This section adds
 				me.data['keys'].push(client_ip);
 				console.log("added "+client_ip);
-				var color;
-				var client_colors=["#0F0","#F00","#00F","#FF0","#0FF","#F0F",];
-				if(client_ip=="192.168.66.127")color=client_colors[0];
-				else if(client_ip=="192.168.66.114")color=client_colors[1];
+				if(client_ip=="192.168.66.127")color=client_colors[1];
+				else if(client_ip=="192.168.66.114")color=client_colors[2];
+				else if(client_ip=="192.168.66.1")color=client_colors[0];
 				else if(me.data['keys'].length<client_colors.length)color=client_colors[me.data['keys'].length-1];
 				else color=mkrandomcolor();
-				me.data[client_ip]={'raw':data[idx],'color':color,};
+				me.data[client_ip]={'raw':spectra_data[idx],'color':color,};
 				//var tstamp=data['lines'][idx][0];
 				//var _mac_addr=data['lines'][idx][1];
 				//var ip_num=data['lines'][idx][2];
@@ -63,30 +125,13 @@ var ClientsDaemonUI=function(){
 				//var mac_addr=data['lines'][idx][4];
 
 				me.data[client_ip]['device']="unk device";//me.data[client_ip]['raw'][3];
-
-				var r=me.table.insertRow(-1);
-				r.id="row_"+client_ip;
-				var c=r.insertCell(-1);
-				var swatch_code=mkswatchcode(me.data[client_ip]['color']);
-				var d=document.createElement("div");
-				d.innerHTML=swatch_code;
-				c.appendChild(d);
-
-				c=r.insertCell(-1);
-				d=document.createElement("div");
-				d.innerHTML=client_ip;
-				c.appendChild(d);
-
-				c=r.insertCell(-1);
-				d=document.createElement("div");
-				d.innerHTML=me.data[client_ip]['device'].slice(0,12);
-				c.appendChild(d);
-
+				me.add_row(client_ip);
 			}
 		}
+/*
 		for(var idx=0;idx<me.data['keys'].length;idx++){//This section preps4 delete
 			var key=me.data['keys'][idx];
-			if(current_keys.indexOf(key)<0 && !document.getElementById("delete "+key)){
+			if(me.current_keys.indexOf(key)<0 && !document.getElementById("delete "+key)){
 				console.log("NEED: Fade2Inactive and Red Remove Button to remove once seen.");
 				var src_ip="src_"+key;
 				var d=document.getElementById(src_ip);
@@ -100,6 +145,7 @@ var ClientsDaemonUI=function(){
 				d.appendChild(delB);
 			}
 		}
+*/
 	}
 	me.delCB=function(e){
 		var target_ip=e.target.id.split(" ")[1];

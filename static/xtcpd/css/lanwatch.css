@@ -41,6 +41,15 @@ body{
 .runBG.running{
 	background-color:#00FF00;
 }
+.layersBG{
+	background-color:#AAAAAA;
+}
+.layersBG:hover{
+	background-color:#00FF00;
+}
+.layersBG.showing{
+	background-color:#00FF00;
+}
 .mapcover{
 	height:50%;
 	width:100%;

@@ -57,7 +57,7 @@ class SpectraDaemonProcess(Daemon):
 					if not a:continue
 					dst=a.group(6)
 					#if dst[0:3]=="192":continue
-					if dst=="192.168.66.127":continue
+					#if dst=="192.168.66.127":continue
 					if dst[0:3]=="255":continue
 					dport=a.group(7)
 					src=a.group(4)

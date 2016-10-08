@@ -5,6 +5,21 @@ var RollUpDiv=function(opts){
 	me.className="rollup";
 	me.expanded=false;
 
+	me.add_swatch=function(client_ip){
+		if(me.opts['clients'].indexOf(client_ip)<0)
+			me.opts['clients'].push(client_ip);
+		//so we store it, but if color=null then we don't make no swatch
+		var client_color=window.clients_widget.get_color(client_ip);
+		if(client_color){
+			var sc=me.sr.insertCell(-1);
+			var swatch_div=document.createElement("div");
+			swatch_div.innerHTML="";
+			var swatchcode=mkswatchcode(client_color);
+			console.log(swatchcode);
+			swatch_div.innerHTML+=swatchcode;
+			sc.appendChild(swatch_div);
+		}
+	}
 	var CB=opts['checkboxCB'];
 	var callCB=function(e,obj){
 		try{
@@ -45,34 +60,30 @@ var RollUpDiv=function(opts){
 	me.tr=t.insertRow(-1);
 	var td=me.tr.insertCell(-1);
 	td.className="swatch_cell";//unused dummy for symmetry
-	var swatch_table=document.createElement("table");
-	var sr=swatch_table.insertRow(-1);
-	for(var dummy=0;dummy<1;dummy++){
-		var sc=sr.insertCell(-1);
-		var swatch_div=document.createElement("div");
-		swatch_div.innerHTML="";
-		swatch_div.innerHTML+=mkswatchcode("#00FFFF");
-		sc.appendChild(swatch_div);
+	me.swatch_table=document.createElement("table");
+	me.sr=me.swatch_table.insertRow(-1);
+	for(var cidx=0;cidx<me.opts['clients'].length;cidx++){
+		me.add_swatch(me.opts['clients'][cidx]);
 	}
-	swatch_table_div.appendChild(swatch_table);
+	swatch_table_div.appendChild(me.swatch_table);
 	td.appendChild(swatch_table_div);
 
 	td=me.tr.insertCell(-1);
 	td.align="center";
 	me.label=document.createElement("div");
 	me.label.id=me.head.id+"_label";
-	me.label.innerHTML=opts['roll_up_name'];
+	me.label.innerHTML=me.opts['roll_up_name'];
 	me.label.className="roll_up_label";
 	td.appendChild(me.label);
 
-	if(opts['checkboxCB']){
+	if(me.opts['checkboxCB']){
 		td=me.tr.insertCell(-1);
 		td.className="roll_up_icon_cell";
 		me.checkbox_icon=new Image();
 		me.checkbox_icon.id=me.head.id+"_checkbox";
 		me.checkbox_icon.className="roll_up_icon";
-		me.checkbox_icon.src=opts['checkboxSRC'];
-		console.log(opts['checkboxSRC']);
+		me.checkbox_icon.src=me.opts['checkboxSRC'];
+		console.log(me.opts['checkboxSRC']);
 		me.checkbox_icon.addEventListener("click",callCB,false);
 		td.appendChild(me.checkbox_icon);
 	}
@@ -83,13 +94,13 @@ var RollUpDiv=function(opts){
 	me.roll_up_icon=new Image();
 	me.roll_up_icon.id=me.head.id+"_icon";
 	me.roll_up_icon.className="roll_up_icon up";
-	if(opts["roll_up_icon_src"]!=null){
-		me.roll_up_icon.src=opts["roll_up_icon_src"];
+	if(me.opts["roll_up_icon_src"]!=null){
+		me.roll_up_icon.src=me.opts["roll_up_icon_src"];
 		td.appendChild(me.roll_up_icon);
 	}
 
 	me.head.appendChild(t);
-	$("#"+opts['parent_id']).append(me.head);
+	$("#"+me.opts['parent_id']).append(me.head);
 
 	me.rollup=document.createElement("div");
 	me.rollup.id=me.head.id+"_rollup";
@@ -98,7 +109,7 @@ var RollUpDiv=function(opts){
 	//$("#"+opts['parent_id']).append(me.rollup);
 	me.head.appendChild(me.rollup);
 
-	if(opts['checkboxCB']){
+	if(me.opts['checkboxCB']){
 		$("#"+me.checkbox_icon.id).click(function(e){
 			callCB(e,me);
 		});

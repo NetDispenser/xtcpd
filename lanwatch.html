@@ -22,6 +22,7 @@
 <script type="text/javascript" src="/static/xtcpd/js/traffic.js"></script>
 <script type="text/javascript" src="/static/xtcpd/js/clients.js"></script>
 <script type="text/javascript" src="/static/xtcpd/js/spectra.js"></script>
+<script type="text/javascript" src="/static/xtcpd/js/spectrogram.js"></script>
 <script type="text/javascript" src="/static/xtcpd/js/zoom.js"></script>
 <script type="text/javascript" src="/static/xtcpd/js/map.js"></script>
 <script type="text/javascript" src="/static/xtcpd/js/roll_up_div.js"></script>
@@ -31,6 +32,7 @@ var TIMEOUT=5000;
 window.traffic_widget=null;
 window.clients_widget=null;
 window.spectra_widget=null;
+window.spectrogram=null;
 window.map_widget=null;
 window.counter=0;
 
@@ -46,17 +48,22 @@ var toggleRunCB=function(e){
 	}
 }
 var clearCB=function(e){
+		console.log("clearCB");
 		window.traffic_widget.clear();
 		window.spectra_widget.clear();
+		window.spectrogram.clear();
 		window.clients_widget.clear();
 		window.map_widget.clear();
 }
 var setup=function(){
 	console.log('setup');
+	window.clients_widget=new ClientsDaemonUI();
+	console.log("window.clients_widget.data "+window.clients_widget.data);
 	window.traffic_widget=new TrafficDaemonUI().setup();
 	window.spectra_widget=new SpectraDaemonUI();
+	window.spectrogram=new Spectrogram();
 	window.spectra_widget.setup();
-	window.clients_widget=new ClientsDaemonUI().setup();
+	window.spectrogram.setup();
 	window.map_widget.map.render();
 //	d3.selectAll("#theCarousel").style('background-color',mkrandomcolor());
 	var bcr=document.getElementById("theCarousel").getBoundingClientRect();
@@ -123,7 +130,7 @@ console.log("end of javascript");
 <img id="clearB" class="menuB" type="button" src="/static/xtcpd/img/clear.png" onclick="window.map_widget.clear()"></img>
 </div>
 </td><td>
-<div class="runBG">
+<div class="layersBG">
 <img id="dummyB" class="menuB" type="button" src="/static/xtcpd/img/layers.png" onclick="window.map_widget.layersCB()"></img>
 </div>
 </td><td>
@@ -165,7 +172,10 @@ console.log("end of javascript");
 
 		<div class="item "><div class="slide2">
 			<div id="traffic">
-				<div id="svg_background" class="svg_background"></div>
+				<div id="traffic_background" class="svg_background"></div>
+			</div>
+			<div id="spectrogram">
+				<div id="spectrogram_background" class="svg_background"></div>
 			</div>
 		</div></div>
 

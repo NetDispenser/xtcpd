@@ -93,6 +93,22 @@ var SpectraDaemonUI=function(){
 	me.allnone_rollup=null;
 	me.current_pyld=null;
 
+	me.mkstatus=function(){
+		var status="Ranges: "+me.data['keys'].length+"&nbsp;&nbsp;";
+		var ip_count=0;
+		var pkt_count=0;
+		for(var kidx=0;kidx<me.data['keys'].length;kidx++){
+			var netrange=me.data['keys'][kidx];
+			ip_count+=me.data[netrange]['ips']['keys'].length;
+			for(var jidx=0;jidx<me.data[netrange]['ips']['keys'].length;jidx++){
+				var ip_key=me.data[netrange]['ips']['keys'][jidx];
+				pkt_count+=me.data[netrange]['ips'][ip_key]['count'];
+			}
+		}
+		status+="IPs: "+ip_count+"&nbsp;&nbsp;";
+		status+="Pkt: "+pkt_count+"&nbsp;&nbsp;";
+	}
+
 	me.clear=function(){
 		me.data={'keys':[],};
 		me.rollups={'keys':[],};
@@ -118,8 +134,11 @@ var SpectraDaemonUI=function(){
 			'checkboxCB':allnone_checkboxCB,//note:external to $this
 			'select_rollupCB':allnone_select_rollupCB,//note:external to $this
 			'checkboxSRC':'/static/xtcpd/img/checkbox-1.png',
+			'clients':window.clients_widget.get_clients(),
 		};
 		me.allnone_rollup=new RollUpDiv(opts);
+		me.allnone_rollup.label.innerHTML=me.mkstatus();
+
 		$("#allnone_icon").click(function(e){
 			//COLLAPSE
 			if(!me.allnone_rollup.expanded){
@@ -176,15 +195,14 @@ var SpectraDaemonUI=function(){
 	me.render_data=function(data){
 		for(var kidx=0;kidx<data['data']['keys'].length;kidx++){
 			var netrange=data['data']['keys'][kidx];
-			var dummy=me.data['keys'].indexOf(netrange);
-			if(dummy<0){
+			if(me.data['keys'].indexOf(netrange)<0){
 				me.data['keys'].push(netrange);
 				me.data[netrange]=data['data'][netrange];//copy entire sub-{}
 				var sanitized=netrange;
 				for(var dummy=0;dummy<8;dummy++)
 					sanitized=sanitized.replace(".","ZZZ");
 
-				var ip_key=me.data[netrange]['ips']['keys'][0];
+				var ip_key=me.data[netrange]['ips']['keys'][0];//
 				var roll_up_name=netrange+"<br>"+me.data[netrange]['ips'][ip_key]['city']+", ";
 				roll_up_name+=me.data[netrange]['ips'][ip_key]['country_name'];
 
@@ -201,6 +219,7 @@ var SpectraDaemonUI=function(){
 					'checkboxCB':checkboxCB,//note:external to $this
 					'select_rollupCB':select_rollupCB,//note:external to $this
 					'checkboxSRC':'/static/xtcpd/img/checkbox-1.png',
+					'clients':[],//me.data[netrange]['ips'][ip_key]['src'],//ADD THEM AS THE OCCUR!
 				};
 				var rollup=new RollUpDiv(opts);
 				me.rollups["nr-"+netrange]=rollup;
@@ -213,6 +232,15 @@ var SpectraDaemonUI=function(){
 				var ips=data['data'][netrange]['ips']['keys'];//incoming list
 				for(var idx=0;idx<ips.length;idx++){//cycle over incoming ips
 					var ip=ips[idx];
+					var src_ip=data['data'][netrange]['ips'][ip]['src'];
+					var dst_ip=data['data'][netrange]['ips'][ip]['dst'];
+					if(me.rollups["nr-"+netrange].opts['clients'].indexOf(src_ip)<0){
+						console.log("adding swatch for ip="+src_ip);
+						me.rollups["nr-"+netrange].add_swatch(src_ip);
+					}
+
+					//STILL NEED: layer_table rows only single swatch possible still
+					//needs to be obj with opts like rollup and methods for add swatch
 					var layer_name=ip;
 					var r=lt.insertRow(-1);
 					var c=r.insertCell(-1);
@@ -222,20 +250,22 @@ var SpectraDaemonUI=function(){
 					var swatch_table_div=document.createElement("div");
 					var swatch_table=document.createElement("table");
 					var sr=swatch_table.insertRow(-1);
-					for(var dummy=0;dummy<1;dummy++){
-						var sc=sr.insertCell(-1);
-						var swatch_div=document.createElement("div");
-						swatch_div.innerHTML="";
-						swatch_div.innerHTML+=mkswatchcode("#00FFFF");
-						sc.appendChild(swatch_div);
-					}
+					sr.id="sr-"+dst_ip;
+					var sc=sr.insertCell(-1);
+					sc.id="sc-"+src_ip+"to"+dst_ip;
+					var swatch_div=document.createElement("div");
+					swatch_div.innerHTML="";
+					swatch_div.innerHTML+=mkswatchcode(window.clients_widget.get_color(me.data[netrange]['ips'][ip]['src']));
+					sc.appendChild(swatch_div);
+
 					swatch_table_div.appendChild(swatch_table);
 					c.appendChild(swatch_table_div);
 					//
 					c=r.insertCell(-1);
 					var ip_label=document.createElement("div");
 					ip_label.id=ip+"ip_label";
-					ip_label.innerHTML="<a>"+ip+"</a>&nbsp;";
+
+					ip_label.innerHTML="<a title='"+src_ip+"->"+dst_ip+"'>"+ip+"</a>&nbsp;";
 					ip_label.innerHTML+="<a>"+me.data[netrange]['ips'][ip]['count']+"</a> &nbsp;";
 					ip_label.innerHTML+="<a>"+me.data[netrange]['ips'][ip]['city']+"</a> &nbsp;";
 					ip_label.innerHTML+="<a>"+me.data[netrange]['ips'][ip]['country_code']+"</a> &nbsp;";
@@ -250,11 +280,14 @@ var SpectraDaemonUI=function(){
 				var ips=data['data'][netrange]['ips']['keys'];//incoming list
 				for(var idx=0;idx<ips.length;idx++){//cycle over incoming ips
 					var ip=ips[idx];
-					var dummy2=me.data[netrange]['ips']['keys'].indexOf(ip);//our list
-					if(dummy2<0){
+					//our list
+					if(me.data[netrange]['ips']['keys'].indexOf(ip)<0){
 						//NEED:insert new select option into corresponding netrange rollup
 						me.data[netrange]['ips'][ip]=data['data'][netrange]['ips'][ip];
 						me.data[netrange]['ips']['keys'].push(ip);
+						var src_ip=data['data'][netrange]['ips'][ip]['src'];
+						var dst_ip=ip;//=data['data'][netrange]['ips'][ip]['dst'];
+						var swatch_color=window.clients_widget.get_color(src_ip);
 						var lt=document.getElementById(netrange+"_layer_table");
 						var layer_name=ip;
 						var r=lt.insertRow(-1);
@@ -265,20 +298,22 @@ var SpectraDaemonUI=function(){
 						var swatch_table_div=document.createElement("div");
 						var swatch_table=document.createElement("table");
 						var sr=swatch_table.insertRow(-1);
-						for(var dummy=0;dummy<1;dummy++){
-							var sc=sr.insertCell(-1);
-							var swatch_div=document.createElement("div");
-							swatch_div.innerHTML="";
-							swatch_div.innerHTML+=mkswatchcode("#00FFFF");
-							sc.appendChild(swatch_div);
-						}
+						sr.id="sr-"+dst_ip;
+						var sc=sr.insertCell(-1);
+						sc.id="sc-"+src_ip+"to"+dst_ip;
+						var swatch_div=document.createElement("div");
+						swatch_div.innerHTML="";
+						console.log(src_ip+" -> "+dst_ip+" == "+ip);
+						swatch_div.innerHTML+=mkswatchcode(swatch_color);
+						sc.appendChild(swatch_div);
+
 						swatch_table_div.appendChild(swatch_table);
 						c.appendChild(swatch_table_div);
 						//
 						c=r.insertCell(-1);
 						var ip_label=document.createElement("div");
 						ip_label.id=ip+"ip_label";
-						ip_label.innerHTML="<a>"+ip+"</a>&nbsp;";
+						ip_label.innerHTML="<a title='"+src_ip+"->"+dst_ip+"'>"+ip+"</a>&nbsp;";
 						ip_label.innerHTML+="<a>"+me.data[netrange]['ips'][ip]['count']+"</a> &nbsp;";
 						ip_label.innerHTML+="<a>"+me.data[netrange]['ips'][ip]['city']+"</a> &nbsp;";
 						ip_label.innerHTML+="<a>"+me.data[netrange]['ips'][ip]['country_code']+"</a> &nbsp;";
@@ -287,36 +322,49 @@ var SpectraDaemonUI=function(){
 						window.map_widget.add_point(me.data[netrange]['ips'][ip]);
 					}
 					else{
+						try{
 						me.data[netrange]['ips'][ip]['count']+=data['data'][netrange]['ips'][ip]['count'];
 						var target_idx=0;
+						var src_ip=data['data'][netrange]['ips'][ip]['src'];
+						var dst_ip=data['data'][netrange]['ips'][ip]['dst'];
+						if(me.rollups["nr-"+netrange].opts['clients'].indexOf(src_ip)<0){
+							console.log("adding swatch for ip="+src_ip);
+							me.rollups["nr-"+netrange].add_swatch(src_ip);
+						}
+						//check this swatch now
+						var sc_id="sc-"+src_ip+"to"+dst_ip;
+						console.log("checking for sc_id="+sc_id);
+						if(!document.getElementById(sc_id)){
+							console.log(sc_id+" not found");
+							var swatch_color=window.clients_widget.get_color(src_ip);
+							if(!swatch_color)continue;
+							var sr_id="sr-"+dst_ip;
+							var sr=document.getElementById(sr_id);
+							var sc=sr.insertCell(-1);
+							sc.id=sc_id;
+							var swatch_div=document.createElement("div");
+							swatch_div.innerHTML="";
+							console.log(src_ip+" -> "+dst_ip+" == "+ip);
+							swatch_div.innerHTML+=mkswatchcode(swatch_color);
+							sc.appendChild(swatch_div);
+						}
+
 						var ip_label=document.getElementById(ip+"ip_label");
-						ip_label.innerHTML="<a>"+ip+"</a>&nbsp;";
+						ip_label.innerHTML="<a title='"+src_ip+"->"+dst_ip+"'>"+ip+"</a>&nbsp;";
 						ip_label.innerHTML+="<a>"+me.data[netrange]['ips'][ip]['count']+"</a> &nbsp;";
 						ip_label.innerHTML+="<a>"+me.data[netrange]['ips'][ip]['city']+"</a> &nbsp;";
 						ip_label.innerHTML+="<a>"+me.data[netrange]['ips'][ip]['country_code']+"</a> &nbsp;";
 						ip_label.className="ip_label";
+						}catch(e){console.log(e);}
 					}
 				}
 			}
 		}//for netrange in keys
 
 		//put up some useful statistics:
-		var status="Ranges: "+me.data['keys'].length+"&nbsp;&nbsp;";
-		var ip_count=0;
-		var pkt_count=0;
-		for(var kidx=0;kidx<me.data['keys'].length;kidx++){
-			var netrange=me.data['keys'][kidx];
-			ip_count+=me.data[netrange]['ips']['keys'].length;
-			for(var jidx=0;jidx<me.data[netrange]['ips']['keys'].length;jidx++){
-				var ip_key=me.data[netrange]['ips']['keys'][jidx];
-				pkt_count+=me.data[netrange]['ips'][ip_key]['count'];
-			}
-		}
-		status+="IPs: "+ip_count+"&nbsp;&nbsp;";
-		status+="Pkt: "+pkt_count+"&nbsp;&nbsp;";
-		me.allnone_rollup.label.innerHTML=status;
-//		document.getElementById("spectra_status").innerHTML=status;
+		var status=me.mkstatus();
 		console.log(status);
+		me.allnone_rollup.label.innerHTML=status;
 
 		d3.selectAll(".marker_default")
 			.on("mouseover",me.markermouseover)
@@ -324,6 +372,8 @@ var SpectraDaemonUI=function(){
 
 
 	}//me.render_data
+
+
 	me.markermouseout=function(){
 		d3.select(this)
 			.style("background-color","#FFFF00");

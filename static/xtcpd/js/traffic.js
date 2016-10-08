@@ -4,10 +4,10 @@ ccosse@gmail.com | www.asymptopia.org
 September 12, 2016
 */
 var TrafficDaemonUI=function(){
-me={};
+var me={};
 me.svg=null;
 var W;
-var H=document.getElementById("theCarousel").getBoundingClientRect().height;
+var H=document.getElementById("theCarousel").getBoundingClientRect().height/2;
 var padd=50;
 var units="kB/s";
 var points=false;
@@ -268,7 +268,7 @@ me.setup=function(){
 	var W=parseInt(document.getElementById("mapdiv").getBoundingClientRect().width);
 	console.log(W);
 //	if(true)W=380;
-	svg = d3.select(".svg_background").append("svg").attr("width",W).attr("height",H).attr('class','swipeable'),
+	svg = d3.select("#traffic_background").append("svg").attr("width",W).attr("height",H).attr('class','swipeable'),
 			width = W,
 			height = H,
 			g_lines = svg.append("g").attr("transform", "translate(0," + (height / 2) + ")"),
@@ -286,11 +286,11 @@ me.setup=function(){
 	me.svg=svg;
 //	me.update();
 
-
+/*
 	svg.on("swipedown",function(){
 		this.style('background-color','red');
 	});
-
+*/
 	return me;
 }
 

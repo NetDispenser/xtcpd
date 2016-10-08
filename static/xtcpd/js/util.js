@@ -67,7 +67,7 @@ var update=function(){
 					//somehow need to apply so don't have to keep checking.
 					//it's actually a const, just under client obj, so ref it!
 					console.log("calling clients.render");
-					window.clients_widget.render_data(pyld['spectra']['clients']);
+					window.clients_widget.render_data(pyld['spectra']['clients'],pyld['clients']);
 
 					console.log("calling spectra.render");
 					window.spectra_widget.render_data(pyld['spectra']);
