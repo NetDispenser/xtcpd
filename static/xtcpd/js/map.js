@@ -31,32 +31,39 @@ var Map=function(mapdiv){
 		center:ol.proj.transform(me.center,"EPSG:4326","EPSG:3857"),
 		zoom:me.zoom_levels[me.current_zoom_idx],
 	});
-	me.osm2_base=new ol.layer.Tile({
-		preload:14,
+	me.OSM2_SOURCE=new ol.source.OSM();
+	me.OSM2_LAYER=new ol.layer.Tile({
+		preload:14,opacity:1.0,
 		title:'OpenStreetMap2',
-		source:new ol.source.OSM()
+		source:me.OSM2_SOURCE
 	});
-
-	var src_url="/static/xtcpd/data/world_borders.geojson";
-	var polygon_source=new ol.source.Vector({
-		url: src_url,
+	me.WORLD_SOURCE=new ol.source.Vector({
+		url: "/static/xtcpd/data/world_borders.geojson",
 		format: new ol.format.GeoJSON()
 	});
-	var polygon_layer= new ol.layer.Vector({
-		source: polygon_source,
+	me.WORLD_LAYER=new ol.layer.Vector({
+		source: me.WORLD_SOURCE,
 		style:new ol.style.Style({
 			stroke: new ol.style.Stroke({
-				color: "rgba(0,0,100,1.0)",
-				width: "1"
+				color: 'rgba(50,50,255,0.5)',
+				width: 0.5
 			}),
 			fill: new ol.style.Fill({
-				color: "rgba(0,0,200,0.5)",
+				color:'rgba(0,0,100,0)',
 			})
 		}),
 	});
-
+	me.EARTHLIGHTS_SOURCE=new ol.source.XYZ({
+		attributions: [new ol.Attribution({html: 'EarthLights'})],
+		url: "/static/xtcpd/data/EarthLights/{z}/{x}/{y}.png",
+		minZoom: 0,maxZoom: 5
+	});
+	me.EARTHLIGHTS_LAYER=new ol.layer.Tile({
+		extent: ol.proj.transformExtent([-360., -85.051129, 360., 85.051129], 'EPSG:4326', 'EPSG:3857'),
+		source: me.EARTHLIGHTS_SOURCE
+	});
 	me.map = new ol.Map({
-		layers: [polygon_layer,],//osm,sat,me.osm2_base,
+		layers: [me.EARTHLIGHTS_LAYER,me.WORLD_LAYER],//osm,sat,me.osm2_base,polygon_layer
 		interactions:[],
 		controls:[],
 		target: mapdiv,
@@ -214,18 +221,21 @@ var Map=function(mapdiv){
 	});
 */
 	me.overlay.on('change:element',function(e){console.log("YOO");});
-	me.osm=new ol.layer.Tile({preload:14,opacity:1.0,title:'OpenStreetMap2',source:new ol.source.OSM()});
-	me.osm_showing=false;
+	me.layer_combo=0;
 	me.layersCB=function(){
-		if(me.osm_showing){
-			me.map.removeLayer(me.osm);
-			me.osm_showing=false;
-			$(".layersBG").toggleClass('showing');
-		}
-		else{
-			me.map.getLayers().insertAt(1,me.osm);
-			me.osm_showing=true;
-			$(".layersBG").toggleClass('showing');
+		console.log('layersCB:'+me.layer_combo);
+		try{me.map.removeLayer(me.EARTHLIGHTS_LAYER);}catch(e){}
+		try{me.map.removeLayer(me.WORLD_LAYER);}catch(e){}
+		try{me.map.removeLayer(me.OSM2_LAYER);}catch(e){}
+		me.layer_combo+=1;
+		if(me.layer_combo>2)me.layer_combo=0;
+		me.layer_combos=[
+			[me.EARTHLIGHTS_LAYER,me.WORLD_LAYER],
+			[me.OSM2_LAYER,me.WORLD_LAYER],
+			[me.WORLD_LAYER],
+		];
+		for(var idx=0;idx<me.layer_combos[me.layer_combo].length;idx++){
+			me.map.getLayers().insertAt(idx,me.layer_combos[me.layer_combo][idx]);
 		}
 	}
 	return me;

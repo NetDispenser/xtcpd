@@ -1,0 +1,93 @@
+<html>
+<head>
+<title>RPC-Django-JavaScript</title>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1, maximum-scale=1">
+<style>
+.slide{
+	#background-color:#333;
+	color:#FFF;
+	height:650px;
+}
+#theCarousel{
+	background-color:#333;
+	height:700px;
+}
+body{height:100%;}
+</style>
+<link rel="stylesheet" type="text/css" href="/static/xtcpd/css/bootstrap.css">
+<script type="text/javascript" src="/static/xtcpd/js/d3.v4.min.js"></script>
+<script type="text/javascript" src="/static/xtcpd/js/jquery.min.js"></script>
+<script type="text/javascript" src="/static/xtcpd/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="/static/xtcpd/js/hammer.min.js"></script>
+<script type="text/javascript">
+var init=function(e){
+	var carhammer = new Hammer(document.body);
+	carhammer.on('swipeleft', function(ev){
+		$("#theCarousel").carousel("next");
+//		d3.selectAll("#theCarousel")
+//			.style('background-color',"#333")
+//			.style('color',"#FFF");
+	});
+	carhammer.on('swiperight', function(ev){
+		$("#theCarousel").carousel("prev");
+//		d3.selectAll("#theCarousel")
+//			.style('background-color',"#FFF")
+//			.style('color',"#333");
+	});
+	console.log("init complete");
+}
+</script>
+<body style="background-color:gray;">
+<div id="layout" class="container">
+	<div class="row">
+
+		<div id="theCarousel" class="carousel page-header slide col-lg-12 col-md-12 col-sm-12 col-xs-12" data-ride="carousel" data-interval=false>
+		<div class="carousel-inner">
+
+			<div class="item slide active">
+				<div id="slide01">
+					<center>
+					<h1>Rendering real-time data using Python and JavaScript</h1>
+					<h3>PDX Code Guild | October 10, 2016 | Charles Cossé</h3>
+					<ul>
+						<li>Talk about one of my favorite
+					</ul>
+					</center>
+				</div>
+			</div>
+
+			<div class="item slide">
+				<div id="slide01"><h1>Core Message</h1>
+					<pre>
+					Python <- {JSON} -> Django <- {JSON} -> JavaScript
+					Daemon <-  RPC   -> Server <-  AJAX  -> Webpage
+					</pre>
+					<ul>
+					<li>Why do this? Because some things need threads.
+					<li>E.g. network-sniffing, logfile-tailing, process-monitoring
+
+					<li>Python and JavaScript are syntactically similar
+					<li>Python and JavaScript both have JSON modules
+					<li>Python is great for harvesting and multiplexing
+					</ul>
+				</div>
+			</div>
+
+			<div class="item slide">
+				<div id="slide01"><h1>The Pieces</h1>
+					<img src="/static/xtcpd/pres/whiteboard01_cropped.jpg" style="height:600px;"/>
+
+
+				</div>
+			</div>
+
+		</div>
+		</div>
+
+	</div>
+</div>
+<script>init();</script>
+</body>
+</html>

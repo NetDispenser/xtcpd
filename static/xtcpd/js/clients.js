@@ -1,7 +1,27 @@
 var client_colors=["#FF0","#0F0","#F00","#00F","#0FF","#F0F",];
+var transparent_colors=[
+	"rgba(255,255,0,0.2)",
+	"rgba(0,255,0,0.2)",
+	"rgba(255,0,0,0.2)",
+	"rgba(0,0,255,0.2)",
+	"rgba(0,255,255,0.2)",
+	"rgba(255,0,255,0.2)",
+];
 var ClientsDaemonUI=function(){
 	var me={};
-	me.data={'keys':[],};
+	me.data={
+		'keys':['192.168.66.1',],
+		'192.168.66.1':{
+			'color':client_colors[0],
+			'transparent_color':transparent_colors[0],
+			'device':'LAN-Watch RPI',
+			'raw':'',
+			'tstamp':'',
+			'_mac_addr':'',
+			'ip_num':'192.168.66.1',
+			'mac_addr':'',
+		},
+	};
 	me.current_keys=[];
 	me.table=document.getElementById("clients_table");//pass-in as arg
 	me.clear=function(){
@@ -40,11 +60,14 @@ var ClientsDaemonUI=function(){
 		try{return me.data['keys'];}
 		catch(e){return [];}
 	}
-	me.get_color=function(client_ip){
-		console.log()
+	me.get_transparent_color=function(client_ip){
 		if(me.data['keys'].indexOf(client_ip)<0){
-			if(client_ip=="192.168.66.1"){return client_colors[0];}
-			console.log("returning null for "+client_ip)
+			return null;
+		}
+		return me.data[client_ip]['transparent_color'];
+	}
+	me.get_color=function(client_ip){
+		if(me.data['keys'].indexOf(client_ip)<0){
 			return null;
 		}
 		return me.data[client_ip]['color'];
@@ -70,7 +93,7 @@ var ClientsDaemonUI=function(){
 	}
 	me.render_data=function(spectra_data,dnsmasq_data){
 		console.log("clients.render_data()");
-		var color;
+		var color,transparent_color;
 
 		if(!me.data){
 			console.log("remaking data!");
@@ -87,14 +110,15 @@ var ClientsDaemonUI=function(){
 			var mac_addr=dnsmasq_data['lines'][idx][4];
 			if(me.data['keys'].indexOf(ip_num)<0){
 				me.data['keys'].push(ip_num);
-				if(ip_num=="192.168.66.127")color=client_colors[1];
-				else if(ip_num=="192.168.66.114")color=client_colors[2];
-				else if(ip_num=="192.168.66.1")color=client_colors[0];
-				else if(me.data['keys'].length<client_colors.length)color=client_colors[me.data['keys'].length-1];
-				else color=mkrandomcolor();
+				if(me.data['keys'].length<client_colors.length){
+					color=client_colors[me.data['keys'].length-1];
+					transparent_color=transparent_colors[me.data['keys'].length-1];
+				}
+				else{color=mkrandomcolor();transparent_color=color;}//FIXME
 				me.data[ip_num]={
 					'raw':dnsmasq_data['lines'][idx],
 					'color':color,
+					'transparent_color':transparent_color,
 					'tstamp':tstamp,
 					'_mac_addr':_mac_addr,
 					'ip_num':ip_num,
@@ -112,12 +136,15 @@ var ClientsDaemonUI=function(){
 			if(me.data['keys'].indexOf(client_ip)<0){//This section adds
 				me.data['keys'].push(client_ip);
 				console.log("added "+client_ip);
-				if(client_ip=="192.168.66.127")color=client_colors[1];
-				else if(client_ip=="192.168.66.114")color=client_colors[2];
-				else if(client_ip=="192.168.66.1")color=client_colors[0];
-				else if(me.data['keys'].length<client_colors.length)color=client_colors[me.data['keys'].length-1];
-				else color=mkrandomcolor();
-				me.data[client_ip]={'raw':spectra_data[idx],'color':color,};
+				if(me.data['keys'].length<client_colors.length){
+					color=client_colors[me.data['keys'].length-1];
+					transparent_color=transparent_colors[me.data['keys'].length-1];
+				}
+				else{
+					color=mkrandomcolor();
+					transparent_color=color;
+				}
+				me.data[client_ip]={'raw':spectra_data[idx],'color':color,'transparent_color':transparent_color,};
 				//var tstamp=data['lines'][idx][0];
 				//var _mac_addr=data['lines'][idx][1];
 				//var ip_num=data['lines'][idx][2];
@@ -160,5 +187,6 @@ var ClientsDaemonUI=function(){
 		delete me.data[target_ip];
 		console.log("all traces removed");
 	}
+	me.add_row('192.168.66.1');
 	return me;
 }

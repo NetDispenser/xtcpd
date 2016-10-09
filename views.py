@@ -55,9 +55,11 @@ def traffic(request):
 		if len(qs)>1:
 			s=None
 			rval={
-			'keys':['tstamp','msg',],
+			'keys':['tstamp','msg','t1'],
 			'tstamp':str(datetime.datetime.now()),
 			'msg':'01 Next: rpc call to get ifstat from trafd',
+			't1':time.time(),
+			't0':time.time()-60.,
 			}
 			if qs=='get_data':
 				client_ip=str(get_client_ip(request))
@@ -68,7 +70,9 @@ def traffic(request):
 				rval['spectra']=s.get_data((client_ip))
 				s=xmlrpc.client.Server("http://spytools.asymptopia.org:8007")
 				rval['clients']=s.get_data((client_ip))
-				#logging.debug("rval-spectra: "+str(rval['spectra']))
+				logging.debug("rval-spectra: "+str(rval['spectra']))
+				rval['t0']=time.time()-60.;
+				rval['t1']=time.time();
 			return HttpResponse(json.dumps(rval));
 	except:
 		logging.exception("get_data failed")

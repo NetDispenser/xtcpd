@@ -2,6 +2,7 @@
 import os,sys,json,logging,re,copy,time
 from xmlrpc.server import SimpleXMLRPCServer
 import threading
+import datetime
 from queue import Queue
 
 from daemon import Daemon
@@ -20,6 +21,11 @@ gip=GeoIP.open("/usr/share/GeoIP/GeoLiteCity.dat",GeoIP.GEOIP_STANDARD)
 
 rexp=re.compile('(\d+:\d+:\d+)(\.\d+) (IP) (.*)(\.\d+) > (\d+\.\d+\.\d+\.\d+)(\.\d+)(.*)')
 tcpdump_cmd="tcpdump -i wlan1 -l -s 0 -n|grep -v ARP"#wlan1
+
+def mktstamp():
+	tstamp="%s"%datetime.datetime.now()
+	truncated=tstamp.split(".")[0]
+	return  truncated
 
 class SpectraDaemonProcess(Daemon):
 
@@ -89,7 +95,11 @@ class SpectraDaemonProcess(Daemon):
 					#logging.debug("looping over client_ips")
 					#logging.debug(src+"->"+dst)
 
+					msg="%.02f,%s,%s,%s,%s,%s"%(time.time(),mktstamp(),src,dst,sport,dport)
+
 					for client_ip in self.data['keys']:
+
+						self.data[client_ip]['tcp'].append(msg)#spectrogram msg
 
 						if time.perf_counter()>self.ttl[client_ip]:
 							logging.debug(threading.current_thread().name+" deleting: "+client_ip)
@@ -98,6 +108,8 @@ class SpectraDaemonProcess(Daemon):
 							self.data['keys'].remove(client_ip)
 							logging.debug(threading.current_thread().name+' done.')
 							continue
+
+
 
 						#logging.debug(client_ip)
 						try:
@@ -162,17 +174,19 @@ class SpectraDaemonProcess(Daemon):
 	def get_data(self,client_ip):
 		try:
 			logging.debug(threading.current_thread().name+" get_data: "+client_ip)
-			rval={'keys':['data'],'data':{'keys':[]}}
+			rval={'keys':['data'],'data':{'keys':[]},'tcp':[]}
 			if self.data['keys'].count(client_ip) > 0:
-				rval={'keys':['data','clients'],'data':copy.copy(self.data[client_ip])}
+				rval={'keys':['data','tcp','clients'],}
+				rval['data']=copy.copy(self.data[client_ip])#this includes tcp [msgs]
 				rval['clients']=self.data['keys']
+				rval['tcp']=copy.copy(self.data[client_ip]['tcp'])#this includes tcp [msgs]
 			else:
 				logging.debug(threading.current_thread().name+" client_ip not found: "+client_ip)
 				msg=''
 				for k in self.data['keys']:msg+=k+' '
 				logging.debug(threading.current_thread().name+" "+msg)
 
-			self.data[client_ip]={'keys':[],}
+			self.data[client_ip]={'keys':[],'tcp':[],}
 			if self.data['keys'].count(client_ip)==0:
 				self.data['keys'].append(client_ip)
 			self.data[client_ip].__init__()

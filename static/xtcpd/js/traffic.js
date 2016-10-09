@@ -7,7 +7,7 @@ var TrafficDaemonUI=function(){
 var me={};
 me.svg=null;
 var W;
-var H=document.getElementById("theCarousel").getBoundingClientRect().height/2;
+var H=parseInt(document.getElementById("theCarousel").getBoundingClientRect().height*.65);
 var padd=50;
 var units="kB/s";
 var points=false;
@@ -213,7 +213,7 @@ me.handleMouseOver=function(d, i) {  // Add interactivity
 				.attr('x', width/2)
 				.attr('y', 0)
 			.text(function() {
-				return "Hi! "+i+","+d;  // Value of the text
+				return "";//"Plot Info Goes Here "+i+","+d;  // Value of the text
 			});
 		}
 

@@ -22,6 +22,7 @@
 <script type="text/javascript" src="/static/xtcpd/js/traffic.js"></script>
 <script type="text/javascript" src="/static/xtcpd/js/clients.js"></script>
 <script type="text/javascript" src="/static/xtcpd/js/spectra.js"></script>
+<script type="text/javascript" src="/static/xtcpd/js/spectra2015.js"></script>
 <script type="text/javascript" src="/static/xtcpd/js/spectrogram.js"></script>
 <script type="text/javascript" src="/static/xtcpd/js/zoom.js"></script>
 <script type="text/javascript" src="/static/xtcpd/js/map.js"></script>
@@ -62,12 +63,20 @@ var setup=function(){
 	window.traffic_widget=new TrafficDaemonUI().setup();
 	window.spectra_widget=new SpectraDaemonUI();
 	window.spectrogram=new Spectrogram();
-	window.spectra_widget.setup();
-	window.spectrogram.setup();
-	window.map_widget.map.render();
-//	d3.selectAll("#theCarousel").style('background-color',mkrandomcolor());
+
 	var bcr=document.getElementById("theCarousel").getBoundingClientRect();
 	console.log(bcr);
+
+	window.spectra2015=new Spectra2015();
+	window.spectra2015.set_size(bcr.width-100,bcr.height/4);
+	document.getElementById('spectra2015_background').appendChild(window.spectra2015.get_canvas());
+	window.spectra2015.render_size("#FFFFFF");
+
+	window.spectra_widget.setup();
+//	window.spectrogram.setup();
+	window.map_widget.map.render();
+
+//	d3.selectAll("#theCarousel").style('background-color',mkrandomcolor());
 	d3.selectAll("#mapcover")
 		.style("width",parseInt(bcr.width));
 
@@ -171,12 +180,20 @@ console.log("end of javascript");
 		</div>
 
 		<div class="item "><div class="slide2">
+			<div id="spectra2015_vspace"></div>
+			<center>
+			<div id="spectra2015_div">
+				<div id="spectra2015_background" class="svg_background"></div>
+			</div>
+			</center>
 			<div id="traffic">
 				<div id="traffic_background" class="svg_background"></div>
 			</div>
+<!--
 			<div id="spectrogram">
 				<div id="spectrogram_background" class="svg_background"></div>
 			</div>
+-->
 		</div></div>
 
 		<div class="item"><div class="slide3">

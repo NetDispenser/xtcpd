@@ -75,6 +75,9 @@ var update=function(){
 					console.log("calling traffic.render");
 					window.traffic_widget.render_data(pyld['traffic']);
 
+					console.log("calling spectra2015.render");
+					window.spectra2015.render_data(pyld['t0'],pyld['t1'],pyld['spectra']['tcp']);
+
 					if(RUNNING==true){
 						setTimeout("update()",TIMEOUT);
 					}

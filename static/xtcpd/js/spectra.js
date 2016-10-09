@@ -107,6 +107,7 @@ var SpectraDaemonUI=function(){
 		}
 		status+="IPs: "+ip_count+"&nbsp;&nbsp;";
 		status+="Pkt: "+pkt_count+"&nbsp;&nbsp;";
+		return status;
 	}
 
 	me.clear=function(){
