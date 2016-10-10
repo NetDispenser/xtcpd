@@ -119,9 +119,18 @@ var Map=function(mapdiv){
 		while(src.indexOf(".")>-1)
 			src=src.replace(".","ZZZ");
 
-		x.className="marker_default "+pyld['country_code']+" "+src+" "+netrange;
+/*
+			.marker_default {
+				width: 8px;height: 8px;border-radius: 4px;opacity:1.0;
+				border: 3px solid #00FF00;
+				background-color: #FFFF00;
+				opacity:1.0;
+			}
+*/
+		x.className=pyld['country_code']+" "+src+" "+netrange;//marker_default
+		x.style="width:8px;height:8px;border-radius:8px;border:4px solid "+window.clients_widget.get_color(pyld['src'])+";background-color:"+window.clients_widget.get_color(pyld['src'])+"";
 		console.log("map.add_point: "+pyld['netrange']);
-
+		console.log("color="+window.clients_widget.get_color(pyld['src']));
 		document.getElementById("mapdiv").appendChild(x);
 		lonlat=[parseFloat(pyld['longitude']),parseFloat(pyld['latitude'])];
 		var oly = new ol.Overlay({
@@ -145,10 +154,10 @@ var Map=function(mapdiv){
 		var pyld=window.spectra_widget.current_pyld;
 		var src=pyld['src'];
 		var src_color=window.clients_widget.get_color(src);//.data[src]['color'];
-		var swatch_code=mkswatchcode(src_color);
+		var client_device=window.clients_widget.device_by_ip(pyld['src']);
+		var swatch_code=mkswatchcode(src_color,client_device,src);
 		me.xpopup.innerHTML=pyld['src']+"->"+pyld['dst'];
 		me.xpopup.innerHTML+="<br>"+swatch_code;
-		var client_device=window.clients_widget.device_by_ip(pyld['src']);
 		me.xpopup.innerHTML+=client_device;
 		var bcr=me.xpopup.getBoundingClientRect();
 		console.log(bcr.width+"x"+bcr.height);

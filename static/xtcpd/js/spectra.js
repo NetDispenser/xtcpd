@@ -256,7 +256,9 @@ var SpectraDaemonUI=function(){
 					sc.id="sc-"+src_ip+"to"+dst_ip;
 					var swatch_div=document.createElement("div");
 					swatch_div.innerHTML="";
-					swatch_div.innerHTML+=mkswatchcode(window.clients_widget.get_color(me.data[netrange]['ips'][ip]['src']));
+					var src_color=window.clients_widget.get_color(src_ip);
+					var src_device=window.clients_widget.get_device(src_ip);
+					swatch_div.innerHTML+=mkswatchcode(src_color,src_device,src_ip);
 					sc.appendChild(swatch_div);
 
 					swatch_table_div.appendChild(swatch_table);
@@ -289,6 +291,7 @@ var SpectraDaemonUI=function(){
 						var src_ip=data['data'][netrange]['ips'][ip]['src'];
 						var dst_ip=ip;//=data['data'][netrange]['ips'][ip]['dst'];
 						var swatch_color=window.clients_widget.get_color(src_ip);
+						var client_device=window.clients_widget.get_device(src_ip);
 						var lt=document.getElementById(netrange+"_layer_table");
 						var layer_name=ip;
 						var r=lt.insertRow(-1);
@@ -305,7 +308,7 @@ var SpectraDaemonUI=function(){
 						var swatch_div=document.createElement("div");
 						swatch_div.innerHTML="";
 						console.log(src_ip+" -> "+dst_ip+" == "+ip);
-						swatch_div.innerHTML+=mkswatchcode(swatch_color);
+						swatch_div.innerHTML+=mkswatchcode(swatch_color,client_device,src_ip);
 						sc.appendChild(swatch_div);
 
 						swatch_table_div.appendChild(swatch_table);
@@ -338,6 +341,7 @@ var SpectraDaemonUI=function(){
 						if(!document.getElementById(sc_id)){
 							console.log(sc_id+" not found");
 							var swatch_color=window.clients_widget.get_color(src_ip);
+							var client_device=window.clients_widget.get_device(src_ip);
 							if(!swatch_color)continue;
 							var sr_id="sr-"+dst_ip;
 							var sr=document.getElementById(sr_id);
@@ -346,7 +350,7 @@ var SpectraDaemonUI=function(){
 							var swatch_div=document.createElement("div");
 							swatch_div.innerHTML="";
 							console.log(src_ip+" -> "+dst_ip+" == "+ip);
-							swatch_div.innerHTML+=mkswatchcode(swatch_color);
+							swatch_div.innerHTML+=mkswatchcode(swatch_color,client_device,src_ip);
 							sc.appendChild(swatch_div);
 						}
 

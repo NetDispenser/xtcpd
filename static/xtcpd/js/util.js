@@ -1,5 +1,5 @@
-var mkswatchcode=function(c){
-	var rval="<div style='width:10px;height:10px;background-color:"+c+";'>";
+var mkswatchcode=function(c,device,ip){
+	var rval="<div style='width:10px;height:10px;background-color:"+c+";' title='"+device+": "+ip+"'>";
 	rval+="</div>";
 	return rval;
 }

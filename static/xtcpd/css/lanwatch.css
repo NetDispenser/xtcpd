@@ -3,6 +3,10 @@ body{
 	#width:360px;
 	#height:640px;
 }
+.swatch_table_div{
+	width:50px;
+	overflow:auto;
+}
 .container{
 	padding-left:0px;
 	padding-right:0px;

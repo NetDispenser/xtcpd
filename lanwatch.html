@@ -68,7 +68,7 @@ var setup=function(){
 	console.log(bcr);
 
 	window.spectra2015=new Spectra2015();
-	window.spectra2015.set_size(bcr.width-100,bcr.height/4);
+	window.spectra2015.set_size(bcr.width-100,bcr.height/4.);
 	document.getElementById('spectra2015_background').appendChild(window.spectra2015.get_canvas());
 	window.spectra2015.render_size("#FFFFFF");
 
@@ -160,7 +160,7 @@ console.log("end of javascript");
 </div>
 </td><td>
 <div class="menuBG">
-<img id="dummyB2" class="menuB" type="button" src="/static/xtcpd/img/info.png" onclick=""></img>
+<img id="dummyB2" class="menuB" type="button" src="/static/xtcpd/img/clear.png" onclick=""></img>
 </div>
 </td></tr>
 </table>

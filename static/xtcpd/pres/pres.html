@@ -4,9 +4,9 @@
 <meta charset="UTF-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1, maximum-scale=1">
+<link rel="stylesheet" type="text/css" href="/static/xtcpd/css/bootstrap.css">
 <style>
 .slide{
-	#background-color:#333;
 	color:#FFF;
 	height:650px;
 }
@@ -14,9 +14,11 @@
 	background-color:#333;
 	height:700px;
 }
-body{height:100%;}
+body{
+	height:100%;
+	color:white;
+}
 </style>
-<link rel="stylesheet" type="text/css" href="/static/xtcpd/css/bootstrap.css">
 <script type="text/javascript" src="/static/xtcpd/js/d3.v4.min.js"></script>
 <script type="text/javascript" src="/static/xtcpd/js/jquery.min.js"></script>
 <script type="text/javascript" src="/static/xtcpd/js/bootstrap.min.js"></script>
@@ -50,36 +52,201 @@ var init=function(e){
 				<div id="slide01">
 					<center>
 					<h1>Rendering real-time data using Python and JavaScript</h1>
-					<h3>PDX Code Guild | October 10, 2016 | Charles Cossé</h3>
-					<ul>
-						<li>Talk about one of my favorite
-					</ul>
+					<h3>Python Meetup | October 10, 2016 | Charles Cossé</h3>
+					<br><br>
+					<table width="100%"><tr>
+					<td align="right"><img src="cover3.png" style="height:500px;"></td>
+					<td align="center"><img src="cover1.png" style="height:500px;"></td>
+					<td align="left"><img src="cover2.png" style="height:500px;"></td>
+					</tr></table>
 					</center>
 				</div>
 			</div>
 
 			<div class="item slide">
-				<div id="slide01"><h1>Core Message</h1>
-					<pre>
-					Python <- {JSON} -> Django <- {JSON} -> JavaScript
-					Daemon <-  RPC   -> Server <-  AJAX  -> Webpage
-					</pre>
+				<div id="slide02">
+					<center>
+					<h1>A useful pattern: </h1>
+					</center>
+					<div style="width:100%;text-align:center;" >
+					<img src="core_message.jpg" style="height:600px">
+					</div>
+					<div>
+						<pre>
+						Python <- {JSON} -> Django <- {JSON} -> JavaScript
+						Daemon <-  RPC   -> Server <-  AJAX  -> Webpage
+						py-rpc <-        -> py-rpc
+						</pre>
+					Q: When is this useful?<br>
+					A: When an application needs threads on server.<br>
+					E.g. network-sniffing, logfile-tailing, process-monitoring<br>
+					E.g. sending work to be done on a server, eg generate this, render that
 					<ul>
-					<li>Why do this? Because some things need threads.
-					<li>E.g. network-sniffing, logfile-tailing, process-monitoring
-
-					<li>Python and JavaScript are syntactically similar
-					<li>Python and JavaScript both have JSON modules
-					<li>Python is great for harvesting and multiplexing
+					<li>An important part is PyDaemon.xmlrpc <-> PyDjango.xmlrpc
+					<li>Define daemon:
+					<li>Not sure how many know/use this; pieces work nicely together!
 					</ul>
+					</div>
 				</div>
 			</div>
 
 			<div class="item slide">
-				<div id="slide01"><h1>The Pieces</h1>
-					<img src="/static/xtcpd/pres/whiteboard01_cropped.jpg" style="height:600px;"/>
+				<div id="slide04">
+					<center>
+					<h1>Essence of a daemon</h1>
+					</center>
+					<pre>
+						"""
+						Python version of "UNIX double-fork magic" , see Stevens' "Advanced
+						Programming in the UNIX Environment" for details (ISBN 0201563177)
+						http://www.erlenstar.demon.co.uk/unix/faq_2.html#SEC16
+						"""
+
+						#Fork own process
+						pid = os.fork()
+
+						#Exit first parent
+						if pid > 0:sys.exit(0)
+
+						#Decouple from parent environment
+						os.chdir("/")
+						os.setsid()#creates a new session
+						os.umask(0)#subsquent permissions
+
+						#Do second fork
+						pid = os.fork()
+
+						#Exit from second parent
+						if pid > 0:sys.exit(0)
+
+					</pre>
+				</div>
+			</div>
+
+			<div class="item slide">
+				<div id="slide05">
+					<center>
+					<h1>Make daemon duel-purpose ...</h1>
+					</center>
+					<pre>
+						"""
+						In addition to its data collection threads
+						have that daemon run an XMLRPCServer ...
+						"""
+						from xmlrpc.server import SimpleXMLRPCServer
+						class DaemonProcess(Daemon):
+							def __init__(self):
+								Daemon.__init__(self)
+
+							def get_data(self,client_ip):
+								rval={...}
+								return rval
+
+							def run(self):
+								self.server=SimpleXMLRPCServer((HOSTNAME,8005))
+								self.server.register_introspection_functions()
+								self.server.register_instance(self)
+								self.server.serve_forever()
+
+						if __name__=="__main__":
+							daemon=DaemonProcess()
+							daemon.start()
+
+					</pre>
+					<div>* Call Attention to arg=client_ip *</div>
+				</div>
+			</div>
+
+			<div class="item slide">
+				<div id="slide06">
+				<center>
+				<h1>RPC <- @Django -> AJAX</h1>
+				</center>
+				<pre>
+					"""
+					And now your Django-Python web server can
+					talk to your daemon via Python-RPC on both
+					sides.  Here is such a Django view:
+					"""
+					from django.http import HttpResponse
+					import json, xmlrpc.client
+
+					def my_view(request):
+						rval={}
+						s=xmlrpc.client.Server("http://spytools.asymptopia.org:8005")
+						rval['data']=s.get_data((client_ip))
+						return HttpResponse(json.dumps(rval));
+				</pre>
+				</div>
+			</div>
+
+			<div class="item slide">
+				<div id="slide07">
+				<center>
+				<h1>JSON data received by webpage ...</h1>
+				</center>
+				<pre>
+					"""
+					The JSON data is returned to the webpage that requested it
+					"""
+					script type="javascript"
+					var xajax=function(what){
+						var xhr=new_xhr();
+						xhr.onreadystatechange=function(){
+							if(xhr.readyState==4){
+								if(xhr.status==200){
+									//console.log(what+" returned "+xhr.responseText);
+								}
+							}
+						}
+						xhr.open('Get',server_hostname+"/get?"+what,true);
+						xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+						xhr.send("");
+					}
+					script
+				</pre>
+				</div>
+			</div>
 
 
+			<div class="item slide">
+				<div id="slide010">
+					<center>
+					<h1>The browser offers Ocean Of Possibilities</h1>
+					<br><br>
+					<table width="100%"><tr>
+					<td align="right"><img src="cover3.png" style="height:500px;"></td>
+					<td align="center"><img src="cover1.png" style="height:500px;"></td>
+					<td align="left"><img src="cover2.png" style="height:500px;"></td>
+					</tr>
+					<tr><td></td>
+					<td align="center">*Call Attention To This*</td>
+					<td></td></tr>
+					</table>
+					</center>
+				</div>
+			</div>
+
+			<div class="item slide">
+				<div id="slide011">
+					<h1>Thank You :) </h1>
+					<table>
+						<tr>
+						<td>
+<h3>Resources:</h3>
+D3js, Open layers, GeoIP<br>
+www.asymptopia.org<br>
+ccosse@gmail.com<br>
+<br><br><br>
+<pre>
+	Python version of "UNIX double-fork magic" , see Stevens' "Advanced
+	Programming in the UNIX Environment" for details (ISBN 0201563177)
+	http://www.erlenstar.demon.co.uk/unix/faq_2.html#SEC16
+</pre>
+
+						</td>
+						</tr>
+					</table>
 				</div>
 			</div>
 

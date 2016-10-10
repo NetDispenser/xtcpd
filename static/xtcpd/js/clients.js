@@ -1,11 +1,11 @@
-var client_colors=["#FF0","#0F0","#F00","#00F","#0FF","#F0F",];
+var client_colors=["#FF0","#A80","#0F0","#F00","#0FF","#F8F",];
 var transparent_colors=[
 	"rgba(255,255,0,0.2)",
+	"rgba(150,100,0,0.2)",
 	"rgba(0,255,0,0.2)",
 	"rgba(255,0,0,0.2)",
-	"rgba(0,0,255,0.2)",
 	"rgba(0,255,255,0.2)",
-	"rgba(255,0,255,0.2)",
+	"rgba(255,100,255,0.2)",
 ];
 var ClientsDaemonUI=function(){
 	var me={};
@@ -66,6 +66,11 @@ var ClientsDaemonUI=function(){
 		}
 		return me.data[client_ip]['transparent_color'];
 	}
+	me.get_device=function(client_ip){
+		if(me.data['keys'].indexOf(client_ip)<0)return null;
+		try{return me.data[client_ip]['device'];}
+		catch(e){return "UNK";}
+	}
 	me.get_color=function(client_ip){
 		if(me.data['keys'].indexOf(client_ip)<0){
 			return null;
@@ -73,10 +78,11 @@ var ClientsDaemonUI=function(){
 		return me.data[client_ip]['color'];
 	}
 	me.add_row=function(client_ip){
+		console.log('adding row for '+client_ip);
 		var r=me.table.insertRow(-1);
 		r.id="row_"+client_ip;
 		var c=r.insertCell(-1);
-		var swatch_code=mkswatchcode(me.data[client_ip]['color']);
+		var swatch_code=mkswatchcode(me.data[client_ip]['color'],me.data[client_ip]['device'],client_ip);
 		var d=document.createElement("div");
 		d.innerHTML=swatch_code;
 		c.appendChild(d);

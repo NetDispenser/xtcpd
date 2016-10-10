@@ -10,11 +10,12 @@ var RollUpDiv=function(opts){
 			me.opts['clients'].push(client_ip);
 		//so we store it, but if color=null then we don't make no swatch
 		var client_color=window.clients_widget.get_color(client_ip);
+		var client_device=window.clients_widget.get_device(client_ip);
 		if(client_color){
 			var sc=me.sr.insertCell(-1);
 			var swatch_div=document.createElement("div");
 			swatch_div.innerHTML="";
-			var swatchcode=mkswatchcode(client_color);
+			var swatchcode=mkswatchcode(client_color,client_device,client_ip);
 			console.log(swatchcode);
 			swatch_div.innerHTML+=swatchcode;
 			sc.appendChild(swatch_div);
