@@ -1,0 +1,1 @@
+python3 ./trafd start;python3 ./clientsd start;python3 ./spectrad start
