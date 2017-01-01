@@ -1,0 +1,14 @@
+<html>
+<head>
+<script type="text/javascript">
+var init=function(e){
+	alert('init');
+	var bcr=document.getElementById("body").getBoundingClientRect();
+	alert(bcr.width+" x "+bcr.height);
+}
+</script>
+</head>
+<body id="body" onload="init()" style="background-color:red;width:100%;height:100%;">
+
+</body>
+</html>
