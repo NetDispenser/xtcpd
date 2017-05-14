@@ -1,8 +1,8 @@
 var Map=function(mapdiv){
 	var me={};
 	me.data={};
-	me.zoom_levels=[1.0,2.0,3.0,4.0,6.0,12.0];
-	me.current_zoom_idx=2;
+	me.zoom_levels=[3.0,4.0,6.0,12.0];
+	me.current_zoom_idx=0;
 
 	me.center=[-50.0,20.0];
 	me.current_center=me.center;
@@ -158,9 +158,9 @@ var Map=function(mapdiv){
 		var src_color=window.clients_widget.get_color(src);//.data[src]['color'];
 		var client_device=window.clients_widget.device_by_ip(pyld['src']);
 		var swatch_code=mkswatchcode(src_color,client_device,src);
-		me.xpopup.innerHTML=pyld['src']+"->"+pyld['dst'];
-		me.xpopup.innerHTML+="<br>"+swatch_code;
-		me.xpopup.innerHTML+=client_device;
+		me.xpopup.innerHTML=swatch_code+" "+pyld['src']+"->"+pyld['dst'];
+//		me.xpopup.innerHTML+="<br>"+swatch_code;
+		me.xpopup.innerHTML+="<br>"+client_device;
 		var bcr=me.xpopup.getBoundingClientRect();
 		console.log(bcr.width+"x"+bcr.height);
 
@@ -234,17 +234,17 @@ var Map=function(mapdiv){
 	me.overlay.on('change:element',function(e){console.log("YOO");});
 	me.layer_combo=0;
 	me.layersCB=function(){
-		console.log('layersCB:'+me.layer_combo);
-		try{me.map.removeLayer(me.EARTHLIGHTS_LAYER);}catch(e){}
+//		try{me.map.removeLayer(me.EARTHLIGHTS_LAYER);}catch(e){}
 		try{me.map.removeLayer(me.WORLD_LAYER);}catch(e){}
 		try{me.map.removeLayer(me.OSM2_LAYER);}catch(e){}
-		me.layer_combo+=1;
-		if(me.layer_combo>2)me.layer_combo=0;
 		me.layer_combos=[
 //			[me.EARTHLIGHTS_LAYER,me.WORLD_LAYER],
-			[me.OSM2_LAYER,me.WORLD_LAYER],
 			[me.WORLD_LAYER],
+			[me.OSM2_LAYER,me.WORLD_LAYER],
 		];
+		me.layer_combo+=1;
+		if(me.layer_combo>me.layer_combos.length-1)me.layer_combo=0;
+		console.log('layersCB:'+me.layer_combo);
 		for(var idx=0;idx<me.layer_combos[me.layer_combo].length;idx++){
 			me.map.getLayers().insertAt(idx,me.layer_combos[me.layer_combo][idx]);
 		}
