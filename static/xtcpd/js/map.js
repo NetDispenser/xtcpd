@@ -53,6 +53,7 @@ var Map=function(mapdiv){
 			})
 		}),
 	});
+/*
 	me.EARTHLIGHTS_SOURCE=new ol.source.XYZ({
 		attributions: [new ol.Attribution({html: 'EarthLights'})],
 		url: "/static/xtcpd/data/EarthLights/{z}/{x}/{y}.png",
@@ -62,6 +63,7 @@ var Map=function(mapdiv){
 		extent: ol.proj.transformExtent([-360., -85.051129, 360., 85.051129], 'EPSG:4326', 'EPSG:3857'),
 		source: me.EARTHLIGHTS_SOURCE
 	});
+*/
 	me.map = new ol.Map({
 		layers: [me.WORLD_LAYER],//me.EARTHLIGHTS_LAYER,osm,sat,me.osm2_base,polygon_layer
 		//interactions:[],
@@ -239,7 +241,7 @@ var Map=function(mapdiv){
 		me.layer_combo+=1;
 		if(me.layer_combo>2)me.layer_combo=0;
 		me.layer_combos=[
-			[me.EARTHLIGHTS_LAYER,me.WORLD_LAYER],
+//			[me.EARTHLIGHTS_LAYER,me.WORLD_LAYER],
 			[me.OSM2_LAYER,me.WORLD_LAYER],
 			[me.WORLD_LAYER],
 		];
