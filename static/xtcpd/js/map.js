@@ -45,7 +45,7 @@ var Map=function(mapdiv){
 		source: me.WORLD_SOURCE,
 		style:new ol.style.Style({
 			stroke: new ol.style.Stroke({
-				color: 'rgba(150,250,150,0.3)',
+				color: 'rgba(150,250,150,0.15)',
 				width: 1
 			}),
 			fill: new ol.style.Fill({

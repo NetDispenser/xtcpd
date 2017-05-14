@@ -93,4 +93,6 @@ i:hover{
 }
 hr{
 	border-color:#555;
+	margin-top:0px;
+	margin-bottom:0px;
 }

@@ -67,7 +67,7 @@ var Spectra2015=function(){
 
 		ctx.globalAlpha=1.0;
 		ctx.fillStyle="#222222";
-		ctx.fillRect(me.padd,0,me.size[0]-2*me.padd,me.size[1]-me.padd);
+		ctx.fillRect(me.padd,me.padd/2,me.size[0]-2*me.padd,me.size[1]-me.padd);
 
 		ctx.globalAlpha=0.35;
 
@@ -101,8 +101,8 @@ var Spectra2015=function(){
 			ctx.strokeStyle=window.clients_widget.get_transparent_color(src_device);//SRC_COLORS[src_idx];
 			//ctx.fillStyle=window.clients_widget.get_color(src_device);//SRC_COLORS[src_idx];
 			ctx.beginPath();
-			ctx.moveTo(xc,0);//LAYOUT['label_height']
-			ctx.lineTo(xc,me.size[1]-me.padd);
+			ctx.moveTo(xc,me.padd/2);//LAYOUT['label_height']
+			ctx.lineTo(xc,me.size[1]-me.padd/2);
 			ctx.stroke();
 
 			//ctx.strokeStyle=window.clients_widget.get_transparent_color(dst_device);//SRC_COLORS[dst_idx];
