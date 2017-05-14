@@ -22,7 +22,7 @@ me.clear=function(){
 me.render_data=function(pyld){
 
 		var W=parseInt(window.innerWidth*0.3);
-		var H=parseInt(window.innerHeight/5.);
+		var H=parseInt(window.innerHeight/6.);
 		var width=W;
 		var height=H;
 
@@ -275,7 +275,7 @@ me.setup=function(){
 //	console.log(W);
 //	if(true)W=380;
 	var W=parseInt(window.innerWidth*0.3);
-	var H=parseInt(window.innerHeight/5.);
+	var H=parseInt(window.innerHeight/6.);
 	svg = d3.select("#traffic_background").append("svg").attr("width",W).attr("height",H).attr('class','swipeable'),
 			width = W,
 			height = H,

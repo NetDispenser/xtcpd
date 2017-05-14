@@ -1,5 +1,5 @@
 
-var client_colors=["#5F5","#F55","#55F","#FF5","#5FF","#F5F",];
+var client_colors=["#5F5","#FF5","#F55","#55F","#5FF","#F5F",];
 var transparent_colors=[
 	"rgba(255,255,0,0.2)",
 	"rgba(150,100,0,0.2)",
@@ -93,6 +93,9 @@ var ClientsDaemonUI=function(){
 		var r=me.table.insertRow(-1);
 		r.id="row_"+client_ip;
 		var c=r.insertCell(-1);
+		c.style.width="20%";
+		c.style.position="relative";
+		c.style.left="20px";
 		var swatch_code=mkswatchcode(me.data[client_ip]['color'],me.data[client_ip]['device'],client_ip);
 		var d=document.createElement("div");
 		d.innerHTML=swatch_code;
@@ -204,6 +207,7 @@ var ClientsDaemonUI=function(){
 		delete me.data[target_ip];
 		console.log("all traces removed");
 	}
-	me.add_row('176.58.90.212');
+//	me.add_row('176.58.90.212');
+	me.add_row('192.168.22.1');
 	return me;
 }

@@ -7,7 +7,7 @@ var Spectra2015=function(){
 
 	var me={};
 	me.padd=30;
-	me.size=[parseInt(window.innerWidth*0.30),parseInt(window.innerHeight/5.)];
+	me.size=[parseInt(window.innerWidth*0.30),parseInt(window.innerHeight/6.)];
 	me.canvas=document.createElement("canvas");
 	me.TCP_DATA=new Array();
 
@@ -67,7 +67,7 @@ var Spectra2015=function(){
 
 		ctx.globalAlpha=1.0;
 		ctx.fillStyle="#222222";
-		ctx.fillRect(me.padd,me.padd,me.size[0]-2*me.padd,me.size[1]-2*me.padd);
+		ctx.fillRect(me.padd,0,me.size[0]-2*me.padd,me.size[1]-me.padd);
 
 		ctx.globalAlpha=0.35;
 
@@ -101,7 +101,7 @@ var Spectra2015=function(){
 			ctx.strokeStyle=window.clients_widget.get_transparent_color(src_device);//SRC_COLORS[src_idx];
 			//ctx.fillStyle=window.clients_widget.get_color(src_device);//SRC_COLORS[src_idx];
 			ctx.beginPath();
-			ctx.moveTo(xc,me.padd);//LAYOUT['label_height']
+			ctx.moveTo(xc,0);//LAYOUT['label_height']
 			ctx.lineTo(xc,me.size[1]-me.padd);
 			ctx.stroke();
 

@@ -44,8 +44,8 @@
 
 #mapdiv{background-color: #444;width:69%;}
 #widgetsdiv{background-color: #4C4C4C;width:30%;}
-#selectra2{height:25%;}
-#clients{overflow:auto;}
+#selectra2{height:40%;}
+#clients{overflow:auto;height:30%}
 #spectra2015_div{}
 #traffic{}
 .svg_background{}
