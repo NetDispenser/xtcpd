@@ -204,7 +204,8 @@ var SpectraDaemonUI=function(){
 					sanitized=sanitized.replace(".","ZZZ");
 
 				var ip_key=me.data[netrange]['ips']['keys'][0];//
-				var roll_up_name=netrange+"<br>"+me.data[netrange]['ips'][ip_key]['city']+", ";
+				var roll_up_name=netrange+"<br>"+me.data[netrange]['ips'][ip_key]['city']+" ";
+				roll_up_name+=me.data[netrange]['ips'][ip_key]['region_code']+", ";
 				roll_up_name+=me.data[netrange]['ips'][ip_key]['country_name'];
 
 				var opts={
@@ -271,9 +272,16 @@ var SpectraDaemonUI=function(){
 					ip_label.innerHTML="<a title='"+src_ip+"->"+dst_ip+"'>"+ip+"</a>&nbsp;";
 					ip_label.innerHTML+="<a>"+me.data[netrange]['ips'][ip]['count']+"</a> &nbsp;";
 					ip_label.innerHTML+="<a>"+me.data[netrange]['ips'][ip]['city']+"</a> &nbsp;";
+					ip_label.innerHTML+="<a>"+me.data[netrange]['ips'][ip]['region_code']+"</a> &nbsp;";
 					ip_label.innerHTML+="<a>"+me.data[netrange]['ips'][ip]['country_code']+"</a> &nbsp;";
 					ip_label.className="ip_label";
 					c.appendChild(ip_label);
+
+					//to balance ip_label in center 2x cells ea side
+					c=r.insertCell(-1);
+					c.style.width="32px";
+					c=r.insertCell(-1);
+					c.style.width="32px";
 
 					window.map_widget.add_point(me.data[netrange]['ips'][ip]);
 				}

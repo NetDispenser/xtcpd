@@ -1,5 +1,5 @@
 
-var client_colors=["#5F5","#FF5","#F55","#55F","#5FF","#F5F",];
+var client_colors=["#5F5","#FF5","#F55","#AAF","#5FF","#F5F",];
 var transparent_colors=[
 	"rgba(255,255,0,0.2)",
 	"rgba(150,100,0,0.2)",

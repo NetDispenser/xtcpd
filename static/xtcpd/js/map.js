@@ -87,7 +87,7 @@ var Map=function(mapdiv){
 		flyin(me.current_center,me.zoom_levels[me.current_zoom_idx]);
 	}
 	me.flyhome=function(){
-		flyin(me.center,me.zoom_levels[2]);
+		flyin(me.center,me.zoom_levels[0]);
 	}
 	me.set_center=function(){
 		try{
