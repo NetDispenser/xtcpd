@@ -1,11 +1,11 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 import os,sys,json,logging
+from daemon import Daemon
 from xmlrpc.server import SimpleXMLRPCServer
 
-from daemon import Daemon
-
 CLIENTSD_PID='/var/run/clientsd.pid'
-CLIENTSD_HOSTNAME="spytools.asymptopia.org"
+#CLIENTSD_HOSTNAME="sirius.asymptopia.org"
+CLIENTSD_HOSTNAME="192.168.22.1"
 
 FORMAT = 'CLIENTS: %(message)s'
 logging.basicConfig(filename='/var/log/xtcpd/xtcpd.log',level=logging.DEBUG, format=FORMAT)

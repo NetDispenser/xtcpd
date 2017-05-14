@@ -1,1 +1,1 @@
-python3 ./trafd stop;python3 ./clientsd stop;python3 ./spectrad stop
+./trafd stop;python3 ./clientsd stop;python3 ./spectrad stop

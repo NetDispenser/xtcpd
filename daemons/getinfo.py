@@ -1,13 +1,13 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 import xmlrpc.client
 
-client_ip="192.168.66.1"
+client_ip="127.0.0.1"
 rval={}
-s=xmlrpc.client.Server("http://spytools.asymptopia.org:8005")
+s=xmlrpc.client.Server("http://sirius.asymptopia.org:8005")
 rval['traffic']=s.get_data((client_ip))
-s=xmlrpc.client.Server("http://spytools.asymptopia.org:8009")#8000=xtcpd;8009=spectra
+s=xmlrpc.client.Server("http://sirius.asymptopia.org:8009")#8000=xtcpd;8009=spectra
 rval['spectra']=s.get_data((client_ip))
-s=xmlrpc.client.Server("http://spytools.asymptopia.org:8007")
+s=xmlrpc.client.Server("http://sirius.asymptopia.org:8007")
 rval['clients']=s.get_data((client_ip))
 
 keys=rval['spectra']['data']['keys']

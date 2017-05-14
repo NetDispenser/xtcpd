@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 import os,sys,json,logging,re,copy,time
 from xmlrpc.server import SimpleXMLRPCServer
 import threading
@@ -9,15 +9,16 @@ from daemon import Daemon
 
 SPECTRAD_LOCK = threading.Lock()
 SPECTRAD_PID='/var/run/spectrad.pid'
-SPECTRAD_HOSTNAME="spytools.asymptopia.org"#spytools
+#SPECTRAD_HOSTNAME="sirius.asymptopia.org"#spytools
+SPECTRAD_HOSTNAME="192.168.22.1"#spytools
 
 FORMAT = 'SPECTRA: %(message)s'
 logging.basicConfig(filename='/var/log/xtcpd/xtcpd.log',level=logging.DEBUG, format=FORMAT)
 
-import GeoIP
-gip=GeoIP.open("/usr/share/GeoIP/GeoLiteCity.dat",GeoIP.GEOIP_STANDARD)
-#import pygeoip
-#gip=pygeoip.GeoIP("/usr/share/GeoIP/GeoLiteCity.dat")
+#import GeoIP
+#gip=GeoIP.open("/usr/share/GeoIP/GeoLiteCity.dat",GeoIP.GEOIP_STANDARD)
+import pygeoip
+gip=pygeoip.GeoIP("/usr/share/GeoIP/GeoLiteCity.dat")
 
 rexp=re.compile('(\d+:\d+:\d+)(\.\d+) (IP) (.*)(\.\d+) > (\d+\.\d+\.\d+\.\d+)(\.\d+)(.*)')
 tcpdump_cmd="tcpdump -i wlan1 -l -s 0 -n|grep -v ARP"#wlan1
@@ -72,10 +73,10 @@ class SpectraDaemonProcess(Daemon):
 					#if dst[0:3]=="239":continue
 					netrange=self.getNetRange(dst)
 					country_code="US"
-					longitude=-122.8037
-					latitude=45.4871
-					city="Beaverton"
-					region_name="OR"
+					longitude=-106.7
+					latitude=32.3
+					city="Las Cruces"
+					region_name="NM"
 					country_code3="USA"
 					country_name="United States"
 

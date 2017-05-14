@@ -7,9 +7,8 @@ from queue import Queue
 
 TRAFD_PID='/var/run/trafd.pid'
 TRAFD_LOCK = threading.Lock()
-TRAFD_HOSTNAME="spytools.asymptopia.org"
-
-TRAFD_CONFIG='/var/www/rpi/xtcpd/daemons/trafd.config'
+#TRAFD_HOSTNAME="sirius.asymptopia.org"
+TRAFD_HOSTNAME="192.168.22.1"
 
 FORMAT = 'TRAFD: %(message)s'
 logging.basicConfig(filename='/var/log/xtcpd/xtcpd.log',level=logging.DEBUG, format=FORMAT)
@@ -38,7 +37,7 @@ class DaemonProcess(Daemon):
 	def harvest(self):
 		try:
 			logging.debug("harvest")
-			ifstat_cmd="ifstat -n -t -i wlan0,wlan1"
+			ifstat_cmd="ifstat -n -t -i wlan1"
 			logging.debug(ifstat_cmd)
 			p=os.popen(ifstat_cmd)
 			self.header_names=self.remove_space(p.readline())
@@ -47,7 +46,7 @@ class DaemonProcess(Daemon):
 				if self.RUNNING:
 					line=self.remove_space(p.readline())
 					line[0]=time.perf_counter()
-					#logging.debug(line)
+					logging.debug(line)
 					self.buffer.append(line)
 					while len(self.buffer)<self.BUFFERLEN:
 						zeros=[time.perf_counter(),]
@@ -64,7 +63,7 @@ class DaemonProcess(Daemon):
 			logging.exception("harvest failed")
 
 	def get_data(self,*args):
-		#logging.debug("get_data")
+		logging.debug("get_data")
 		#{"geoip": {"keys": []},
 		t_now=time.perf_counter()
 		dt=t_now-self.t_last
@@ -78,7 +77,7 @@ class DaemonProcess(Daemon):
 			'bufferlen':self.BUFFERLEN,
 		}
 		#self.buffer.__init__()
-		#logging.debug(json.dumps(rval))
+		logging.debug(json.dumps(rval))
 		#return json.dumps(rval)
 		return rval
 
