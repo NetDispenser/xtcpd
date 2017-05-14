@@ -4,19 +4,12 @@ from django.http import HttpResponse
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 import logging,json,time,os,string,sys,datetime
-
+PY3=True
 #FORMAT = '%(asctime)-15s %(message)s'
 FORMAT = 'VIEWS: %(message)s'
 logging.basicConfig(filename='/var/log/xtcpd/xtcpd.log',level=logging.DEBUG, format=FORMAT)
 
-PY3=False
-if sys.version_info[0]==2:
-	import xmlrpclib
-elif sys.version_info[0]==3:
-	PY3=True
-	import xmlrpc.client
-else:
-	logging.debug("Unable to determine python version")
+import xmlrpc.client
 
 #from lanwatch.daemons.service_utils import *
 #from lanwatch.models import NetworkEvent
@@ -43,9 +36,8 @@ def editor(request):
 		content_type='text/html'
 	)
 
-
 def lanwatch(request):
-	return render(request,'lanwatch.html',context={'title':'LAN-Watch'},content_type="text/html")
+	return render(request,'lanwatch2017.html',context={'title':'LAN-Watch'},content_type="text/html")
 
 def traffic(request):
 	#traffic->getalldata?
@@ -55,25 +47,25 @@ def traffic(request):
 		if len(qs)>1:
 			s=None
 			rval={
-			'keys':['tstamp','msg','t1'],
+			'keys':['tstamp','msg',],
 			'tstamp':str(datetime.datetime.now()),
 			'msg':'01 Next: rpc call to get ifstat from trafd',
-			't1':time.time(),
-			't0':time.time()-60.,
 			}
 			if qs=='get_data':
 				client_ip=str(get_client_ip(request))
 				rval={}
-				s=xmlrpc.client.Server("http://spytools.asymptopia.org:8005")
+				s=xmlrpc.client.Server("http://192.168.22.1:8005")
 				rval['traffic']=s.get_data((client_ip))
-				s=xmlrpc.client.Server("http://spytools.asymptopia.org:8009")#8000=xtcpd;8009=spectra
+				s=xmlrpc.client.Server("http://192.168.22.1:8009")#8000=xtcpd;8009=spectra
 				rval['spectra']=s.get_data((client_ip))
-				s=xmlrpc.client.Server("http://spytools.asymptopia.org:8007")
+				logging.debug("returned from call to spectrad")
+				s=xmlrpc.client.Server("http://192.168.22.1:8007")
 				rval['clients']=s.get_data((client_ip))
-				logging.debug("rval-spectra: "+str(rval['spectra']))
-				rval['t0']=time.time()-60.;
-				rval['t1']=time.time();
-			return HttpResponse(json.dumps(rval));
+				logging.debug("printing spectra")
+				logging.debug(rval['spectra'])
+				rval['t0']=time.time()-60.
+				rval['t1']=time.time()
+			return HttpResponse(json.dumps(rval))
 	except:
 		logging.exception("get_data failed")
 
@@ -85,6 +77,7 @@ def traffic(request):
 		},
 	)
 
+@login_required
 def xtcpd(request):
 	#logging.debug(request.META)
 	try:
@@ -92,7 +85,7 @@ def xtcpd(request):
 		if len(qs)>1:
 			s=None
 			if PY3:
-				s=xmlrpc.client.Server("http://spytools.asymptopia.org:8000")
+				s=xmlrpc.client.Server("http://192.168.22.1:8000")
 			else:
 				s=xmlrpclib.Server("http://xtcpd.asymptopia.org:8000")
 			#s=xmlrpc.client.Server("http://192.168.68.1:8000")

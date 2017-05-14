@@ -1,0 +1,120 @@
+<html>
+<head>
+<title>LAN-Watch</title>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1, maximum-scale=1">
+
+<link rel="shortcut icon" href="/static/xtcpd/img/anim.png">
+<link rel="stylesheet" type="text/css" href="/static/xtcpd/css/bootstrap.css">
+<link rel="stylesheet" type="text/css" href="/static/xtcpd/css/traffic.css">
+<link rel="stylesheet" type="text/css" href="/static/xtcpd/css/lanwatch2017.css">
+<link rel="stylesheet" type="text/css" href="/static/xtcpd/css/roll_up_div.css">
+<link rel="stylesheet" href="/static/creditmeter/css/font-awesome.min.css">
+<link rel="stylesheet" type="text/css" href="/static/xtcpd/css/ol.css">
+
+<script src="/static/stcpd/js/HackTimer.js"></script>
+<script type="text/javascript" src="/static/xtcpd/js/ol.js"></script>
+<script type="text/javascript" src="/static/xtcpd/js/d3.v4.min.js"></script>
+<script type="text/javascript" src="/static/xtcpd/js/jquery.min.js"></script>
+<script type="text/javascript" src="/static/xtcpd/js/config.js"></script>
+<script type="text/javascript" src="/static/xtcpd/js/util.js"></script>
+<script type="text/javascript" src="/static/xtcpd/js/traffic.js"></script>
+<script type="text/javascript" src="/static/xtcpd/js/clients.js"></script>
+<script type="text/javascript" src="/static/xtcpd/js/spectra.js"></script>
+<script type="text/javascript" src="/static/xtcpd/js/spectra2015.js"></script>
+<script type="text/javascript" src="/static/xtcpd/js/roll_up_div.js"></script>
+<script type="text/javascript" src="/static/xtcpd/js/zoom.js"></script>
+<script type="text/javascript" src="/static/xtcpd/js/map.js"></script>
+<script type="text/javascript">
+var RUNNING=false;
+var TIMEOUT=5000;
+window.traffic_widget=null;
+window.clients_widget=null;
+window.spectra_widget=null;
+window.spectrogram=null;
+window.map_widget=null;
+window.counter=0;
+
+var toggleRunCB=function(e){
+	if(RUNNING==true){
+		RUNNING=false;
+		$(".runBG").toggleClass('running');
+	}
+	else{
+		RUNNING=true;
+		$(".runBG").toggleClass('running');
+		update();
+	}
+}
+var clearCB=function(e){
+		console.log("clearCB");
+		window.traffic_widget.clear();
+		window.spectra_widget.clear();
+		window.spectrogram.clear();
+		window.clients_widget.clear();
+		window.map_widget.clear();
+}
+
+$(document).ready(function(){
+	window.map_widget=new Map('mapdiv');
+	window.clients_widget=new ClientsDaemonUI();
+	console.log("window.clients_widget.data "+window.clients_widget.data);
+	window.traffic_widget=new TrafficDaemonUI().setup();
+	window.spectra_widget=new SpectraDaemonUI();
+
+	window.spectra2015=new Spectra2015();
+	window.spectra2015.set_size();
+	document.getElementById('spectra2015_background').appendChild(window.spectra2015.get_canvas());
+
+	window.spectra_widget.setup();
+	window.map_widget.map.render();
+});
+
+</script>
+</head>
+
+<body style="background-color:yellow;">
+
+	<div class="icon-bar" id="icon_bar">
+		<a class="fifth" onclick="window.map_widget.layersCB()"><i style="font-size:38px;" class="fa">&#xf1b3;</i></a>
+		<a class="fifth" onclick="window.map_widget.flyhome()"><i style="font-size:38px;" class="fa">&#xf05b;</i></a>
+		<a class="fifth" onclick="toggleRunCB()"><i style="font-size:38px;" class="fa">&#xf011;</i></a>
+		<a class="fifth" onclick="window.map_widget.flyin3()"><i style="font-size:38px;" class="fa">&#xf00e;</i></a>
+		<a class="fifth" onclick="window.map_widget.full_info()"><i style="font-size:38px;" class="fa">&#xf129;</i></a>
+		<a class="statbar"><div id="statusbar" class="statusbar"></div></a>
+	</div>
+
+	<div id="tracker">
+		<div class="row" id="row1">
+
+		<div id="mapdiv" class="column"></div>
+
+		<div id="widgetsdiv" class="column">
+
+			<div id="selectra2" style="overflow:auto;"></div>
+<hr>
+			<div id="spectra2015_div">
+				<div id="spectra2015_background" class="svg_background"></div>
+			</div>
+
+			<div id="traffic">
+				<div id="traffic_background" class="svg_background"></div>
+			</div>
+<hr>
+			<div id="clients">
+				<table id="clients_table"></table>
+			</div>
+
+		</div>
+
+		</div>
+	</div>
+
+	<div id="popup" class="ol-popup">
+		<a href="#" id="popup-closer" class="ol-popup-closer"></a>
+		<div id="xpopup"></div>
+	</div>
+
+</body>
+</html>

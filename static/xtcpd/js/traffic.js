@@ -6,9 +6,9 @@ September 12, 2016
 var TrafficDaemonUI=function(){
 var me={};
 me.svg=null;
-var W;
-var H=parseInt(document.getElementById("theCarousel").getBoundingClientRect().height*.65);
-var padd=50;
+//var W;
+//var H=300;//parseInt(document.getElementById("theCarousel").getBoundingClientRect().height*.65);
+var padd=30;
 var units="kB/s";
 var points=false;
 var lines=true;
@@ -20,6 +20,12 @@ me.clear=function(){
 }
 
 me.render_data=function(pyld){
+
+		var W=parseInt(window.innerWidth*0.3);
+		var H=parseInt(window.innerHeight/5.);
+		var width=W;
+		var height=H;
+
 		console.log(pyld);
 		maxdat=1E-6;
 		for(var ii=0;ii<pyld['bufferlen'];ii++){
@@ -265,9 +271,11 @@ me.render_metadata=function(pyld){
 }
 
 me.setup=function(){
-	var W=parseInt(document.getElementById("mapdiv").getBoundingClientRect().width);
-	console.log(W);
+//	var W=parseInt(document.getElementById("mapdiv").getBoundingClientRect().width);
+//	console.log(W);
 //	if(true)W=380;
+	var W=parseInt(window.innerWidth*0.3);
+	var H=parseInt(window.innerHeight/5.);
 	svg = d3.select("#traffic_background").append("svg").attr("width",W).attr("height",H).attr('class','swipeable'),
 			width = W,
 			height = H,

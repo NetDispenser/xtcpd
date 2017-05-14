@@ -1,0 +1,96 @@
+.icon-bar {
+    width: 100%; /* Full-width */
+    background-color: #555; /* Dark-grey background */
+    overflow: hidden; /* Overflow due to float */
+		position:fixed;z-index:10;left:0px;top:0px;
+		opacity:1.0;
+}
+.icon-bar a{
+	float: left; /* Float links side by side */
+	text-align: center; /* Center-align text */
+	padding: 12px 0px; /* Some top and bottom padding */
+	transition: all 0.3s ease; /* Add transition for hover effects */
+	color: white; /* White text color */
+	font-size: 32px; /* Increased font size */
+	cursor:pointer;
+	height:100%;
+}
+.icon-bar .fifth {
+    width: 14%;
+}
+.icon-bar .statbar {
+    width: 29%;
+}
+.icon-bar a:hover {
+/*    background-color: darkorange; /* Add a hover color */
+}
+#tracker{
+	width:100%;
+	height:100%;
+	opacity:1.0;
+	background-color:black;
+	color:white;
+	position:fixed;z-index:0;left:0px;top:62px;
+}
+#xpopup{
+  font-family:Pacifico;
+  font-size:12pt;
+  padding:10px;
+  color:#f5f5f5;
+	background-color:rgba(51,51,51,0.7);
+  text-align:center;
+  border-radius:2px;
+}
+
+#mapdiv{background-color: #444;width:69%;}
+#widgetsdiv{background-color: #4C4C4C;width:30%;}
+#selectra2{height:25%;}
+#clients{overflow:auto;}
+#spectra2015_div{}
+#traffic{}
+.svg_background{}
+.column {
+  float: left;
+	height:100%;
+}
+i{font-size:38px;}
+i:hover{
+	color:#AFA;
+}
+.item{width:100%;}
+#statusbar{background-color: #4C4C4C;border:solid #444 1px;}
+#clients_table{
+	width:100%;
+	color:#ccc;
+}
+@media (max-width: 600px) {
+	.column{height:50%;}
+	#mapdiv{width:100%;}
+	#widgetsdiv{width:100%;}
+	.item{width:33.3%;}
+}
+.marker{
+  width: 100px;
+  height: 100px;
+  background: url("/static/xtcpd/img/anim.png") no-repeat scroll 0% 0% transparent;
+}
+.marker80 {
+	width: 18px;height: 18px;border-radius: 9px;opacity:1.0;
+	border: 5px solid #0000AA;
+	background-color: #00EEFF;
+}
+.marker_default.hide{
+	opacity:0.0;
+}
+.marker_default {
+	width: 8px;height: 8px;border-radius: 4px;opacity:1.0;
+	border: 3px solid #00FF00;
+	background-color: #FFFF00;
+	opacity:1.0;
+}
+.marker_default_hilite{
+	border 3px solid #FF0000;
+}
+hr{
+	border-color:#555;
+}

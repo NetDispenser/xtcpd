@@ -132,12 +132,12 @@ var RollUpDiv=function(opts){
 		}
 	});
 	me.select=function(e){
-		me.tr.style.backgroundColor="#666666";
+//		me.tr.style.backgroundColor="#666666";
 		me.selected=true;
 		window.map_widget.set_center(e);
 	}
 	me.deselect=function(e){
-		me.tr.style.backgroundColor="#333333";
+//		me.tr.style.backgroundColor="#333333";
 		me.selected=false;
 	}
 	$("#"+me.roll_up_icon.id).click(function(e){

@@ -1,4 +1,5 @@
-var client_colors=["#FF0","#A80","#0F0","#F00","#0FF","#F8F",];
+
+var client_colors=["#5F5","#F55","#55F","#FF5","#5FF","#F5F",];
 var transparent_colors=[
 	"rgba(255,255,0,0.2)",
 	"rgba(150,100,0,0.2)",
@@ -10,17 +11,27 @@ var transparent_colors=[
 var ClientsDaemonUI=function(){
 	var me={};
 	me.data={
-		'keys':['192.168.66.1',],
-		'192.168.66.1':{
+		'keys':['192.168.22.1','176.58.90.212',],
+		'176.58.90.212':{
 			'color':client_colors[0],
 			'transparent_color':transparent_colors[0],
-			'device':'LAN-Watch RPI',
+			'device':'LAN-Watch RPi3',
 			'raw':'',
 			'tstamp':'',
 			'_mac_addr':'',
-			'ip_num':'192.168.66.1',
+			'ip_num':'176.58.90.212',
 			'mac_addr':'',
 		},
+                '192.168.22.1':{
+                        'color':client_colors[1],
+                        'transparent_color':transparent_colors[1],
+                        'device':'LAN-Watch PI',
+                        'raw':'',
+                        'tstamp':'',
+                        '_mac_addr':'',
+                        'ip_num':'192.168.22.1',
+                        'mac_addr':'',
+                },
 	};
 	me.current_keys=[];
 	me.table=document.getElementById("clients_table");//pass-in as arg
@@ -193,6 +204,6 @@ var ClientsDaemonUI=function(){
 		delete me.data[target_ip];
 		console.log("all traces removed");
 	}
-	me.add_row('192.168.66.1');
+	me.add_row('176.58.90.212');
 	return me;
 }

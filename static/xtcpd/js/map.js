@@ -1,10 +1,10 @@
 var Map=function(mapdiv){
 	var me={};
 	me.data={};
-	me.zoom_levels=[1.0,4.0,6.0,12.0];
-	me.current_zoom_idx=0;
+	me.zoom_levels=[1.0,2.0,3.0,4.0,6.0,12.0];
+	me.current_zoom_idx=2;
 
-	me.center=[0.0,35.31];
+	me.center=[-50.0,20.0];
 	me.current_center=me.center;
 
 	me.clear=function(){
@@ -27,7 +27,7 @@ var Map=function(mapdiv){
 		return false;
 	};
 	me.view = new ol.View({
-	  maxZoom: 21,
+	  maxZoom: 19,
 		center:ol.proj.transform(me.center,"EPSG:4326","EPSG:3857"),
 		zoom:me.zoom_levels[me.current_zoom_idx],
 	});
@@ -45,8 +45,8 @@ var Map=function(mapdiv){
 		source: me.WORLD_SOURCE,
 		style:new ol.style.Style({
 			stroke: new ol.style.Stroke({
-				color: 'rgba(50,50,255,0.5)',
-				width: 0.5
+				color: 'rgba(150,250,150,0.3)',
+				width: 1
 			}),
 			fill: new ol.style.Fill({
 				color:'rgba(0,0,100,0)',
@@ -63,8 +63,8 @@ var Map=function(mapdiv){
 		source: me.EARTHLIGHTS_SOURCE
 	});
 	me.map = new ol.Map({
-		layers: [me.EARTHLIGHTS_LAYER,me.WORLD_LAYER],//osm,sat,me.osm2_base,polygon_layer
-		interactions:[],
+		layers: [me.WORLD_LAYER],//me.EARTHLIGHTS_LAYER,osm,sat,me.osm2_base,polygon_layer
+		//interactions:[],
 		controls:[],
 		target: mapdiv,
 		view:me.view,
@@ -85,7 +85,7 @@ var Map=function(mapdiv){
 		flyin(me.current_center,me.zoom_levels[me.current_zoom_idx]);
 	}
 	me.flyhome=function(){
-		flyin(me.center,me.zoom_levels[0]);
+		flyin(me.center,me.zoom_levels[2]);
 	}
 	me.set_center=function(){
 		try{
