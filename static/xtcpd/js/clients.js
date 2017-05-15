@@ -15,23 +15,23 @@ var ClientsDaemonUI=function(){
 		'176.58.90.212':{
 			'color':client_colors[0],
 			'transparent_color':transparent_colors[0],
-			'device':'LAN-Watch RPi3',
+			'device':'LAN-Watch FR',
 			'raw':'',
 			'tstamp':'',
 			'_mac_addr':'',
 			'ip_num':'176.58.90.212',
 			'mac_addr':'',
 		},
-                '192.168.22.1':{
-                        'color':client_colors[1],
-                        'transparent_color':transparent_colors[1],
-                        'device':'LAN-Watch PI',
-                        'raw':'',
-                        'tstamp':'',
-                        '_mac_addr':'',
-                        'ip_num':'192.168.22.1',
-                        'mac_addr':'',
-                },
+    '192.168.22.1':{
+      'color':client_colors[1],
+      'transparent_color':transparent_colors[1],
+      'device':'Raspberry-Pi3',
+      'raw':'',
+      'tstamp':'',
+      '_mac_addr':'',
+      'ip_num':'192.168.22.1',
+      'mac_addr':'',
+    },
 	};
 	me.current_keys=[];
 	me.table=document.getElementById("clients_table");//pass-in as arg
