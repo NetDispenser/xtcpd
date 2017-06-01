@@ -54,12 +54,12 @@ def traffic(request):
 			if qs=='get_data':
 				client_ip=str(get_client_ip(request))
 				rval={}
-				s=xmlrpc.client.Server("http://192.168.22.1:8005")
+				s=xmlrpc.client.Server("http://192.168.1.1:8005")
 				rval['traffic']=s.get_data((client_ip))
-				s=xmlrpc.client.Server("http://192.168.22.1:8009")#8000=xtcpd;8009=spectra
+				s=xmlrpc.client.Server("http://192.168.1.1:8009")#8000=xtcpd;8009=spectra
 				rval['spectra']=s.get_data((client_ip))
 				logging.debug("returned from call to spectrad")
-				s=xmlrpc.client.Server("http://192.168.22.1:8007")
+				s=xmlrpc.client.Server("http://192.168.1.1:8007")
 				rval['clients']=s.get_data((client_ip))
 				logging.debug("printing spectra")
 				logging.debug(rval['spectra'])
@@ -84,11 +84,8 @@ def xtcpd(request):
 		qs=request.META['QUERY_STRING']
 		if len(qs)>1:
 			s=None
-			if PY3:
-				s=xmlrpc.client.Server("http://192.168.22.1:8000")
-			else:
-				s=xmlrpclib.Server("http://xtcpd.asymptopia.org:8000")
-			#s=xmlrpc.client.Server("http://192.168.68.1:8000")
+			s=xmlrpc.client.Server("http://192.168.1.1:8000")
+			
 			client_ip=str(get_client_ip(request))
 			if qs=='get_data':
 				logging.debug(client_ip)

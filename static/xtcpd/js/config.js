@@ -11,7 +11,7 @@
 //
 //for e- DNS registered w/ A record -> 192.168.68.1
 //var server_hostname="http://sirius.asymptopia.org";
-var server_hostname="http://192.168.22.1";
+var server_hostname="http://192.168.1.1";
 //
 //for e- This works b/c only 1 server/vhost at this addr
 //var server_hostname="http://192.168.68.1";
