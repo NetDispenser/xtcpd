@@ -67,7 +67,7 @@ var Spectra2015=function(){
 
 		ctx.globalAlpha=1.0;
 		ctx.fillStyle="#222222";
-		ctx.fillRect(me.padd,me.padd/2,me.size[0]-2*me.padd,me.size[1]-me.padd);
+		ctx.fillRect(me.padd,me.padd/2,me.size[0]-me.padd,me.size[1]-me.padd);
 
 		ctx.globalAlpha=0.35;
 
