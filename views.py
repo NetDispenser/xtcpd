@@ -7,7 +7,7 @@ import logging,json,time,os,string,sys,datetime
 PY3=True
 #FORMAT = '%(asctime)-15s %(message)s'
 FORMAT = 'VIEWS: %(message)s'
-logging.basicConfig(filename='/var/log/xtcpd/xtcpd.log',level=logging.DEBUG, format=FORMAT)
+logging.basicConfig(filename='/var/log/xtcpd/xtcpd.log',level=logging.INFO, format=FORMAT)
 
 import xmlrpc.client
 
@@ -67,7 +67,7 @@ def traffic(request):
 				rval['t1']=time.time()
 			return HttpResponse(json.dumps(rval))
 	except:
-		logging.exception("get_data failed")
+		logging.exception(str(get_client_ip(request)))
 
 	return render_to_response(
 	    'traffic.html',{
