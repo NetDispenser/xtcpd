@@ -7,11 +7,11 @@ from queue import Queue
 
 TRAFD_PID='/var/run/trafd.pid'
 TRAFD_LOCK = threading.Lock()
-#TRAFD_HOSTNAME="sirius.asymptopia.org"
-TRAFD_HOSTNAME="192.168.22.1"
+TRAFD_HOSTNAME="meter.creditfeed.me"
+#TRAFD_HOSTNAME="192.168.22.1"
 
 FORMAT = 'TRAFD: %(message)s'
-logging.basicConfig(filename='/var/log/xtcpd/xtcpd.log',level=logging.DEBUG, format=FORMAT)
+logging.basicConfig(filename='/var/log/xtcpd/xtcpd.log',level=logging.INFO, format=FORMAT)
 
 class DaemonProcess(Daemon):
 
@@ -37,7 +37,7 @@ class DaemonProcess(Daemon):
 	def harvest(self):
 		try:
 			logging.debug("harvest")
-			ifstat_cmd="ifstat -n -t -i wlan1"
+			ifstat_cmd="ifstat -n -t -i eth0"
 			logging.debug(ifstat_cmd)
 			p=os.popen(ifstat_cmd)
 			self.header_names=self.remove_space(p.readline())

@@ -49,7 +49,7 @@ var Map=function(mapdiv){
 				width: 1
 			}),
 			fill: new ol.style.Fill({
-				color:'rgba(0,0,100,0)',
+				color:'rgba(75,75,75,0.25)',
 			})
 		}),
 	});

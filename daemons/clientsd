@@ -4,11 +4,11 @@ from daemon import Daemon
 from xmlrpc.server import SimpleXMLRPCServer
 
 CLIENTSD_PID='/var/run/clientsd.pid'
-#CLIENTSD_HOSTNAME="sirius.asymptopia.org"
-CLIENTSD_HOSTNAME="192.168.22.1"
+CLIENTSD_HOSTNAME="meter.creditfeed.me"
+#CLIENTSD_HOSTNAME="192.168.22.1"
 
 FORMAT = 'CLIENTS: %(message)s'
-logging.basicConfig(filename='/var/log/xtcpd/xtcpd.log',level=logging.DEBUG, format=FORMAT)
+logging.basicConfig(filename='/var/log/xtcpd/xtcpd.log',level=logging.INFO, format=FORMAT)
 
 class ClientsDaemonProcess(Daemon):
 

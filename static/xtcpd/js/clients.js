@@ -1,12 +1,12 @@
 
 var client_colors=["#5F5","#FF5","#F55","#AAF","#5FF","#F5F",];
 var transparent_colors=[
-	"rgba(255,255,0,0.2)",
-	"rgba(150,100,0,0.2)",
-	"rgba(0,255,0,0.2)",
-	"rgba(255,0,0,0.2)",
-	"rgba(0,255,255,0.2)",
-	"rgba(255,100,255,0.2)",
+	"rgba(85,255,85,0.2)",
+	"rgba(255,255,85,0.2)",
+	"rgba(255,85,85,0.2)",
+	"rgba(170,170,255,0.2)",
+	"rgba(85,255,255,0.2)",
+	"rgba(255,85,255,0.2)",
 ];
 var ClientsDaemonUI=function(){
 	var me={};
@@ -15,23 +15,23 @@ var ClientsDaemonUI=function(){
 		'176.58.90.212':{
 			'color':client_colors[0],
 			'transparent_color':transparent_colors[0],
-			'device':'LAN-Watch RPi3',
+			'device':'LAN-Watch FR',
 			'raw':'',
 			'tstamp':'',
 			'_mac_addr':'',
 			'ip_num':'176.58.90.212',
 			'mac_addr':'',
 		},
-                '192.168.22.1':{
-                        'color':client_colors[1],
-                        'transparent_color':transparent_colors[1],
-                        'device':'LAN-Watch PI',
-                        'raw':'',
-                        'tstamp':'',
-                        '_mac_addr':'',
-                        'ip_num':'192.168.22.1',
-                        'mac_addr':'',
-                },
+    '192.168.22.1':{
+      'color':client_colors[1],
+      'transparent_color':transparent_colors[1],
+      'device':'Raspberry-Pi3',
+      'raw':'',
+      'tstamp':'',
+      '_mac_addr':'',
+      'ip_num':'192.168.22.1',
+      'mac_addr':'',
+    },
 	};
 	me.current_keys=[];
 	me.table=document.getElementById("clients_table");//pass-in as arg
@@ -207,7 +207,7 @@ var ClientsDaemonUI=function(){
 		delete me.data[target_ip];
 		console.log("all traces removed");
 	}
-//	me.add_row('176.58.90.212');
-	me.add_row('192.168.22.1');
+	me.add_row('176.58.90.212');
+//	me.add_row('192.168.22.1');
 	return me;
 }

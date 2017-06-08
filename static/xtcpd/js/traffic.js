@@ -40,9 +40,7 @@ me.render_data=function(pyld){
 		maxdatidx=pyld['data'].length-1;
 		t_min=pyld['data'][maxdatidx][0]-pyld['bufferlen'];
 
-		//***************************
 		//AXES LABELS
-		//***************************
 		g_decor.selectAll(".title")
 			.data(['Network Traffic'])
 			.enter().append("text")
@@ -77,9 +75,7 @@ me.render_data=function(pyld){
 				.attr("dy", (height/2-padd/3))
 				.text(function(d) { return d; });
 
-		//***************************
 		//TOP,BOTTOM AXES
-		//***************************
 		var botScale=d3.scaleLinear()
 			.range([padd,width-padd])
 			.domain([pyld['data'].length,0]);
@@ -104,10 +100,7 @@ me.render_data=function(pyld){
 			.attr("class","x axis")
 			.call(botAxis);
 
-		//***************************
 		//L,R AXES
-		//***************************
-
 		var kbLowerScale=d3
 			.scaleLinear()
 			.range([-(height)/2+padd,0])
@@ -146,9 +139,7 @@ me.render_data=function(pyld){
 			.attr("class","x axis")
 			.call(kbLowerAxisL);
 
-		//***************************
 		//LINES
-		//***************************
 		var dot_classes=[".wlan0_RX",".wlan0_TX",".wlan1_RX",".wlan1_TX"];
 		var classnames=["wlan0_RX","wlan0_TX","wlan1_RX","wlan1_TX",];
 
@@ -176,9 +167,7 @@ me.render_data=function(pyld){
 			.on("mouseout", me.handleMouseOut);
 		}}
 
-		//***************************
 		//POINTS
-		//***************************
 		if(points){
 		var pFn = function(d){return d[0];}
 		for(var ii=1;ii<pyld['data'][0].length;ii++){

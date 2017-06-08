@@ -9,11 +9,11 @@ from daemon import Daemon
 
 SPECTRAD_LOCK = threading.Lock()
 SPECTRAD_PID='/var/run/spectrad.pid'
-#SPECTRAD_HOSTNAME="sirius.asymptopia.org"#spytools
-SPECTRAD_HOSTNAME="192.168.22.1"#spytools
+SPECTRAD_HOSTNAME="meter.creditfeed.me"#spytools
+#SPECTRAD_HOSTNAME="192.168.22.1"#spytools
 
 FORMAT = 'SPECTRA: %(message)s'
-logging.basicConfig(filename='/var/log/xtcpd/xtcpd.log',level=logging.DEBUG, format=FORMAT)
+logging.basicConfig(filename='/var/log/xtcpd/xtcpd.log',level=logging.INFO, format=FORMAT)
 
 #import GeoIP
 #gip=GeoIP.open("/usr/share/GeoIP/GeoLiteCity.dat",GeoIP.GEOIP_STANDARD)
@@ -21,7 +21,7 @@ import pygeoip
 gip=pygeoip.GeoIP("/usr/share/GeoIP/GeoLiteCity.dat")
 
 rexp=re.compile('(\d+:\d+:\d+)(\.\d+) (IP) (.*)(\.\d+) > (\d+\.\d+\.\d+\.\d+)(\.\d+)(.*)')
-tcpdump_cmd="tcpdump -i wlan1 -l -s 0 -n|grep -v ARP"#wlan1
+tcpdump_cmd="tcpdump -i eth0 -l -s 0 -n|grep -v ARP"#wlan1
 
 def mktstamp():
 	tstamp="%s"%datetime.datetime.now()
