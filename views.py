@@ -61,8 +61,8 @@ def traffic(request):
 				logging.debug("returned from call to spectrad")
 				s=xmlrpc.client.Server("http://meter.creditfeed.me:8007")
 				rval['clients']=s.get_data((client_ip))
-				logging.debug("printing spectra")
-				logging.debug(rval['spectra'])
+				#logging.debug("printing spectra")
+				#logging.debug(rval['spectra'])
 				rval['t0']=time.time()-60.
 				rval['t1']=time.time()
 			return HttpResponse(json.dumps(rval))
